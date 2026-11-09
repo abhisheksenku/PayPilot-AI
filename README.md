@@ -1,73 +1,86 @@
 # 🚀 PayPilot AI
 
-> **Autonomous AI-Powered Agentic Commerce Platform**  
-> Built for the **PayPal AI Hackathon 2026** — *Agentic Commerce Track*
+> **Autonomous AI-Powered Agentic Commerce Platform on Official PayPal Rails**  
+> *Built for the **PayPal AI Hackathon 2026** — Agentic Commerce Track*  
+> 🔗 **GitHub Repository:** [https://github.com/abhisheksenku/PayPilot-AI](https://github.com/abhisheksenku/PayPilot-AI)
 
-PayPilot AI transforms modern ecommerce through an autonomous multi-agent system governed by **strict human-in-the-loop authorization**. Instead of browsing hundreds of online storefronts, users describe their purchasing requirements, use cases, and budget in natural language. A coordinated swarm of AI agents discovers genuine products, evaluates technical specifications, ranks top options, drafts orders, and halts for user authorization before capturing payments securely via the official **PayPal Sandbox Orders v2 & Captures v2 APIs**.
-
----
-
-## 🌟 Key Features
-
-1. **Autonomous Multi-Agent Orchestration**:
-   - **Supervisor Agent**: Understands natural language, classifies intent, and extracts structured requirements (converts local currencies like ₹70,000 to USD).
-   - **Memory Agent**: Contextualizes multi-turn conversations across sessions.
-   - **Shopping Research Agent**: Queries Channel3 API and local high-performance catalog.
-   - **Product Analyst Agent**: Evaluates CPU benchmarks, GPU tier, RAM, SSD speed, and builds multi-attribute ranking matrices (scores 0–100).
-   - **Purchase Agent**: Prepares verified orders and triggers official PayPal Sandbox checkouts.
-   - **Payment Verification Agent**: Verifies capture receipts, enforces idempotency, and logs immutable audit trails.
-
-2. **Mandatory Human-in-the-Loop Governance**:
-   - AI agents **never** independently charge payments.
-   - The workflow halts at the authorization checkpoint and requires physical user interaction with the official `<PayPalButtons />` SDK.
-
-3. **Anti-Tampering Price Lock**:
-   - Order amounts are validated server-side against backend database pricing. Even if client-side parameters are modified, the server enforces strict price integrity.
-
-4. **Real-Time AG Grid Transaction Dashboard**:
-   - Enterprise data grid rendering live transactions, PayPal Order IDs, PayPal Capture IDs, and agent execution times directly from MySQL 9.3.
-
-5. **Bespoke Fintech Visual Identity**:
-   - Modern **Black, White, and Red** theme (`#111111`, `#1A1A1A`, `#E53935`, `#FFFFFF`) built with Next.js 14 App Router, Tailwind CSS, and Lucide Icons.
+PayPilot AI transforms modern ecommerce through an autonomous multi-agent system governed by **strict human-in-the-loop authorization**. Instead of browsing dozens of online storefronts and deciphering complex spec sheets, users describe their computing requirements, use cases, and budget in natural language. A coordinated swarm of AI agents discovers genuine hardware via Channel3, evaluates technical specifications (GPU TGP wattage, CPU multithreading), ranks top options, drafts orders, and halts for user authorization before capturing payments securely via official **PayPal Sandbox Orders v2 & Captures v2 APIs**.
 
 ---
 
-## 🏗️ Multi-Agent Architecture
+## 🏆 Hackathon Alignment & Judging Criteria
+
+| Objective | How PayPilot AI Delivers |
+| :--- | :--- |
+| **1. Meaningful AI (Beyond Chatbots)** | A deterministic multi-agent state machine (Supervisor, Research, Analyst, Purchase nodes) that extracts technical constraints, performs real-time currency conversions (₹70,000 $\to$ ~$824 USD), and runs multi-attribute benchmark formulas. |
+| **2. Meaningful PayPal Integration** | Integrated with official **PayPal REST APIs v2** (`/v2/checkout/orders` & `/v2/payments/captures`) and the official `@paypal/react-paypal-js` SDK, returning verified PayPal Capture IDs (`8B...`) and Order IDs (`5O...`). |
+| **3. Real-World Problem Solved** | Eliminates the 4-hour technical ordeal of researching hardware specs, thermal throttling, and misleading GPU wattages across retail sites, reducing it to a 30-second conversational purchase. |
+| **4. Working End-to-End Product** | Full-stack monorepo with 7 interactive pages, MySQL 9.3 schema (8 relational tables), and a **Dual-Mode Engine** (`USE_MOCK_DATA`) for 100% resilient judging demos. |
+| **5. Innovation & Financial Governance** | Solves the core dilemma of Agentic Commerce via the **Mandatory Human-in-the-Loop Checkpoint**: agents have full autonomy to prepare and evaluate, but zero authority to charge funds without user biometric/credential approval. |
+
+---
+
+## 🏗️ Multi-Agent Architecture & Flow
 
 ```
 User Prompt (e.g. "I need a laptop under ₹70,000 for ML and gaming")
                           │
                           ▼
              [Node 1: Memory Agent]
-             (Retrieves session history)
+             (Retrieves multi-turn session context)
                           │
                           ▼
-           [Node 2: Supervisor Agent (Gemini)]
-  (Extracts: category="laptop", budget=$824 USD, useCase="ML & gaming")
+            [Node 2: Supervisor Agent (Gemini)]
+   (Extracts: category="laptop", budget=$824 USD, useCase="ML & gaming")
                           │
                           ▼
-       [Node 3: Shopping Research Agent (Channel3)]
-      (Retrieves real candidate hardware specifications)
+        [Node 3: Shopping Research Agent (Channel3)]
+       (Retrieves real candidate hardware specifications)
                           │
                           ▼
-       [Node 4: Product Analyst Agent (Gemini)]
-     (Scores candidates: Lenovo LOQ 15 -> 98/100 Top Pick)
+        [Node 4: Product Analyst Agent (Gemini)]
+      (Scores candidates: Lenovo LOQ 15 -> 98/100 Top Pick)
                           │
                           ▼
-       [MANDATORY HUMAN-IN-THE-LOOP CHECKPOINT]
-    (Agent halts execution -> displays PayPal SDK Button)
+        [MANDATORY HUMAN-IN-THE-LOOP CHECKPOINT]
+     (Agent execution halts -> Cryptographic Price Lock Armed)
                           │
                           ▼
-         User Clicks PayPal Button & Authenticates
+          User Clicks PayPal Button & Authenticates
                           │
                           ▼
-      [Node 5 & 6: Purchase & Payment Verification]
-  (Calls PayPal Captures v2 -> Verifies Server Price Match)
+       [Node 5 & 6: Purchase & Payment Verification]
+   (Calls PayPal Captures v2 -> Verifies Server Price Integrity)
                           │
                           ▼
-       [MySQL 9.3 Transaction & Execution Audit Trail]
-   (Reflected in Real-Time AG Grid Dashboard & Confetti Receipt)
+        [MySQL 9.3 Transaction & Execution Audit Trail]
+    (Reflected in Institutional AG Grid Ledger & Confetti Receipt)
 ```
+
+---
+
+## 🌟 Key Capabilities
+
+1. **Split-Screen Command Studio (`/assistant`)**:
+   - **Left Panel (42%)**: Conversational reasoning feed with live 4-stage swarm progress ticker (`[1/4] Supervisor` $\to$ `[2/4] Research` $\to$ `[3/4] Analyst` $\to$ `[4/4] Purchase`).
+   - **Right Panel (58%)**: Dynamic hardware canvas spotlighting the #1 recommended match with specs matrix, honest strengths vs. trade-offs, and runner-up comparative delta chips.
+
+2. **Fintech Escrow Authorization Checkpoint (`CheckoutModal`)**:
+   - Cryptographic server price lock seal (`MATCHED`).
+   - Itemized hardware invoice with immutable hash.
+   - Official `<PayPalButtons />` SDK container + instant 1-click **Fast Demo Capture** fallback.
+
+3. **Anti-Tampering Server Price Lock**:
+   - Order amounts are verified server-side against backend database pricing. Even if client-side parameters are modified, the server enforces strict price integrity before dispatching to PayPal.
+
+4. **Institutional AG Grid Ledger (`/dashboard`)**:
+   - Enterprise data grid rendering live transactions, PayPal Order IDs, copyable PayPal Capture IDs, execution latency, and CSV export.
+
+5. **Multi-Attribute Spec Matrix (`/compare`)**:
+   - Direct side-by-side evaluation of GPU TGP wattages, CPU benchmark multithreading, and expandability.
+
+6. **Dual-Mode Engine (`USE_MOCK_DATA`)**:
+   - In `frontend/src/lib/mockData.ts`, toggle `USE_MOCK_DATA = true` for a 100% offline, lightning-fast demo. Set to `false` to connect directly to the live Express/MySQL backend.
 
 ---
 
@@ -79,16 +92,26 @@ User Prompt (e.g. "I need a laptop under ₹70,000 for ML and gaming")
 - **Database:** MySQL 9.3 (`paypilot_ai` schema, 8 tables)
 - **Artificial Intelligence:** Google Gemini (`gemini-3.5-flash-lite`) Native Fetch Adapter
 - **Product Discovery:** Channel3 Integration + High-Performance Catalog Fallback
+- **Design System:** "Precision Obsidian & Surgical Red" (`#090A0C`, `#111215`, `#17181D`, `#23252B`, `#E53535`)
 
 ---
 
 ## ⚡ Quick Start
 
-### 1. Prerequisites
-- **Node.js** v20+ or v24+
-- **MySQL Server** 8.0+ or 9.0+ running on `127.0.0.1:3306`
+### 1. Option A: Instant Demo Mode (No Database Setup Needed)
+The frontend comes pre-configured with the centralized mock engine (`USE_MOCK_DATA = true`):
+```bash
+cd frontend
+npm install
+npm run dev
+```
+Open **[http://localhost:3000](http://localhost:3000)** in your browser to experience the full interactive workflow.
 
-### 2. Configure Environment Variables
+---
+
+### 2. Option B: Full-Stack Live Backend Mode (MySQL + Live PayPal Sandbox)
+
+#### Configure Environment Variables:
 Inside `backend/.env`:
 ```env
 PORT=5000
@@ -109,41 +132,40 @@ GEMINI_API_KEY=your_gemini_api_key
 CHANNEL3_API_KEY=your_channel3_api_key
 ```
 
-Inside `frontend/.env.local`:
-```env
-NEXT_PUBLIC_API_URL=http://localhost:5000/api/v1
-NEXT_PUBLIC_PAYPAL_CLIENT_ID=your_paypal_sandbox_client_id
+Inside `frontend/src/lib/mockData.ts`:
+```typescript
+export const USE_MOCK_DATA = false; // Connects to live Express backend
 ```
 
-### 3. Launch the Application
-Run both backend and frontend simultaneously:
+#### Run Monorepo Concurrently:
 ```bash
 npm run dev
 ```
 
-- **Frontend:** [http://localhost:3000](http://localhost:3000)
-- **Backend API:** [http://localhost:5000/api/v1](http://localhost:5000/api/v1)
-- **Health Diagnostics:** [http://localhost:5000/api/health](http://localhost:5000/api/health)
+- **Frontend Application:** [http://localhost:3000](http://localhost:3000)
+- **Backend REST API:** [http://localhost:5000/api/v1](http://localhost:5000/api/v1)
+- **Diagnostics Health Check:** [http://localhost:5000/api/health](http://localhost:5000/api/health)
 
 ---
 
 ## 🧪 Live Demo Walkthrough for Judges
 
-1. Open **[http://localhost:3000](http://localhost:3000)** in your browser.
-2. Click **"Launch Shopping Assistant"** or navigate to `/assistant`.
-3. Enter a prompt like:
+1. Open **[http://localhost:3000](http://localhost:3000)** to view the executive showcase and Swarm Lifecycle.
+2. Click **"Launch Shopping Studio"** (or go to `/assistant`).
+3. Click the sample prompt:
    > *"I need a laptop under ₹70,000 for programming, machine learning and occasional gaming"*
-4. Observe the **Supervisor Agent** convert ₹70,000 to ~$824 USD, and watch the **Product Analyst Agent** recommend the **Lenovo LOQ 15 Gaming & ML Laptop** with score 98/100.
-5. Click **"Select & Review Checkout"**:
-   - The **Human Authorization Modal** appears with a strict anti-tampering server price guarantee ($749.00 USD).
-6. Click the yellow **PayPal** button in the modal:
-   - Log into PayPal Sandbox (using any Sandbox Personal buyer account).
-   - Click **Complete Purchase**.
-7. The payment is immediately captured via PayPal Captures v2, triggering celebration confetti and displaying your live **PayPal Capture ID**.
-8. Navigate to **[http://localhost:3000/dashboard](http://localhost:3000/dashboard)**:
-   - See your completed transaction reflected in real time inside the **AG Grid Dashboard**.
+4. Watch the multi-agent progress ticker:
+   - **Supervisor**: Parses intent and converts ₹70,000 to ~$824 USD.
+   - **Shopping Research**: Queries Channel3 verified catalog.
+   - **Product Analyst**: Evaluates benchmarks and spotlights the **Lenovo LOQ 15 (115W TGP RTX 4060)** at **98/100** with trade-offs.
+5. Click **"Authorize Checkout via PayPal"**:
+   - The **Escrow Modal** appears with the server price guarantee ($749.00 USD).
+   - Click the yellow **PayPal** button (or click **"Simulate Instant Authorization"** for fast demo).
+6. Confetti triggers, displaying the verified **PayPal Capture ID**.
+7. Navigate to **[http://localhost:3000/dashboard](http://localhost:3000/dashboard)**:
+   - Inspect the completed transaction in the **AG Grid Ledger** and export the audit CSV.
 
 ---
 
 ## 📜 License
-MIT License - Copyright (c) 2026 PayPilot AI Team
+MIT License - Copyright (c) 2026 PayPilot AI Team — PayPal AI Hackathon 2026
