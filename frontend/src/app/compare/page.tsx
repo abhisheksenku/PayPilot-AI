@@ -134,86 +134,86 @@ export default function ComparePage() {
   ];
 
   return (
-    <div className="space-y-8 py-4">
+    <div className="space-y-8 py-6">
       {/* =========================================================================
           PAGE HEADER
           ========================================================================= */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-[#23252B]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-white/[0.08]">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#111215] border border-[#23252B] text-xs font-mono text-[#8F94A0] mb-2.5">
-            <span className="w-2 h-2 rounded-full bg-[#E53535]"></span>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0F172A] border border-white/[0.08] text-xs font-mono text-slate-300 mb-2.5">
+            <span className="w-2 h-2 rounded-full bg-paypal-blue"></span>
             <span className="text-white font-medium">Product Analyst Matrix</span>
-            <span className="text-[#3A3D46]">/</span>
-            <span className="text-[#E53535] font-semibold">Side-by-Side Spec Evaluation</span>
+            <span className="text-slate-600">/</span>
+            <span className="text-paypal-blue font-semibold">Side-by-Side Spec Evaluation</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
             Multi-Attribute Hardware Spec Matrix
           </h1>
-          <p className="text-xs sm:text-sm text-[#8F94A0] mt-1">
+          <p className="text-xs sm:text-sm text-slate-400 mt-1 font-sans">
             Compare candidate hardware specifications, GPU TGP wattages, and benchmark matrices under strict server price locks.
           </p>
         </div>
 
-        <div className="flex items-center gap-2 text-xs font-mono text-emerald-400 bg-[#111215] px-3.5 py-2 rounded-xl border border-[#23252B]">
+        <div className="flex items-center gap-2 text-xs font-mono text-emerald-400 bg-[#0F172A] px-3.5 py-2 rounded-xl border border-white/[0.08]">
           <ShieldCheck className="w-4 h-4" />
           <span>Anti-Tamper Lock Active</span>
         </div>
       </div>
 
       {loading ? (
-        <div className="text-center py-24 text-[#8F94A0] font-mono text-xs">
+        <div className="text-center py-24 text-slate-400 font-mono text-xs">
           Loading comparison matrix from verified catalog...
         </div>
       ) : products.length === 0 ? (
-        <div className="text-center py-20 text-[#8F94A0] text-sm">
+        <div className="text-center py-20 text-slate-400 text-sm">
           No candidate hardware models available for comparison.
         </div>
       ) : (
         /* =========================================================================
             COMPARISON MATRIX TABLE
             ========================================================================= */
-        <div className="rounded-2xl border border-[#23252B] bg-[#111215] overflow-hidden shadow-fintech-card">
+        <div className="rounded-2xl border border-white/[0.08] bg-[#0F172A] overflow-hidden shadow-fintech-card">
           <div className="overflow-x-auto">
             <table className="w-full border-collapse text-left">
               {/* Product Cards Header Row */}
               <thead>
-                <tr className="border-b border-[#23252B] bg-[#14151A]">
-                  <th className="p-5 w-[25%] font-mono uppercase tracking-wider text-xs font-bold text-[#8F94A0] align-top">
+                <tr className="border-b border-white/[0.08] bg-[#0D1527]">
+                  <th className="p-5 w-[25%] font-mono uppercase tracking-wider text-xs font-bold text-slate-400 align-top">
                     <div className="space-y-1">
                       <div className="text-white">HARDWARE CANDIDATES</div>
-                      <div className="text-[11px] font-normal text-[#8F94A0]">
+                      <div className="text-[11px] font-normal text-slate-400">
                         Multi-Factor Scoring
                       </div>
                     </div>
                   </th>
 
                   {products.map((p, idx) => (
-                    <th key={p.id} className="p-5 w-[25%] align-top border-l border-[#23252B]">
+                    <th key={p.id} className="p-5 w-[25%] align-top border-l border-white/[0.08]">
                       <div className="space-y-3">
                         {/* Recommendation Tag */}
                         <div className="flex items-center justify-between">
                           <span
-                            className={`px-2.5 py-1 rounded-md text-xs font-mono font-bold uppercase tracking-wider ${
+                            className={`px-2.5 py-1 rounded-lg text-xs font-mono font-bold uppercase tracking-wider ${
                               idx === 0
-                                ? 'bg-[#E53535]/15 text-[#E53535] border border-[#E53535]/30 flex items-center gap-1.5'
-                                : 'bg-[#17181D] text-[#8F94A0] border border-[#23252B]'
+                                ? 'bg-[#0070BA]/20 text-[#00CFDE] border border-[#0070BA]/40 flex items-center gap-1.5'
+                                : 'bg-[#1E293B] text-slate-400 border border-white/[0.08]'
                             }`}
                           >
                             {idx === 0 && <Award className="w-3.5 h-3.5" />}
                             {idx === 0 ? '#1 Top Pick' : `Alternative #${idx + 1}`}
                           </span>
-                          <span className="text-xs font-mono text-[#8F94A0]">{p.brand}</span>
+                          <span className="text-xs font-mono text-slate-400">{p.brand}</span>
                         </div>
 
                         {/* Title */}
-                        <h3 className="text-sm font-bold text-white line-clamp-2 h-10">
+                        <h3 className="text-sm font-bold text-white line-clamp-2 h-10 font-sans">
                           {p.name}
                         </h3>
 
                         {/* Price */}
                         <div className="flex items-baseline gap-1.5 font-mono">
                           <span className="text-2xl font-bold text-white">${p.price.toFixed(2)}</span>
-                          <span className="text-xs text-[#8F94A0]">USD</span>
+                          <span className="text-xs text-slate-400">USD</span>
                         </div>
 
                         {/* Action CTA */}
@@ -227,10 +227,10 @@ export default function ComparePage() {
                             });
                             setIsModalOpen(true);
                           }}
-                          className={`w-full py-2.5 px-3 rounded-xl text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all ${
+                          className={`w-full py-2.5 px-3 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all ${
                             idx === 0
-                              ? 'bg-[#E53535] hover:bg-[#D32F2F] text-white shadow-md shadow-[#E53535]/20'
-                              : 'bg-[#17181D] hover:bg-[#202229] text-[#A3A8B5] hover:text-white border border-[#23252B]'
+                              ? 'bg-[#0070BA] hover:bg-[#005EA6] text-white shadow-fintech-glow'
+                              : 'bg-[#1E293B] hover:bg-[#334155] text-slate-200 hover:text-white border border-white/[0.08]'
                           }`}
                         >
                           <span>Authorize with PayPal</span>
@@ -247,7 +247,7 @@ export default function ComparePage() {
                 {specCategories.map((group, groupIdx) => (
                   <React.Fragment key={groupIdx}>
                     {/* Category Divider Header */}
-                    <tr className="bg-[#0E0F12] border-t border-b border-[#23252B]">
+                    <tr className="bg-[#080C15] border-t border-b border-white/[0.08]">
                       <td
                         colSpan={products.length + 1}
                         className="px-5 py-2.5 font-mono text-xs font-bold uppercase tracking-wider text-white"
@@ -260,10 +260,10 @@ export default function ComparePage() {
                     {group.rows.map((row, rowIdx) => (
                       <tr
                         key={rowIdx}
-                        className="border-b border-[#23252B]/60 hover:bg-[#14151A] transition-colors"
+                        className="border-b border-white/[0.05] hover:bg-[#1E293B]/40 transition-colors"
                       >
                         {/* Spec Label */}
-                        <td className="px-5 py-3.5 text-xs font-mono font-medium text-[#8F94A0]">
+                        <td className="px-5 py-3.5 text-xs font-mono font-medium text-slate-300">
                           {row.label}
                         </td>
 
@@ -278,8 +278,8 @@ export default function ComparePage() {
                           return (
                             <td
                               key={p.id}
-                              className={`px-5 py-3.5 text-xs font-mono border-l border-[#23252B] ${
-                                isBest ? 'bg-[#14151A]/80 text-white font-medium' : 'text-[#8F94A0]'
+                              className={`px-5 py-3.5 text-xs font-mono border-l border-white/[0.08] ${
+                                isBest ? 'bg-[#1E293B]/30 text-white font-medium' : 'text-slate-400'
                               }`}
                             >
                               <div className="flex items-center justify-between gap-2">
@@ -287,7 +287,7 @@ export default function ComparePage() {
                                   {typeof row.getValue === 'function' ? (row.getValue as any)(p, pIdx) : val}
                                 </span>
                                 {isBest && (
-                                  <span className="shrink-0 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                  <span className="shrink-0 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                                     Top
                                   </span>
                                 )}

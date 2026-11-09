@@ -193,24 +193,24 @@ function AssistantContent() {
   const runnerUps = activeProducts?.slice(1) || [];
 
   return (
-    <div className="flex flex-col lg:flex-row h-[calc(100vh-6.5rem)] rounded-2xl bg-[#090A0C] border border-[#23252B] overflow-hidden shadow-fintech-card">
+    <div className="flex flex-col lg:flex-row h-[calc(100vh-6.5rem)] rounded-2xl bg-[#080C15] border border-white/[0.08] overflow-hidden shadow-fintech-card">
       {/* =========================================================================
           LEFT PANEL (42%): CONVERSATIONAL WORKSPACE & AGENT TELEMETRY
           ========================================================================= */}
-      <div className="flex flex-col w-full lg:w-[42%] border-b lg:border-b-0 lg:border-r border-[#23252B] bg-[#0E0F12]">
+      <div className="flex flex-col w-full lg:w-[42%] border-b lg:border-b-0 lg:border-r border-white/[0.08] bg-[#0F172A]">
         {/* Left Header */}
-        <div className="flex items-center justify-between px-4 py-3.5 border-b border-[#23252B] bg-[#111215]">
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/[0.08] bg-[#0D1527]">
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
-            <span className="text-xs font-mono font-bold text-white tracking-tight">AGENT WORKSPACE</span>
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.6)]"></span>
+            <span className="text-xs font-mono font-bold text-white tracking-wider">AGENT WORKSPACE</span>
           </div>
 
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowAuditDrawer(!showAuditDrawer)}
-              className="px-3 py-1 rounded-md bg-[#17181D] hover:bg-[#202229] border border-[#23252B] text-xs font-mono text-[#8F94A0] hover:text-white flex items-center gap-1.5 transition-colors"
+              className="px-3 py-1.5 rounded-lg bg-[#1E293B] hover:bg-[#334155] border border-white/[0.08] text-xs font-mono text-slate-300 hover:text-white flex items-center gap-1.5 transition-colors shadow-sm"
             >
-              <Terminal className="w-3.5 h-3.5 text-[#E53535]" />
+              <Terminal className="w-3.5 h-3.5 text-paypal-blue" />
               <span>Audit Trail</span>
             </button>
             <button
@@ -219,7 +219,7 @@ function AssistantContent() {
                 setActiveProducts([]);
               }}
               title="Reset conversation"
-              className="p-1.5 rounded-md hover:bg-[#17181D] text-[#8F94A0] hover:text-white transition-colors"
+              className="p-1.5 rounded-lg hover:bg-[#1E293B] text-slate-400 hover:text-white transition-colors"
             >
               <RefreshCw className="w-4 h-4" />
             </button>
@@ -227,7 +227,7 @@ function AssistantContent() {
         </div>
 
         {/* Swarm Live Status Ticker */}
-        <div className="px-4 py-2 border-b border-[#23252B] bg-[#14151A] flex items-center gap-2 overflow-x-auto">
+        <div className="px-4 py-2.5 border-b border-white/[0.08] bg-[#080C15]/70 flex items-center gap-2 overflow-x-auto">
           <AgentPill agentName="supervisor" isProcessing={currentStepIndex === 1} />
           <AgentPill agentName="research" isProcessing={currentStepIndex === 2} />
           <AgentPill agentName="analyst" isProcessing={currentStepIndex === 3} />
@@ -240,7 +240,7 @@ function AssistantContent() {
             const isUser = msg.role === 'user';
             return (
               <div key={msg.id} className={`flex flex-col ${isUser ? 'items-end' : 'items-start'} space-y-1.5`}>
-                <div className="flex items-center gap-2 px-1 text-xs font-mono text-[#8F94A0]">
+                <div className="flex items-center gap-2 px-1 text-xs font-mono text-slate-400">
                   <span className="font-semibold text-white">{isUser ? 'You' : 'PayPilot Swarm'}</span>
                   <span>•</span>
                   <span>{msg.timestamp}</span>
@@ -249,8 +249,8 @@ function AssistantContent() {
                 <div
                   className={`max-w-[96%] rounded-xl px-4 py-3.5 text-sm leading-relaxed ${
                     isUser
-                      ? 'bg-[#1D1F26] text-white border border-[#2D3039]'
-                      : 'bg-[#111215] text-[#E5E7EB] border border-[#23252B] shadow-sm'
+                      ? 'bg-[#1E293B] text-white border border-white/[0.1] shadow-sm'
+                      : 'bg-[#0D1424] text-slate-100 border border-white/[0.08] shadow-sm'
                   }`}
                 >
                   {isUser ? (
@@ -274,10 +274,10 @@ function AssistantContent() {
 
           {/* Active Reasoning Ticker */}
           {isProcessing && activeStep && (
-            <div className="p-3.5 rounded-xl bg-[#14151A] border border-[#23252B] flex items-center gap-3">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#E53535] animate-ping" />
-              <div className="font-mono text-xs text-[#A3A8B5] truncate">
-                <span className="text-[#E53535] font-bold">[{currentStepIndex}/4]</span> {activeStep}
+            <div className="p-3.5 rounded-xl bg-[#0D1527] border border-paypal-blue/30 flex items-center gap-3 shadow-fintech-glow">
+              <span className="w-2.5 h-2.5 rounded-full bg-paypal-blue animate-ping" />
+              <div className="font-mono text-xs text-slate-300 truncate">
+                <span className="text-paypal-blue font-bold">[{currentStepIndex}/4]</span> {activeStep}
               </div>
             </div>
           )}
@@ -286,8 +286,8 @@ function AssistantContent() {
         </div>
 
         {/* Quick Prompts Bar */}
-        <div className="px-4 pt-3 pb-2 border-t border-[#23252B] bg-[#0E0F12]">
-          <div className="text-xs font-mono uppercase tracking-wider text-[#8F94A0] mb-2 font-semibold">
+        <div className="px-4 pt-3 pb-2 border-t border-white/[0.08] bg-[#080C15]/80">
+          <div className="text-xs font-mono uppercase tracking-wider text-slate-400 mb-2 font-semibold">
             Quick Prompts
           </div>
           <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
@@ -296,7 +296,7 @@ function AssistantContent() {
                 key={idx}
                 onClick={() => handleSendMessage(q)}
                 disabled={isProcessing}
-                className="shrink-0 px-3 py-1.5 rounded-lg bg-[#17181D] hover:bg-[#202229] hover:border-[#3E424E] border border-[#23252B] text-xs text-[#A3A8B5] hover:text-white transition-colors"
+                className="shrink-0 px-3.5 py-1.5 rounded-lg bg-[#1E293B] hover:bg-[#334155] hover:border-paypal-blue/40 border border-white/[0.08] text-xs text-slate-300 hover:text-white transition-all shadow-sm"
               >
                 {q}
               </button>
@@ -305,13 +305,13 @@ function AssistantContent() {
         </div>
 
         {/* Input Bar */}
-        <div className="p-4 bg-[#111215] border-t border-[#23252B]">
+        <div className="p-4 bg-[#0F172A] border-t border-white/[0.08]">
           <form
             onSubmit={(e) => {
               e.preventDefault();
               handleSendMessage();
             }}
-            className="flex items-center gap-2 bg-[#17181D] border border-[#23252B] focus-within:border-[#E53535]/60 rounded-xl px-3.5 py-2.5 transition-colors"
+            className="flex items-center gap-2 bg-[#1E293B] border border-white/[0.08] focus-within:border-paypal-blue rounded-xl px-4 py-2.5 transition-all shadow-sm"
           >
             <input
               type="text"
@@ -319,17 +319,17 @@ function AssistantContent() {
               onChange={(e) => setInputMessage(e.target.value)}
               placeholder="Describe specs, budget (₹ / $), and workload..."
               disabled={isProcessing}
-              className="flex-1 bg-transparent text-sm text-white placeholder-[#8F94A0] outline-none"
+              className="flex-1 bg-transparent text-sm text-white placeholder-slate-400 outline-none"
             />
             <button
               type="submit"
               disabled={!inputMessage.trim() || isProcessing}
-              className="p-2 rounded-lg bg-[#E53535] hover:bg-[#D32F2F] disabled:opacity-30 disabled:hover:bg-[#E53535] text-white transition-colors"
+              className="p-2 rounded-lg bg-[#0070BA] hover:bg-[#005EA6] disabled:opacity-30 disabled:hover:bg-[#0070BA] text-white shadow-fintech-glow transition-all"
             >
               <Send className="w-4 h-4" />
             </button>
           </form>
-          <div className="flex items-center justify-between text-xs font-mono text-[#8F94A0] px-1 mt-2">
+          <div className="flex items-center justify-between text-xs font-mono text-slate-400 px-1 mt-2">
             <span>Official PayPal Sandbox Rails</span>
             <span>Press Enter ↵ to send</span>
           </div>
@@ -339,71 +339,71 @@ function AssistantContent() {
       {/* =========================================================================
           RIGHT PANEL (58%): DYNAMIC COMMERCE & SPEC EVALUATION CANVAS
           ========================================================================= */}
-      <div className="flex-1 flex flex-col bg-[#090A0C] overflow-y-auto">
+      <div className="flex-1 flex flex-col bg-[#080C15] overflow-y-auto">
         {activeProducts.length === 0 ? (
           /* Idle / Discovery Canvas */
           <div className="flex-1 flex flex-col items-center justify-center p-8 text-center space-y-6">
-            <div className="w-14 h-14 rounded-2xl bg-[#17181D] border border-[#23252B] flex items-center justify-center text-[#E53535] shadow-lg">
-              <Cpu className="w-7 h-7" />
+            <div className="w-16 h-16 rounded-2xl bg-[#0F172A] border border-white/[0.1] flex items-center justify-center text-paypal-blue shadow-fintech-glow">
+              <Cpu className="w-8 h-8" />
             </div>
 
             <div className="max-w-md space-y-2">
               <h3 className="text-xl font-bold text-white tracking-tight">
                 Autonomous Hardware Discovery Canvas
               </h3>
-              <p className="text-xs text-[#8F94A0] leading-relaxed">
+              <p className="text-xs text-slate-400 leading-relaxed font-sans">
                 When you submit a request, the multi-agent swarm retrieves candidate hardware from Channel3, calculates deep benchmark matrices, and spotlights the #1 match here with price guarantees.
               </p>
             </div>
 
             {/* Feature Pills */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full max-w-lg text-left">
-              <div className="p-3 rounded-xl bg-[#111215] border border-[#23252B] space-y-1">
-                <span className="text-[10px] font-mono text-[#E53535] font-bold">01 / DISCOVERY</span>
+              <div className="p-3.5 rounded-xl bg-[#0F172A] border border-white/[0.08] space-y-1 shadow-sm">
+                <span className="text-[10px] font-mono text-cyan-400 font-bold">01 / DISCOVERY</span>
                 <div className="text-xs font-bold text-white">Channel3 Catalog</div>
-                <p className="text-[11px] text-[#8F94A0]">Live hardware specs with real TGP ratings.</p>
+                <p className="text-[11px] text-slate-400">Live hardware specs with real TGP ratings.</p>
               </div>
-              <div className="p-3 rounded-xl bg-[#111215] border border-[#23252B] space-y-1">
-                <span className="text-[10px] font-mono text-amber-400 font-bold">02 / ANALYSIS</span>
+              <div className="p-3.5 rounded-xl bg-[#0F172A] border border-white/[0.08] space-y-1 shadow-sm">
+                <span className="text-[10px] font-mono text-purple-400 font-bold">02 / ANALYSIS</span>
                 <div className="text-xs font-bold text-white">Benchmark Matrix</div>
-                <p className="text-[11px] text-[#8F94A0]">Weighted 0–100 multi-attribute suitability scores.</p>
+                <p className="text-[11px] text-slate-400">Weighted 0–100 multi-attribute suitability scores.</p>
               </div>
-              <div className="p-3 rounded-xl bg-[#111215] border border-[#23252B] space-y-1">
+              <div className="p-3.5 rounded-xl bg-[#0F172A] border border-white/[0.08] space-y-1 shadow-sm">
                 <span className="text-[10px] font-mono text-emerald-400 font-bold">03 / GOVERNANCE</span>
                 <div className="text-xs font-bold text-white">PayPal Checkpoint</div>
-                <p className="text-[11px] text-[#8F94A0]">Mandatory human approval via PayPal SDK.</p>
+                <p className="text-[11px] text-slate-400">Mandatory human approval via PayPal SDK.</p>
               </div>
             </div>
 
             <button
               onClick={() => handleSendMessage('I need a laptop under ₹70,000 for programming, machine learning and occasional gaming')}
-              className="px-5 py-2.5 rounded-xl bg-[#17181D] hover:bg-[#202229] border border-[#23252B] text-xs font-mono font-bold text-white flex items-center gap-2 transition-all hover:scale-105"
+              className="px-6 py-3 rounded-xl bg-[#0F172A] hover:bg-[#1E293B] hover:border-paypal-blue/50 border border-white/[0.08] text-xs font-mono font-bold text-white flex items-center gap-2 transition-all hover:scale-105 shadow-sm"
             >
-              <Sparkles className="w-3.5 h-3.5 text-[#E53535]" />
+              <Sparkles className="w-4 h-4 text-paypal-blue" />
               <span>Simulate Benchmark Query (₹70,000 ML Laptop)</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <ArrowRight className="w-4 h-4" />
             </button>
           </div>
         ) : (
           /* Active Results Canvas */
           <div className="p-6 space-y-6">
             {/* Results Header */}
-            <div className="flex items-center justify-between pb-4 border-b border-[#23252B]">
+            <div className="flex items-center justify-between pb-4 border-b border-white/[0.08]">
               <div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2.5">
                   <h2 className="text-lg font-bold text-white tracking-tight">Evaluated Hardware Portfolio</h2>
-                  <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[#17181D] text-[#8F94A0] border border-[#23252B]">
+                  <span className="px-2.5 py-0.5 rounded-lg text-xs font-mono font-bold bg-[#0F172A] text-slate-300 border border-white/[0.08]">
                     {activeProducts.length} Models
                   </span>
                 </div>
-                <p className="text-xs text-[#8F94A0] mt-0.5">
+                <p className="text-xs text-slate-400 mt-0.5 font-sans">
                   Ranked against your multi-attribute workload parameters.
                 </p>
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="text-xs font-mono text-emerald-400 flex items-center gap-1">
-                  <ShieldCheck className="w-3.5 h-3.5" />
+                <span className="text-xs font-mono text-emerald-400 flex items-center gap-1.5">
+                  <ShieldCheck className="w-4 h-4" />
                   Anti-Tamper Lock Active
                 </span>
               </div>
@@ -422,7 +422,7 @@ function AssistantContent() {
             {/* RUNNER-UP ALTERNATIVES */}
             {runnerUps.length > 0 && (
               <div className="space-y-3 pt-2">
-                <div className="text-xs font-mono font-bold uppercase tracking-wider text-[#8F94A0]">
+                <div className="text-xs font-mono font-bold uppercase tracking-wider text-slate-400">
                   Comparative Runner-Up Options
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

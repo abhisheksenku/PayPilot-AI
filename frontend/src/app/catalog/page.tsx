@@ -82,7 +82,7 @@ export default function CatalogPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2 text-xs font-mono text-emerald-400 bg-[#111215] px-3.5 py-2 rounded-xl border border-[#23252B]">
+        <div className="flex items-center gap-2 text-xs font-mono text-emerald-400 bg-[#0F172A] px-3.5 py-2 rounded-xl border border-white/[0.08]">
           <ShieldCheck className="w-4 h-4" />
           <span>Server Price Integrity Active</span>
         </div>
@@ -93,43 +93,43 @@ export default function CatalogPage() {
           ========================================================================= */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
         {/* Tier Filters */}
-        <div className="flex items-center gap-1 p-1 rounded-xl bg-[#111215] border border-[#23252B] font-mono text-xs overflow-x-auto">
+        <div className="flex items-center gap-1 p-1 rounded-xl bg-[#0F172A] border border-white/[0.08] font-mono text-xs overflow-x-auto">
           <button
             onClick={() => setActiveFilter('all')}
-            className={`px-3.5 py-1.5 rounded-lg transition-colors whitespace-nowrap font-medium ${
+            className={`px-3.5 py-1.5 rounded-lg transition-all whitespace-nowrap font-medium ${
               activeFilter === 'all'
-                ? 'bg-[#17181D] text-white font-bold border border-[#2D3039]'
-                : 'text-[#8F94A0] hover:text-white'
+                ? 'bg-[#1E293B] text-white font-bold border border-white/[0.12] shadow-sm'
+                : 'text-slate-400 hover:text-white'
             }`}
           >
             All Hardware ({products.length})
           </button>
           <button
             onClick={() => setActiveFilter('ml')}
-            className={`px-3.5 py-1.5 rounded-lg transition-colors whitespace-nowrap font-medium ${
+            className={`px-3.5 py-1.5 rounded-lg transition-all whitespace-nowrap font-medium ${
               activeFilter === 'ml'
-                ? 'bg-[#17181D] text-[#E53535] font-bold border border-[#2D3039]'
-                : 'text-[#8F94A0] hover:text-white'
+                ? 'bg-[#1E293B] text-[#00CFDE] font-bold border border-white/[0.12] shadow-sm'
+                : 'text-slate-400 hover:text-white'
             }`}
           >
             ML & CUDA Laptops
           </button>
           <button
             onClick={() => setActiveFilter('creator')}
-            className={`px-3.5 py-1.5 rounded-lg transition-colors whitespace-nowrap font-medium ${
+            className={`px-3.5 py-1.5 rounded-lg transition-all whitespace-nowrap font-medium ${
               activeFilter === 'creator'
-                ? 'bg-[#17181D] text-purple-400 font-bold border border-[#2D3039]'
-                : 'text-[#8F94A0] hover:text-white'
+                ? 'bg-[#1E293B] text-purple-400 font-bold border border-white/[0.12] shadow-sm'
+                : 'text-slate-400 hover:text-white'
             }`}
           >
             Creator & Workstations
           </button>
           <button
             onClick={() => setActiveFilter('apple')}
-            className={`px-3.5 py-1.5 rounded-lg transition-colors whitespace-nowrap font-medium ${
+            className={`px-3.5 py-1.5 rounded-lg transition-all whitespace-nowrap font-medium ${
               activeFilter === 'apple'
-                ? 'bg-[#17181D] text-blue-400 font-bold border border-[#2D3039]'
-                : 'text-[#8F94A0] hover:text-white'
+                ? 'bg-[#1E293B] text-blue-400 font-bold border border-white/[0.12] shadow-sm'
+                : 'text-slate-400 hover:text-white'
             }`}
           >
             Apple Silicon M3
@@ -138,13 +138,13 @@ export default function CatalogPage() {
 
         {/* Search Bar */}
         <div className="relative w-full sm:w-80">
-          <Search className="w-4 h-4 text-[#8F94A0] absolute left-3.5 top-3" />
+          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search brand, CPU, GPU, or spec..."
-            className="w-full pl-10 pr-4 py-2 bg-[#111215] border border-[#23252B] focus:border-[#E53535] rounded-xl text-xs text-white placeholder-[#8F94A0] outline-none font-mono"
+            className="w-full pl-10 pr-4 py-2 bg-[#0F172A] border border-white/[0.08] focus:border-paypal-blue rounded-xl text-xs text-white placeholder-slate-400 outline-none font-mono transition-all"
           />
         </div>
       </div>
@@ -153,11 +153,11 @@ export default function CatalogPage() {
           PRODUCT CARDS GRID
           ========================================================================= */}
       {loading ? (
-        <div className="text-center py-24 text-[#8F94A0] font-mono text-xs">
+        <div className="text-center py-24 text-slate-400 font-mono text-xs">
           Querying Channel3 verified catalog feeds...
         </div>
       ) : filteredProducts.length === 0 ? (
-        <div className="text-center py-24 text-[#8F94A0] text-sm">
+        <div className="text-center py-24 text-slate-400 text-sm font-sans">
           No hardware products found matching your filter criteria.
         </div>
       ) : (
@@ -165,35 +165,35 @@ export default function CatalogPage() {
           {filteredProducts.map((product) => (
             <div
               key={product.id}
-              className="flex flex-col justify-between p-5 rounded-2xl bg-[#111215] border border-[#23252B] hover:border-[#383C46] transition-all group shadow-fintech-card"
+              className="flex flex-col justify-between p-5 rounded-2xl bg-[#0F172A] border border-white/[0.08] hover:border-paypal-blue/40 transition-all group shadow-sm"
             >
               <div className="space-y-4">
                 {/* Brand & Rating Header */}
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-[#17181D] text-[#8F94A0] border border-[#23252B]">
+                  <span className="text-xs font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg bg-[#1E293B] text-slate-300 border border-white/[0.08]">
                     {product.brand}
                   </span>
                   <div className="flex items-center gap-1.5 text-xs text-amber-400 font-mono">
                     <Star className="w-3.5 h-3.5 fill-amber-400" />
                     <span className="font-bold text-white">{product.rating}</span>
-                    <span className="text-[#8F94A0]">({product.reviewsCount})</span>
+                    <span className="text-slate-400">({product.reviewsCount})</span>
                   </div>
                 </div>
 
                 {/* Title */}
-                <h3 className="text-base font-bold text-white group-hover:text-[#E53535] transition-colors line-clamp-2 h-12">
+                <h3 className="text-base font-bold text-white group-hover:text-paypal-blue transition-colors line-clamp-2 h-12 font-sans">
                   {product.name}
                 </h3>
 
                 {/* Price */}
                 <div className="flex items-baseline gap-1.5 font-mono">
                   <span className="text-2xl font-bold text-white">${product.price.toFixed(2)}</span>
-                  <span className="text-xs text-[#8F94A0]">{product.currency}</span>
+                  <span className="text-xs text-slate-400">{product.currency}</span>
                 </div>
 
                 {/* Spec Summary Chips */}
                 {product.specifications && (
-                  <div className="space-y-2 p-3.5 rounded-xl bg-[#0E0F12] border border-[#23252B] text-xs font-mono text-[#A3A8B5]">
+                  <div className="space-y-2 p-3.5 rounded-xl bg-[#080C15]/70 border border-white/[0.06] text-xs font-mono text-slate-300">
                     {product.specifications.gpu && (
                       <div className="flex items-center gap-2 truncate">
                         <Zap className="w-3.5 h-3.5 text-amber-400 shrink-0" />
@@ -202,13 +202,13 @@ export default function CatalogPage() {
                     )}
                     {product.specifications.processor && (
                       <div className="flex items-center gap-2 truncate">
-                        <Cpu className="w-3.5 h-3.5 text-[#E53535] shrink-0" />
+                        <Cpu className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
                         <span className="truncate">{product.specifications.processor}</span>
                       </div>
                     )}
                     {product.specifications.ram && (
                       <div className="flex items-center gap-2 truncate">
-                        <HardDrive className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+                        <HardDrive className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
                         <span className="truncate">{product.specifications.ram} • {product.specifications.storage}</span>
                       </div>
                     )}
@@ -217,12 +217,12 @@ export default function CatalogPage() {
               </div>
 
               {/* Action Buttons Row */}
-              <div className="pt-4 mt-4 border-t border-[#23252B] flex items-center gap-2.5">
+              <div className="pt-4 mt-4 border-t border-white/[0.08] flex items-center gap-2.5">
                 <Link
                   href={`/assistant?q=${encodeURIComponent(`Evaluate ${product.name} against other models`)}`}
-                  className="flex-1 py-2.5 px-3 rounded-xl bg-[#17181D] hover:bg-[#202229] border border-[#23252B] text-white font-mono text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
+                  className="flex-1 py-2.5 px-3 rounded-xl bg-[#1E293B] hover:bg-[#334155] border border-white/[0.08] text-white font-mono text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
                 >
-                  <Bot className="w-3.5 h-3.5 text-[#E53535]" />
+                  <Bot className="w-3.5 h-3.5 text-paypal-blue" />
                   <span>Ask Swarm</span>
                 </Link>
 
@@ -236,7 +236,7 @@ export default function CatalogPage() {
                     });
                     setIsModalOpen(true);
                   }}
-                  className="flex-1 py-2.5 px-3 rounded-xl bg-[#E53535] hover:bg-[#D32F2F] text-white font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-md shadow-[#E53535]/20 transition-all hover:scale-[1.02]"
+                  className="flex-1 py-2.5 px-3 rounded-xl bg-[#0070BA] hover:bg-[#005EA6] text-white font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-fintech-glow transition-all hover:scale-[1.02]"
                 >
                   <ShoppingCart className="w-3.5 h-3.5" />
                   <span>Checkout</span>

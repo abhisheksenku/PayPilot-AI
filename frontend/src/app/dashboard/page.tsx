@@ -230,40 +230,40 @@ export default function DashboardPage() {
   );
 
   return (
-    <div className="space-y-8 py-4">
+    <div className="space-y-8 py-6">
       {/* =========================================================================
           PAGE HEADER
           ========================================================================= */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-2 border-b border-[#23252B]">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-2 border-b border-white/[0.08]">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#111215] border border-[#23252B] text-xs font-mono text-[#8F94A0] mb-2.5">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0F172A] border border-white/[0.08] text-xs font-mono text-slate-300 mb-2.5">
             <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
             <span className="text-white font-medium">MySQL 9.3 Ledger</span>
-            <span className="text-[#3A3D46]">/</span>
-            <span className="text-[#E53535] font-semibold">PayPal REST Captures v2</span>
+            <span className="text-slate-600">/</span>
+            <span className="text-paypal-blue font-semibold">PayPal REST Captures v2</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
             Institutional Transaction & Audit Ledger
           </h1>
-          <p className="text-xs sm:text-sm text-[#8F94A0] mt-1">
+          <p className="text-xs sm:text-sm text-slate-400 mt-1 font-sans">
             Immutable settlement audit trail of multi-agent order drafts and user-authorized PayPal Sandbox receipts.
           </p>
         </div>
 
         {/* Action Controls */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
           <button
             onClick={fetchOrders}
             disabled={loading}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#111215] hover:bg-[#17181D] border border-[#23252B] text-white text-xs font-mono font-semibold transition-colors"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#0070BA] hover:bg-[#005EA6] text-white text-xs font-semibold shadow-fintech-glow transition-all"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-[#E53535]' : ''}`} />
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
             <span>Sync Ledger</span>
           </button>
 
           <button
             onClick={handleExportCSV}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#17181D] hover:bg-[#202229] border border-[#23252B] text-[#A3A8B5] hover:text-white text-xs font-mono font-semibold transition-colors"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#0F172A] hover:bg-[#1E293B] border border-white/[0.08] text-slate-200 hover:text-white text-xs font-semibold transition-all shadow-sm"
           >
             <Download className="w-3.5 h-3.5" />
             <span>Export CSV</span>
@@ -276,8 +276,8 @@ export default function DashboardPage() {
           ========================================================================= */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Metric 1: Total Volume */}
-        <div className="p-5 rounded-2xl bg-[#111215] border border-[#23252B] space-y-2">
-          <div className="flex items-center justify-between text-xs font-mono text-[#8F94A0]">
+        <div className="p-5 rounded-2xl bg-[#0F172A] border border-white/[0.08] space-y-2 shadow-sm">
+          <div className="flex items-center justify-between text-xs font-mono text-slate-400">
             <span>SETTLED VOLUME (USD)</span>
             <DollarSign className="w-4 h-4 text-emerald-400" />
           </div>
@@ -291,43 +291,43 @@ export default function DashboardPage() {
         </div>
 
         {/* Metric 2: Completed Captures */}
-        <div className="p-5 rounded-2xl bg-[#111215] border border-[#23252B] space-y-2">
-          <div className="flex items-center justify-between text-xs font-mono text-[#8F94A0]">
+        <div className="p-5 rounded-2xl bg-[#0F172A] border border-white/[0.08] space-y-2 shadow-sm">
+          <div className="flex items-center justify-between text-xs font-mono text-slate-400">
             <span>VERIFIED CAPTURES</span>
             <CheckCircle2 className="w-4 h-4 text-emerald-400" />
           </div>
           <div className="text-3xl font-mono font-black text-white">
-            {completedCount} <span className="text-base text-[#8F94A0] font-normal">/ {orders.length}</span>
+            {completedCount} <span className="text-base text-slate-400 font-normal">/ {orders.length}</span>
           </div>
-          <div className="text-xs font-mono text-[#8F94A0]">
+          <div className="text-xs font-mono text-slate-400">
             PayPal Captures v2 Authenticated
           </div>
         </div>
 
         {/* Metric 3: Swarm Execution Latency */}
-        <div className="p-5 rounded-2xl bg-[#111215] border border-[#23252B] space-y-2">
-          <div className="flex items-center justify-between text-xs font-mono text-[#8F94A0]">
+        <div className="p-5 rounded-2xl bg-[#0F172A] border border-white/[0.08] space-y-2 shadow-sm">
+          <div className="flex items-center justify-between text-xs font-mono text-slate-400">
             <span>AVG SWARM SETTLEMENT</span>
             <Clock className="w-4 h-4 text-blue-400" />
           </div>
           <div className="text-3xl font-mono font-black text-white">
-            1.12<span className="text-base text-[#8F94A0] font-normal">s</span>
+            1.12<span className="text-base text-slate-400 font-normal">s</span>
           </div>
-          <div className="text-xs font-mono text-[#8F94A0]">
+          <div className="text-xs font-mono text-slate-400">
             Supervisor → Analyst → Checkpoint
           </div>
         </div>
 
         {/* Metric 4: Human-in-Loop Rate */}
-        <div className="p-5 rounded-2xl bg-[#111215] border border-[#23252B] space-y-2">
-          <div className="flex items-center justify-between text-xs font-mono text-[#8F94A0]">
+        <div className="p-5 rounded-2xl bg-[#0F172A] border border-white/[0.08] space-y-2 shadow-sm">
+          <div className="flex items-center justify-between text-xs font-mono text-slate-400">
             <span>HUMAN GOVERNANCE</span>
-            <Lock className="w-4 h-4 text-[#E53535]" />
+            <Lock className="w-4 h-4 text-paypal-blue" />
           </div>
           <div className="text-3xl font-mono font-black text-white">
-            100<span className="text-base text-[#E53535] font-normal">%</span>
+            100<span className="text-base text-paypal-blue font-normal">%</span>
           </div>
-          <div className="text-xs font-mono text-[#8F94A0]">
+          <div className="text-xs font-mono text-slate-400">
             Zero Autonomous Charging
           </div>
         </div>
@@ -338,33 +338,33 @@ export default function DashboardPage() {
           ========================================================================= */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
         {/* Tabs */}
-        <div className="flex items-center gap-1 p-1 rounded-xl bg-[#111215] border border-[#23252B] font-mono text-xs">
+        <div className="flex items-center gap-1 p-1 rounded-xl bg-[#0F172A] border border-white/[0.08] font-mono text-xs">
           <button
             onClick={() => setActiveTab('all')}
-            className={`px-3.5 py-1.5 rounded-lg transition-colors font-medium ${
+            className={`px-3.5 py-1.5 rounded-lg transition-all font-medium ${
               activeTab === 'all'
-                ? 'bg-[#17181D] text-white font-bold border border-[#2D3039]'
-                : 'text-[#8F94A0] hover:text-white'
+                ? 'bg-[#1E293B] text-white font-bold border border-white/[0.12] shadow-sm'
+                : 'text-slate-400 hover:text-white'
             }`}
           >
             All Ledger Records ({orders.length})
           </button>
           <button
             onClick={() => setActiveTab('captured')}
-            className={`px-3.5 py-1.5 rounded-lg transition-colors font-medium ${
+            className={`px-3.5 py-1.5 rounded-lg transition-all font-medium ${
               activeTab === 'captured'
-                ? 'bg-[#17181D] text-emerald-400 font-bold border border-[#2D3039]'
-                : 'text-[#8F94A0] hover:text-white'
+                ? 'bg-[#1E293B] text-emerald-400 font-bold border border-white/[0.12] shadow-sm'
+                : 'text-slate-400 hover:text-white'
             }`}
           >
             Captured ({completedCount})
           </button>
           <button
             onClick={() => setActiveTab('pending')}
-            className={`px-3.5 py-1.5 rounded-lg transition-colors font-medium ${
+            className={`px-3.5 py-1.5 rounded-lg transition-all font-medium ${
               activeTab === 'pending'
-                ? 'bg-[#17181D] text-amber-400 font-bold border border-[#2D3039]'
-                : 'text-[#8F94A0] hover:text-white'
+                ? 'bg-[#1E293B] text-amber-400 font-bold border border-white/[0.12] shadow-sm'
+                : 'text-slate-400 hover:text-white'
             }`}
           >
             In Escrow ({pendingCount})
@@ -373,13 +373,13 @@ export default function DashboardPage() {
 
         {/* Search */}
         <div className="relative w-full sm:w-80">
-          <Search className="w-4 h-4 text-[#8F94A0] absolute left-3.5 top-3" />
+          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
           <input
             type="text"
             value={searchFilter}
             onChange={(e) => setSearchFilter(e.target.value)}
             placeholder="Search Order ID, Product, or PayPal ID..."
-            className="w-full pl-10 pr-4 py-2 bg-[#111215] border border-[#23252B] focus:border-[#E53535] rounded-xl text-xs text-white placeholder-[#8F94A0] outline-none font-mono"
+            className="w-full pl-10 pr-4 py-2 bg-[#0F172A] border border-white/[0.08] focus:border-paypal-blue rounded-xl text-xs text-white placeholder-slate-400 outline-none font-mono transition-all"
           />
         </div>
       </div>
@@ -387,7 +387,7 @@ export default function DashboardPage() {
       {/* =========================================================================
           INSTITUTIONAL AG GRID DATA LEDGER
           ========================================================================= */}
-      <div className="rounded-2xl border border-[#23252B] bg-[#111215] p-3 shadow-fintech-card">
+      <div className="rounded-2xl border border-white/[0.08] bg-[#0F172A] p-3 shadow-fintech-card">
         <div className="ag-theme-quartz-dark w-full h-[540px]">
           <AgGridReact
             rowData={filteredOrders}

@@ -41,10 +41,10 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
   const triggerConfetti = () => {
     confetti({
-      particleCount: 75,
-      spread: 60,
+      particleCount: 80,
+      spread: 70,
       origin: { y: 0.6 },
-      colors: ['#E53535', '#FFFFFF', '#10B981'],
+      colors: ['#0070BA', '#2563EB', '#00CFDE', '#FFC439', '#10B981'],
     });
   };
 
@@ -83,19 +83,19 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="relative w-full max-w-lg rounded-2xl bg-[#111215] border border-[#23252B] shadow-fintech-modal overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#080C15]/85 backdrop-blur-xl animate-in fade-in duration-200">
+      <div className="relative w-full max-w-lg rounded-2xl bg-[#0F172A] border border-white/[0.12] shadow-fintech-modal overflow-hidden">
         {/* Top Escrow Bar */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#23252B] bg-[#14151A]">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.08] bg-[#0D1527]">
+          <div className="flex items-center gap-2.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
             <span className="text-xs font-mono font-bold uppercase tracking-wider text-white">
               Human-in-the-Loop Checkpoint
             </span>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded text-[#8F94A0] hover:text-white hover:bg-[#1D1F26] transition-colors"
+            className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-[#1E293B] transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -106,40 +106,40 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
           {successData ? (
             /* Post-Capture Verified Receipt */
             <div className="space-y-5 text-center py-2">
-              <div className="w-14 h-14 mx-auto rounded-2xl bg-[#17181D] border border-emerald-500/40 text-emerald-400 flex items-center justify-center shadow-lg">
-                <CheckCircle2 className="w-8 h-8" />
+              <div className="w-16 h-16 mx-auto rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center shadow-fintech-glow">
+                <CheckCircle2 className="w-9 h-9" />
               </div>
 
               <div className="space-y-1">
                 <h4 className="text-xl font-bold text-white tracking-tight">
                   PayPal Payment Authorized & Captured
                 </h4>
-                <p className="text-xs text-[#8F94A0]">
+                <p className="text-xs text-slate-400">
                   Funds verified via PayPal REST API v2 and committed to immutable MySQL ledger.
                 </p>
               </div>
 
               {/* Immutable Receipt Ledger Card */}
-              <div className="p-4 rounded-xl bg-[#0E0F12] border border-[#23252B] text-left font-mono text-xs space-y-3">
-                <div className="flex items-center justify-between pb-2 border-b border-[#23252B]/60 text-xs">
-                  <span className="text-[#8F94A0]">SETTLEMENT STATUS</span>
-                  <span className="px-2.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold">
+              <div className="p-4 rounded-xl bg-[#080C15]/70 border border-white/[0.06] text-left font-mono text-xs space-y-3">
+                <div className="flex items-center justify-between pb-2 border-b border-white/[0.06] text-xs">
+                  <span className="text-slate-400">SETTLEMENT STATUS</span>
+                  <span className="px-2.5 py-0.5 rounded-md bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-bold">
                     COMPLETED (200 OK)
                   </span>
                 </div>
 
                 <div className="flex justify-between items-center text-xs">
-                  <span className="text-[#8F94A0]">Order Reference:</span>
+                  <span className="text-slate-400">Order Reference:</span>
                   <span className="text-white font-bold">{successData.orderId}</span>
                 </div>
 
                 <div className="flex justify-between items-center text-xs">
-                  <span className="text-[#8F94A0]">PayPal Capture ID:</span>
+                  <span className="text-slate-400">PayPal Capture ID:</span>
                   <div className="flex items-center gap-1.5">
                     <span className="text-emerald-400 font-bold">{successData.captureId}</span>
                     <button
                       onClick={() => handleCopyCaptureId(successData.captureId)}
-                      className="p-1 rounded bg-[#17181D] hover:text-white text-[#8F94A0] transition-colors"
+                      className="p-1 rounded bg-[#1E293B] hover:text-white text-slate-300 transition-colors"
                       title="Copy Capture ID"
                     >
                       {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
@@ -148,11 +148,11 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 </div>
 
                 <div className="flex justify-between items-center text-xs">
-                  <span className="text-[#8F94A0]">Captured Amount:</span>
+                  <span className="text-slate-400">Captured Amount:</span>
                   <span className="text-white font-bold">${successData.amount.toFixed(2)} USD</span>
                 </div>
 
-                <div className="flex justify-between items-center text-xs text-[#8F94A0]">
+                <div className="flex justify-between items-center text-xs text-slate-400">
                   <span>Anti-Tamper Hash:</span>
                   <span className="truncate max-w-[200px]">e3b0c44298fc1c149afbf4c8...</span>
                 </div>
@@ -163,14 +163,14 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 <Link
                   href="/dashboard"
                   onClick={onClose}
-                  className="flex-1 py-3 px-4 rounded-xl bg-[#E53535] hover:bg-[#D32F2F] text-white text-xs font-bold font-mono uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-[#E53535]/20 transition-all hover:scale-[1.02]"
+                  className="flex-1 py-3 px-4 rounded-xl bg-[#0070BA] hover:bg-[#005EA6] text-white text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 shadow-fintech-glow transition-all hover:scale-[1.02]"
                 >
                   <span>Inspect in AG Grid</span>
                   <ArrowRight className="w-4 h-4" />
                 </Link>
                 <button
                   onClick={onClose}
-                  className="py-3 px-5 rounded-xl bg-[#17181D] hover:bg-[#202229] border border-[#23252B] text-white text-xs font-mono font-semibold transition-colors"
+                  className="py-3 px-5 rounded-xl bg-[#1E293B] hover:bg-[#334155] border border-white/[0.08] text-white text-xs font-semibold transition-colors"
                 >
                   Dismiss
                 </button>
@@ -180,51 +180,51 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
             /* Checkout Authorization State */
             <div className="space-y-5">
               {/* Security Banner */}
-              <div className="flex items-start gap-3 p-3.5 rounded-xl bg-[#14151A] border border-[#23252B]">
+              <div className="flex items-start gap-3 p-3.5 rounded-xl bg-[#080C15]/70 border border-white/[0.06]">
                 <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
                 <div className="text-xs space-y-0.5">
-                  <div className="font-mono font-bold text-white flex items-center gap-1.5">
+                  <div className="font-mono font-bold text-white flex items-center gap-2">
                     <span>Cryptographic Price Lock Verified</span>
-                    <span className="px-1.5 py-0.2 rounded text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    <span className="px-2 py-0.5 rounded text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
                       MATCHED
                     </span>
                   </div>
-                  <p className="text-[11px] text-[#8F94A0] leading-relaxed">
+                  <p className="text-[11px] text-slate-400 leading-relaxed font-sans">
                     The backend strictly validates this price against MySQL catalog records. Autonomous agents cannot modify the charge amount.
                   </p>
                 </div>
               </div>
 
               {/* Itemized Order Breakdown */}
-              <div className="p-4 rounded-xl bg-[#0E0F12] border border-[#23252B] space-y-3 font-mono">
+              <div className="p-4 rounded-xl bg-[#080C15]/70 border border-white/[0.06] space-y-3 font-mono">
                 <div className="flex justify-between items-start">
                   <div>
-                    <h5 className="text-xs font-bold text-white line-clamp-1">{product.name}</h5>
-                    <p className="text-[10px] text-[#8F94A0] mt-0.5">1 Unit • Immediate Sandbox Dispatch</p>
+                    <h5 className="text-xs font-bold text-white line-clamp-1 font-sans">{product.name}</h5>
+                    <p className="text-[11px] text-slate-400 mt-0.5">1 Unit • Immediate Sandbox Dispatch</p>
                   </div>
                   <div className="text-right">
                     <span className="text-sm font-bold text-white">${product.price.toFixed(2)}</span>
-                    <span className="text-[10px] text-[#8F94A0] block">USD</span>
+                    <span className="text-[10px] text-slate-400 block">USD</span>
                   </div>
                 </div>
 
-                <div className="pt-2 border-t border-[#23252B] flex justify-between items-center text-xs">
-                  <span className="text-[#8F94A0] font-medium">Total Required Authorization:</span>
+                <div className="pt-2 border-t border-white/[0.06] flex justify-between items-center text-xs">
+                  <span className="text-slate-400 font-medium">Total Required Authorization:</span>
                   <span className="text-base font-black text-white">${product.price.toFixed(2)} USD</span>
                 </div>
               </div>
 
               {/* Error Message if any */}
               {errorMessage && (
-                <div className="p-3 rounded-lg bg-red-950/40 border border-red-800 text-xs text-red-300 font-mono">
+                <div className="p-3 rounded-xl bg-red-950/40 border border-red-800 text-xs text-red-300 font-mono">
                   {errorMessage}
                 </div>
               )}
 
               {/* Official PayPal Buttons SDK Container */}
               <div className="space-y-3 pt-1">
-                <div className="p-3 rounded-xl bg-[#14151A] border border-[#23252B]">
-                  <div className="text-[10px] font-mono uppercase tracking-wider text-[#8F94A0] mb-2 text-center">
+                <div className="p-4 rounded-xl bg-[#0D1527] border border-white/[0.08] shadow-sm">
+                  <div className="text-xs font-mono uppercase tracking-wider text-slate-300 mb-3 text-center font-bold">
                     Authorized PayPal Checkout Rails
                   </div>
                   <PayPalButtons
@@ -233,7 +233,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                       color: 'gold',
                       shape: 'rect',
                       label: 'paypal',
-                      height: 42,
+                      height: 44,
                     }}
                     disabled={loading}
                     createOrder={async () => {
@@ -297,15 +297,15 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                   type="button"
                   onClick={handleSimulateInstantCapture}
                   disabled={loading}
-                  className="w-full py-2.5 px-3 rounded-xl bg-[#17181D] hover:bg-[#202229] border border-[#23252B] text-[#A3A8B5] hover:text-white text-[11px] font-mono flex items-center justify-center gap-2 transition-colors"
+                  className="w-full py-2.5 px-3 rounded-xl bg-[#1E293B] hover:bg-[#334155] border border-white/[0.08] text-slate-300 hover:text-white text-xs font-mono flex items-center justify-center gap-2 transition-all shadow-sm"
                 >
                   <Zap className="w-3.5 h-3.5 text-amber-400" />
                   <span>Simulate Instant Authorization & Capture (Fast Demo)</span>
                 </button>
               </div>
 
-              <div className="text-center text-[10px] font-mono text-[#8F94A0] flex items-center justify-center gap-1.5 pt-1">
-                <Lock className="w-3 h-3 text-[#8F94A0]" />
+              <div className="text-center text-[11px] font-mono text-slate-400 flex items-center justify-center gap-1.5 pt-1">
+                <Lock className="w-3.5 h-3.5 text-paypal-blue" />
                 <span>Protected by PayPal 256-Bit SSL Sandbox Rails</span>
               </div>
             </div>

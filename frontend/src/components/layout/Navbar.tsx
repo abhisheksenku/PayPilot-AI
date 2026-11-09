@@ -27,26 +27,26 @@ export const Navbar = () => {
   ];
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-[#23252B] bg-[#090A0C]/90 backdrop-blur-md">
+    <header className="sticky top-0 z-40 w-full border-b border-white/[0.08] bg-[#080C15]/85 backdrop-blur-xl">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         {/* Brand */}
         <Link href="/" className="flex items-center gap-3 group">
-          <div className="w-9 h-9 rounded-xl bg-[#E53535] flex items-center justify-center text-white font-black text-lg shadow-sm transition-transform group-hover:scale-105">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#003087] via-[#0070BA] to-[#2563EB] flex items-center justify-center text-white font-extrabold text-base shadow-fintech-glow transition-all group-hover:scale-105 border border-white/20">
             P
           </div>
           <div>
             <div className="flex items-center gap-2">
               <span className="font-extrabold text-base text-white tracking-tight">PayPilot</span>
-              <span className="text-xs px-1.5 py-0.5 rounded font-mono font-bold bg-[#E53535]/15 text-[#E53535] border border-[#E53535]/30">
+              <span className="text-xs px-2 py-0.5 rounded font-mono font-bold bg-[#0070BA]/20 text-[#00CFDE] border border-[#0070BA]/40">
                 AI
               </span>
             </div>
-            <p className="text-xs text-[#8F94A0] font-mono">Agentic Commerce • PayPal 2026</p>
+            <p className="text-[11px] text-slate-400 font-sans font-medium">Agentic Commerce • PayPal 2026</p>
           </div>
         </Link>
 
         {/* Navigation Tabs */}
-        <nav className="hidden md:flex items-center gap-1 bg-[#111215] p-1.5 rounded-xl border border-[#23252B]">
+        <nav className="hidden md:flex items-center gap-1 bg-[#0F172A] p-1.5 rounded-xl border border-white/[0.08]">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href;
@@ -54,10 +54,10 @@ export const Navbar = () => {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-medium transition-all ${
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold transition-all ${
                   isActive
-                    ? 'bg-[#E53535] text-white shadow-sm font-semibold'
-                    : 'text-[#8F94A0] hover:text-white hover:bg-[#17181D]'
+                    ? 'bg-[#0070BA] text-white shadow-fintech-glow'
+                    : 'text-slate-400 hover:text-white hover:bg-[#1E293B]/70'
                 }`}
               >
                 <Icon className="w-3.5 h-3.5" />
@@ -68,15 +68,15 @@ export const Navbar = () => {
         </nav>
 
         {/* Telemetry Status Badges */}
-        <div className="flex items-center gap-3 font-mono text-xs">
-          <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#111215] border border-[#23252B] text-[#8F94A0]">
+        <div className="flex items-center gap-2.5 font-mono text-xs">
+          <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#0F172A] border border-white/[0.08] text-slate-300">
             <ShieldCheck className="w-4 h-4 text-emerald-400" />
-            <span>Human Guardrail: Armed</span>
+            <span className="text-[11px]">Human Guardrail: Armed</span>
           </div>
 
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#111215] border border-[#23252B]">
-            <span className={`w-2 h-2 rounded-full ${online ? 'bg-emerald-400' : 'bg-amber-400'}`} />
-            <span className="text-white font-medium">
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#0F172A] border border-white/[0.08]">
+            <span className={`w-2 h-2 rounded-full ${online ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]' : 'bg-amber-400'}`} />
+            <span className="text-white font-medium text-[11px]">
               {online ? 'PayPal Rails Active' : 'Connecting'}
             </span>
           </div>
