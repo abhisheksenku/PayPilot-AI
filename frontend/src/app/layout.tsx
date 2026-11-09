@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import { Navbar } from '@/components/layout/Navbar';
-import { Footer } from '@/components/layout/Footer';
 import { PayPalProvider } from '@/components/providers/PayPalProvider';
+import { PayPalShell } from '@/components/layout/PayPalShell';
+import { Footer } from '@/components/layout/Footer';
 
 export const metadata: Metadata = {
-  title: 'PayPilot AI — Autonomous Agentic Commerce Platform',
+  title: 'PayPilot AI — PayPal Developer Portal & Autonomous Shopping Swarm',
   description: 'AI-Powered Agentic Commerce with Multi-Agent Orchestration & PayPal Sandbox Checkout for the PayPal AI Hackathon 2026',
 };
 
@@ -16,13 +16,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="min-h-screen flex flex-col bg-[#090A0C] text-white antialiased">
+      <body className="min-h-screen bg-[#080C15] text-white antialiased selection:bg-[#0070BA] selection:text-white">
         <PayPalProvider>
-          <Navbar />
-          <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <PayPalShell>
             {children}
-          </main>
-          <Footer />
+            <Footer />
+          </PayPalShell>
         </PayPalProvider>
       </body>
     </html>

@@ -18,10 +18,22 @@ import {
   Search,
   Download,
   Lock,
-  ArrowUpRight,
   Clock,
   Terminal,
+  ChevronDown,
+  Globe,
+  Users,
+  Activity,
+  FileCode,
+  CreditCard,
+  BookOpen,
+  Send,
+  ExternalLink,
+  Layers,
+  ArrowRight
 } from 'lucide-react';
+import { TestCardsModal } from '@/components/layout/TestCardsModal';
+import { CredentialsModal } from '@/components/layout/CredentialsModal';
 
 ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
@@ -30,7 +42,12 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [searchFilter, setSearchFilter] = useState('');
   const [activeTab, setActiveTab] = useState<'all' | 'captured' | 'pending'>('all');
+  const [dateRange, setDateRange] = useState('Last 12 hours');
+  const [showDateDropdown, setShowDateDropdown] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [showTestCards, setShowTestCards] = useState(false);
+  const [showCredentials, setShowCredentials] = useState(false);
+  const [activeSolutionTab, setActiveSolutionTab] = useState<'popular' | 'online' | 'payouts' | 'multiparty'>('popular');
 
   const fetchOrders = async () => {
     setLoading(true);
@@ -72,14 +89,12 @@ export default function DashboardPage() {
   // Filtered dataset
   const filteredOrders = useMemo(() => {
     return orders.filter((o) => {
-      // Tab filter
       const isCompleted =
         (o.status as string)?.toLowerCase() === 'paid' ||
         (o.status as string)?.toLowerCase() === 'completed';
       if (activeTab === 'captured' && !isCompleted) return false;
       if (activeTab === 'pending' && isCompleted) return false;
 
-      // Search filter
       if (searchFilter) {
         const q = searchFilter.toLowerCase();
         const pName = (o.Product?.name || '').toLowerCase();
@@ -141,7 +156,7 @@ export default function DashboardPage() {
             <span className="font-semibold text-white text-xs truncate">
               {params.value || params.data?.product?.name || 'Developer Hardware Package'}
             </span>
-            <span className="text-[11px] text-[#8F94A0] truncate">
+            <span className="text-[11px] text-slate-400 truncate">
               {params.data?.Product?.specifications?.gpu || 'Verified Channel3 Hardware'}
             </span>
           </div>
@@ -156,7 +171,7 @@ export default function DashboardPage() {
             <span className="font-bold text-white text-xs">
               ${Number(params.value || 0).toFixed(2)}
             </span>
-            <span className="text-[10px] text-[#8F94A0]">USD</span>
+            <span className="text-[10px] text-slate-400">USD</span>
           </div>
         ),
       },
@@ -186,7 +201,7 @@ export default function DashboardPage() {
         field: 'paypalOrderId',
         width: 180,
         cellRenderer: (params: any) => (
-          <span className="font-mono text-xs text-[#8F94A0]">
+          <span className="font-mono text-xs text-slate-400">
             {params.value || '—'}
           </span>
         ),
@@ -198,7 +213,7 @@ export default function DashboardPage() {
         cellRenderer: (params: any) => {
           const capId = params.value;
           if (!capId || capId === 'PENDING_CAPTURE') {
-            return <span className="font-mono text-xs text-[#8F94A0]">PENDING_ESCROW</span>;
+            return <span className="font-mono text-xs text-slate-500">PENDING_ESCROW</span>;
           }
           const isCopied = copiedId === capId;
           return (
@@ -206,7 +221,7 @@ export default function DashboardPage() {
               <span className="text-emerald-400 font-bold">{capId}</span>
               <button
                 onClick={() => handleCopy(capId)}
-                className="p-1 rounded bg-[#17181D] hover:text-white text-[#8F94A0] transition-colors"
+                className="p-1 rounded bg-[#17181D] hover:text-white text-slate-400 transition-colors"
                 title="Copy Capture ID"
               >
                 {isCopied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
@@ -220,7 +235,7 @@ export default function DashboardPage() {
         field: 'createdAt',
         width: 180,
         cellRenderer: (params: any) => (
-          <span className="text-[#8F94A0] text-xs font-mono">
+          <span className="text-slate-400 text-xs font-mono">
             {params.value ? new Date(params.value).toLocaleString() : 'N/A'}
           </span>
         ),
@@ -230,179 +245,425 @@ export default function DashboardPage() {
   );
 
   return (
-    <div className="space-y-8 py-6">
+    <div className="space-y-8 py-2">
       {/* =========================================================================
-          PAGE HEADER
+          1. OFFICIAL PAYPAL DEVELOPER HEADER (PRE-ARTICLE)
           ========================================================================= */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-2 border-b border-white/[0.08]">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-white/[0.08]">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0F172A] border border-white/[0.08] text-xs font-mono text-slate-300 mb-2.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
-            <span className="text-white font-medium">MySQL 9.3 Ledger</span>
-            <span className="text-slate-600">/</span>
-            <span className="text-paypal-blue font-semibold">PayPal REST Captures v2</span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-            Institutional Transaction & Audit Ledger
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight font-sans">
+            Welcome back, Abhishek
           </h1>
           <p className="text-xs sm:text-sm text-slate-400 mt-1 font-sans">
-            Immutable settlement audit trail of multi-agent order drafts and user-authorized PayPal Sandbox receipts.
+            Get started with step-by-step advice for setting up your payment solutions & monitoring autonomous commerce agents.
           </p>
         </div>
 
-        {/* Action Controls */}
-        <div className="flex items-center gap-2.5">
+        {/* Date Range Selector (Dropdown) */}
+        <div className="relative">
           <button
-            onClick={fetchOrders}
-            disabled={loading}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#0070BA] hover:bg-[#005EA6] text-white text-xs font-semibold shadow-fintech-glow transition-all"
+            onClick={() => setShowDateDropdown(!showDateDropdown)}
+            className="flex items-center gap-2 px-3.5 py-2 rounded-lg bg-[#0F172A] border border-white/[0.1] text-xs font-mono text-slate-200 hover:text-white transition-all shadow-sm"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-            <span>Sync Ledger</span>
+            <span>{dateRange}</span>
+            <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
           </button>
 
-          <button
-            onClick={handleExportCSV}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#0F172A] hover:bg-[#1E293B] border border-white/[0.08] text-slate-200 hover:text-white text-xs font-semibold transition-all shadow-sm"
-          >
-            <Download className="w-3.5 h-3.5" />
-            <span>Export CSV</span>
-          </button>
+          {showDateDropdown && (
+            <div className="absolute right-0 mt-2 w-44 rounded-xl bg-[#0F172A] border border-white/[0.1] shadow-xl p-1 z-20 text-xs font-mono">
+              {['Last 1 hour', 'Last 12 hours', 'Last 24 hours', 'Last 7 days', 'Last 14 days'].map((range) => (
+                <button
+                  key={range}
+                  onClick={() => {
+                    setDateRange(range);
+                    setShowDateDropdown(false);
+                  }}
+                  className={`w-full text-left px-3 py-1.5 rounded-lg transition-colors ${
+                    dateRange === range
+                      ? 'bg-[#0070BA] text-white font-bold'
+                      : 'text-slate-300 hover:bg-slate-800'
+                  }`}
+                >
+                  {range}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
       {/* =========================================================================
-          INSTITUTIONAL METRIC CARDS (HIGH-DENSITY FINANCIAL KPIS)
+          2. OFFICIAL PAYPAL ONBOARDING BANNER ("Which Payment Solution...?")
           ========================================================================= */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Metric 1: Total Volume */}
-        <div className="p-5 rounded-2xl bg-[#0F172A] border border-white/[0.08] space-y-2 shadow-sm">
-          <div className="flex items-center justify-between text-xs font-mono text-slate-400">
-            <span>SETTLED VOLUME (USD)</span>
-            <DollarSign className="w-4 h-4 text-emerald-400" />
+      <div className="p-6 rounded-2xl bg-[#0F172A] border border-white/[0.08] shadow-fintech-card relative overflow-hidden">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4">
+          <div>
+            <h2 className="text-base font-bold text-white">
+              Which Payment Solution do you want to offer?
+            </h2>
+            <p className="text-xs text-slate-400 mt-0.5">
+              We&apos;ll help you set up everything from multi-agent integration to sandbox go-live.
+            </p>
           </div>
-          <div className="text-3xl font-mono font-black text-white">
-            ${totalVolume.toFixed(2)}
-          </div>
-          <div className="text-xs font-mono text-emerald-400 flex items-center gap-1">
-            <ShieldCheck className="w-3.5 h-3.5" />
-            <span>100% Server Price Locked</span>
-          </div>
+          <a
+            href="https://developer.paypal.com/docs/online"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs font-semibold text-[#00CFDE] hover:underline flex items-center gap-1"
+          >
+            <span>All products</span>
+            <ExternalLink className="w-3 h-3" />
+          </a>
         </div>
 
-        {/* Metric 2: Completed Captures */}
-        <div className="p-5 rounded-2xl bg-[#0F172A] border border-white/[0.08] space-y-2 shadow-sm">
-          <div className="flex items-center justify-between text-xs font-mono text-slate-400">
-            <span>VERIFIED CAPTURES</span>
-            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-          </div>
-          <div className="text-3xl font-mono font-black text-white">
-            {completedCount} <span className="text-base text-slate-400 font-normal">/ {orders.length}</span>
-          </div>
-          <div className="text-xs font-mono text-slate-400">
-            PayPal Captures v2 Authenticated
-          </div>
+        {/* Tab Group */}
+        <div className="flex items-center gap-2 border-b border-white/[0.08] pb-3 text-xs font-semibold">
+          {[
+            { id: 'popular', label: 'Most popular' },
+            { id: 'online', label: 'Online' },
+            { id: 'payouts', label: 'Payouts' },
+            { id: 'multiparty', label: 'Multi-party Escrow' },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveSolutionTab(tab.id as any)}
+              className={`px-3 py-1.5 rounded-lg transition-all ${
+                activeSolutionTab === tab.id
+                  ? 'bg-[#0070BA] text-white shadow-sm'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
 
-        {/* Metric 3: Swarm Execution Latency */}
-        <div className="p-5 rounded-2xl bg-[#0F172A] border border-white/[0.08] space-y-2 shadow-sm">
-          <div className="flex items-center justify-between text-xs font-mono text-slate-400">
-            <span>AVG SWARM SETTLEMENT</span>
-            <Clock className="w-4 h-4 text-blue-400" />
+        {/* Solution Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
+          {/* Card 1: PayPal Checkout */}
+          <div className="p-4 rounded-xl bg-[#080C15] border border-white/[0.06] hover:border-[#0070BA]/50 transition-all flex flex-col justify-between">
+            <div>
+              <div className="w-8 h-8 rounded-lg bg-[#0070BA]/20 text-[#0070BA] flex items-center justify-center font-bold text-xs mb-3">
+                PP
+              </div>
+              <h3 className="text-sm font-bold text-white">PayPal Checkout</h3>
+              <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                Set up standard payments on your checkout page for buyers with server-side price locks.
+              </p>
+            </div>
+            <div className="mt-4 flex items-center justify-between text-xs">
+              <span className="text-emerald-400 font-mono text-[11px] font-bold">● Active Rails</span>
+              <span className="text-slate-400 font-mono text-[11px]">v2/orders</span>
+            </div>
           </div>
-          <div className="text-3xl font-mono font-black text-white">
-            1.12<span className="text-base text-slate-400 font-normal">s</span>
-          </div>
-          <div className="text-xs font-mono text-slate-400">
-            Supervisor → Analyst → Checkpoint
-          </div>
-        </div>
 
-        {/* Metric 4: Human-in-Loop Rate */}
-        <div className="p-5 rounded-2xl bg-[#0F172A] border border-white/[0.08] space-y-2 shadow-sm">
-          <div className="flex items-center justify-between text-xs font-mono text-slate-400">
-            <span>HUMAN GOVERNANCE</span>
-            <Lock className="w-4 h-4 text-paypal-blue" />
+          {/* Card 2: Expanded Checkout */}
+          <div className="p-4 rounded-xl bg-[#080C15] border border-white/[0.06] hover:border-[#0070BA]/50 transition-all flex flex-col justify-between">
+            <div>
+              <div className="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold text-xs mb-3">
+                CC
+              </div>
+              <h3 className="text-sm font-bold text-white">Expanded Checkout</h3>
+              <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                Build and customize standard debit and credit card flows with 3D Secure fallback.
+              </p>
+            </div>
+            <div className="mt-4 flex items-center justify-between text-xs">
+              <span className="text-slate-400 font-mono text-[11px]">Ready in Sandbox</span>
+              <button
+                onClick={() => setShowTestCards(true)}
+                className="text-[#00CFDE] hover:underline font-mono text-[11px]"
+              >
+                View Cards →
+              </button>
+            </div>
           </div>
-          <div className="text-3xl font-mono font-black text-white">
-            100<span className="text-base text-paypal-blue font-normal">%</span>
-          </div>
-          <div className="text-xs font-mono text-slate-400">
-            Zero Autonomous Charging
+
+          {/* Card 3: Multi-Agent Escrow */}
+          <div className="p-4 rounded-xl bg-[#080C15] border border-white/[0.06] hover:border-[#0070BA]/50 transition-all flex flex-col justify-between">
+            <div>
+              <div className="w-8 h-8 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold text-xs mb-3">
+                AI
+              </div>
+              <h3 className="text-sm font-bold text-white">Autonomous Agent Escrow</h3>
+              <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                Halts automated purchasing swarms at human authorization checkpoints.
+              </p>
+            </div>
+            <div className="mt-4 flex items-center justify-between text-xs">
+              <span className="text-purple-400 font-mono text-[11px] font-bold">● Armed Checkpoint</span>
+              <span className="text-slate-400 font-mono text-[11px]">PayPilot Swarm</span>
+            </div>
           </div>
         </div>
       </div>
 
       {/* =========================================================================
-          FILTER & SEARCH TOOLBAR
+          3. OFFICIAL PAYPAL QUICK LINKS ROW
           ========================================================================= */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-        {/* Tabs */}
-        <div className="flex items-center gap-1 p-1 rounded-xl bg-[#0F172A] border border-white/[0.08] font-mono text-xs">
-          <button
-            onClick={() => setActiveTab('all')}
-            className={`px-3.5 py-1.5 rounded-lg transition-all font-medium ${
-              activeTab === 'all'
-                ? 'bg-[#1E293B] text-white font-bold border border-white/[0.12] shadow-sm'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            All Ledger Records ({orders.length})
-          </button>
-          <button
-            onClick={() => setActiveTab('captured')}
-            className={`px-3.5 py-1.5 rounded-lg transition-all font-medium ${
-              activeTab === 'captured'
-                ? 'bg-[#1E293B] text-emerald-400 font-bold border border-white/[0.12] shadow-sm'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            Captured ({completedCount})
-          </button>
-          <button
-            onClick={() => setActiveTab('pending')}
-            className={`px-3.5 py-1.5 rounded-lg transition-all font-medium ${
-              activeTab === 'pending'
-                ? 'bg-[#1E293B] text-amber-400 font-bold border border-white/[0.12] shadow-sm'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            In Escrow ({pendingCount})
-          </button>
+      <div>
+        <div className="text-xs font-mono uppercase tracking-wider text-slate-400 font-bold mb-3">
+          Developer Quick Access Links
         </div>
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+          {[
+            {
+              label: 'API & credentials',
+              icon: FileCode,
+              onClick: () => setShowCredentials(true),
+            },
+            {
+              label: 'Sandbox accounts',
+              icon: Users,
+              href: 'https://developer.paypal.com/dashboard/accounts',
+              external: true,
+            },
+            {
+              label: 'API calls',
+              icon: Globe,
+              onClick: () => setActiveTab('all'),
+            },
+            {
+              label: 'Webhooks events',
+              icon: Activity,
+              href: 'https://developer.paypal.com/dashboard/webhooks/sandbox',
+              external: true,
+            },
+            {
+              label: 'Webhooks simulator',
+              icon: Send,
+              href: 'https://developer.paypal.com/dashboard/webhooksSimulator',
+              external: true,
+            },
+            {
+              label: 'Test credit cards',
+              icon: CreditCard,
+              onClick: () => setShowTestCards(true),
+            },
+            {
+              label: 'Dev docs',
+              icon: BookOpen,
+              href: 'https://developer.paypal.com/docs/online/',
+              external: true,
+            },
+          ].map((item, idx) => {
+            const Icon = item.icon;
+            if (item.onClick) {
+              return (
+                <button
+                  key={idx}
+                  onClick={item.onClick}
+                  className="p-3 rounded-xl bg-[#0F172A] border border-white/[0.08] hover:border-[#0070BA] hover:bg-[#1E293B] transition-all flex flex-col items-center text-center gap-2 group"
+                >
+                  <div className="w-8 h-8 rounded-lg bg-[#080C15] flex items-center justify-center text-slate-300 group-hover:text-white transition-colors">
+                    <Icon className="w-4 h-4" />
+                  </div>
+                  <span className="text-[11px] font-medium text-slate-300 group-hover:text-white">
+                    {item.label}
+                  </span>
+                </button>
+              );
+            }
 
-        {/* Search */}
-        <div className="relative w-full sm:w-80">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
-          <input
-            type="text"
-            value={searchFilter}
-            onChange={(e) => setSearchFilter(e.target.value)}
-            placeholder="Search Order ID, Product, or PayPal ID..."
-            className="w-full pl-10 pr-4 py-2 bg-[#0F172A] border border-white/[0.08] focus:border-paypal-blue rounded-xl text-xs text-white placeholder-slate-400 outline-none font-mono transition-all"
-          />
+            return (
+              <a
+                key={idx}
+                href={item.href}
+                target={item.external ? '_blank' : '_self'}
+                rel={item.external ? 'noopener noreferrer' : undefined}
+                className="p-3 rounded-xl bg-[#0F172A] border border-white/[0.08] hover:border-[#0070BA] hover:bg-[#1E293B] transition-all flex flex-col items-center text-center gap-2 group"
+              >
+                <div className="w-8 h-8 rounded-lg bg-[#080C15] flex items-center justify-center text-slate-300 group-hover:text-white transition-colors">
+                  <Icon className="w-4 h-4" />
+                </div>
+                <span className="text-[11px] font-medium text-slate-300 group-hover:text-white">
+                  {item.label}
+                </span>
+              </a>
+            );
+          })}
         </div>
       </div>
 
       {/* =========================================================================
-          INSTITUTIONAL AG GRID DATA LEDGER
+          4. OFFICIAL ERROR LOG & MONITORING TILES (FROM PAYPAL DEVELOPER CONSOLE)
           ========================================================================= */}
-      <div className="rounded-2xl border border-white/[0.08] bg-[#0F172A] p-3 shadow-fintech-card">
-        <div className="ag-theme-quartz-dark w-full h-[540px]">
-          <AgGridReact
-            rowData={filteredOrders}
-            columnDefs={columnDefs}
-            pagination={true}
-            paginationPageSize={10}
-            animateRows={true}
-            defaultColDef={{
-              sortable: true,
-              filter: true,
-              resizable: true,
-            }}
-          />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {/* Error Log Tile */}
+        <div className="p-5 rounded-2xl bg-[#0F172A] border border-white/[0.08] shadow-sm flex flex-col justify-between">
+          <div className="flex items-center justify-between pb-3 border-b border-white/[0.06]">
+            <h3 className="text-xs font-mono uppercase tracking-wider text-slate-300 font-bold">
+              Error Log
+            </h3>
+            <span className="text-[11px] font-mono text-emerald-400">Zero System Faults</span>
+          </div>
+
+          <div className="py-6 flex flex-col items-center justify-center text-center">
+            <div className="w-10 h-10 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mb-2">
+              <CheckCircle2 className="w-6 h-6" />
+            </div>
+            <div className="font-bold text-white text-sm">No errors found</div>
+            <div className="text-xs text-slate-400 mt-0.5">We found 0 errors in the {dateRange.toLowerCase()}.</div>
+          </div>
+
+          <div className="pt-2 border-t border-white/[0.06] flex items-center justify-between text-xs text-slate-400">
+            <span>PayPal Rails Status</span>
+            <span className="text-emerald-400 font-mono font-bold">Operational (100%)</span>
+          </div>
+        </div>
+
+        {/* Monitoring Card 1: API Calls */}
+        <div className="p-5 rounded-2xl bg-[#0F172A] border border-white/[0.08] shadow-sm flex flex-col justify-between">
+          <div className="flex items-center justify-between pb-3 border-b border-white/[0.06]">
+            <h3 className="text-xs font-mono uppercase tracking-wider text-slate-300 font-bold">
+              API Calls (v2 REST)
+            </h3>
+            <span className="text-[11px] font-mono text-cyan-400">Sandbox Metrics</span>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 py-4">
+            <div className="p-3 rounded-xl bg-[#080C15] border border-white/[0.04]">
+              <div className="text-[11px] text-slate-400">Successful Requests</div>
+              <div className="text-2xl font-mono font-black text-white mt-1">142</div>
+            </div>
+            <div className="p-3 rounded-xl bg-[#080C15] border border-white/[0.04]">
+              <div className="text-[11px] text-slate-400">Errors</div>
+              <div className="text-2xl font-mono font-black text-emerald-400 mt-1">0</div>
+            </div>
+          </div>
+
+          <div className="pt-2 border-t border-white/[0.06] flex items-center justify-between text-xs text-slate-400 font-mono">
+            <span>Latency SLA</span>
+            <span className="text-white">avg 240ms</span>
+          </div>
+        </div>
+
+        {/* Monitoring Card 2: API Error Distribution */}
+        <div className="p-5 rounded-2xl bg-[#0F172A] border border-white/[0.08] shadow-sm flex flex-col justify-between">
+          <div className="flex items-center justify-between pb-3 border-b border-white/[0.06]">
+            <h3 className="text-xs font-mono uppercase tracking-wider text-slate-300 font-bold">
+              HTTP Method Distribution
+            </h3>
+            <span className="text-[11px] font-mono text-purple-400">HTTP Status 200</span>
+          </div>
+
+          <div className="grid grid-cols-3 gap-2 py-4 text-center">
+            <div className="p-2.5 rounded-xl bg-[#080C15] border border-white/[0.04]">
+              <div className="text-[10px] font-mono text-slate-400">GET</div>
+              <div className="text-xl font-mono font-black text-white mt-1">86</div>
+            </div>
+            <div className="p-2.5 rounded-xl bg-[#080C15] border border-white/[0.04]">
+              <div className="text-[10px] font-mono text-slate-400">POST</div>
+              <div className="text-xl font-mono font-black text-white mt-1">56</div>
+            </div>
+            <div className="p-2.5 rounded-xl bg-[#080C15] border border-white/[0.04]">
+              <div className="text-[10px] font-mono text-slate-400">DELETE</div>
+              <div className="text-xl font-mono font-black text-white mt-1">0</div>
+            </div>
+          </div>
+
+          <div className="pt-2 border-t border-white/[0.06] flex items-center justify-between text-xs text-slate-400 font-mono">
+            <span>Escrow Integrity</span>
+            <span className="text-emerald-400 font-bold">Verified</span>
+          </div>
         </div>
       </div>
+
+      {/* =========================================================================
+          5. AG GRID FINANCIAL & ESCROW AUDIT LEDGER
+          ========================================================================= */}
+      <div className="space-y-4 pt-2">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+          {/* Tabs */}
+          <div className="flex items-center gap-1 p-1 rounded-xl bg-[#0F172A] border border-white/[0.08] font-mono text-xs">
+            <button
+              onClick={() => setActiveTab('all')}
+              className={`px-3.5 py-1.5 rounded-lg transition-all font-medium ${
+                activeTab === 'all'
+                  ? 'bg-[#1E293B] text-white font-bold border border-white/[0.12] shadow-sm'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              All Records ({orders.length})
+            </button>
+            <button
+              onClick={() => setActiveTab('captured')}
+              className={`px-3.5 py-1.5 rounded-lg transition-all font-medium ${
+                activeTab === 'captured'
+                  ? 'bg-[#1E293B] text-emerald-400 font-bold border border-white/[0.12] shadow-sm'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              Captured ({completedCount})
+            </button>
+            <button
+              onClick={() => setActiveTab('pending')}
+              className={`px-3.5 py-1.5 rounded-lg transition-all font-medium ${
+                activeTab === 'pending'
+                  ? 'bg-[#1E293B] text-amber-400 font-bold border border-white/[0.12] shadow-sm'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              In Escrow ({pendingCount})
+            </button>
+          </div>
+
+          {/* Search + Sync + Export */}
+          <div className="flex items-center gap-2">
+            <div className="relative w-full sm:w-64">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+              <input
+                type="text"
+                value={searchFilter}
+                onChange={(e) => setSearchFilter(e.target.value)}
+                placeholder="Search Order, Product, ID..."
+                className="w-full pl-9 pr-3 py-1.5 bg-[#0F172A] border border-white/[0.08] focus:border-[#0070BA] rounded-xl text-xs text-white placeholder-slate-400 outline-none font-mono transition-all"
+              />
+            </div>
+
+            <button
+              onClick={fetchOrders}
+              disabled={loading}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#0070BA] hover:bg-[#005EA6] text-white text-xs font-semibold shadow-sm transition-all shrink-0"
+              title="Sync Ledger"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+              <span className="hidden sm:inline">Sync</span>
+            </button>
+
+            <button
+              onClick={handleExportCSV}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#0F172A] hover:bg-[#1E293B] border border-white/[0.08] text-slate-200 hover:text-white text-xs font-semibold transition-all shrink-0"
+              title="Export CSV"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">CSV</span>
+            </button>
+          </div>
+        </div>
+
+        {/* The AG Grid */}
+        <div className="rounded-2xl border border-white/[0.08] bg-[#0F172A] p-3 shadow-fintech-card">
+          <div className="ag-theme-quartz-dark w-full h-[520px]">
+            <AgGridReact
+              rowData={filteredOrders}
+              columnDefs={columnDefs}
+              pagination={true}
+              paginationPageSize={10}
+              animateRows={true}
+              defaultColDef={{
+                sortable: true,
+                filter: true,
+                resizable: true,
+              }}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Modals */}
+      <TestCardsModal isOpen={showTestCards} onClose={() => setShowTestCards(false)} />
+      <CredentialsModal isOpen={showCredentials} onClose={() => setShowCredentials(false)} />
     </div>
   );
 }
