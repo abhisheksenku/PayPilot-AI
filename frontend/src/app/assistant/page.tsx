@@ -69,6 +69,7 @@ function AssistantContent() {
       initialQueryProcessed.current = true;
       handleSendMessage(initialQuery);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialQuery]);
 
   const quickPrompts = [
