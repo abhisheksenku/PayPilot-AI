@@ -7,6 +7,7 @@ import { api, ChatResponse, ExecutionLog } from '@/lib/api';
 import { AgentPill } from '@/components/assistant/AgentPill';
 import { ProductCard } from '@/components/assistant/ProductCard';
 import { CheckoutModal } from '@/components/assistant/CheckoutModal';
+import { FormattedMessage } from '@/components/assistant/FormattedMessage';
 
 interface MessageItem {
   id: string;
@@ -246,13 +247,26 @@ function AssistantContent() {
                 </div>
 
                 <div
-                  className={`max-w-[92%] rounded-xl px-4 py-3 text-sm leading-relaxed ${
+                  className={`max-w-[96%] rounded-xl px-4 py-3.5 text-sm leading-relaxed ${
                     isUser
                       ? 'bg-[#1D1F26] text-white border border-[#2D3039]'
-                      : 'bg-[#111215] text-[#E5E7EB] border border-[#23252B]'
+                      : 'bg-[#111215] text-[#E5E7EB] border border-[#23252B] shadow-sm'
                   }`}
                 >
-                  <div className="whitespace-pre-wrap">{msg.content}</div>
+                  {isUser ? (
+                    <div className="whitespace-pre-wrap">{msg.content}</div>
+                  ) : (
+                    <FormattedMessage
+                      content={msg.content}
+                      hasProductToCheckout={Boolean(activeProducts[0])}
+                      onOpenCheckout={() => {
+                        if (activeProducts[0]) {
+                          setSelectedProduct(activeProducts[0]);
+                          setIsModalOpen(true);
+                        }
+                      }}
+                    />
+                  )}
                 </div>
               </div>
             );
