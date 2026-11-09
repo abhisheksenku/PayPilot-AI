@@ -1,0 +1,23 @@
+{
+  "name": "paypilot-ai",
+  "version": "1.0.0",
+  "description": "PayPilot AI - AI-Powered Agentic Commerce Platform for PayPal AI Hackathon 2026",
+  "private": true,
+  "scripts": {
+    "dev:backend": "npm run dev --prefix backend",
+    "dev:frontend": "npm run dev --prefix frontend",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "build:backend": "npm run build --prefix backend",
+    "build:frontend": "npm run build --prefix frontend",
+    "build": "npm run build:backend && npm run build:frontend"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  },
+  "author": "PayPilot AI Team",
+  "license": "MIT",
+  "dependencies": {
+    "mysql2": "^3.24.6",
+    "sequelize": "^6.37.8"
+  }
+}
