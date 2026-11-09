@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Send, Bot, User, Sparkles, ShieldAlert, Activity, ChevronRight } from 'lucide-react';
+import { Send, Sparkles, Terminal, Activity, ArrowRight, ShieldCheck, Cpu, SlidersHorizontal, RefreshCw } from 'lucide-react';
 import { api, ChatResponse, ExecutionLog } from '@/lib/api';
 import { AgentPill } from '@/components/assistant/AgentPill';
 import { ProductCard } from '@/components/assistant/ProductCard';
@@ -29,15 +29,19 @@ function AssistantContent() {
       id: 'welcome',
       role: 'assistant',
       content:
-        "👋 Hello! I am **PayPilot AI**, your autonomous shopping assistant powered by multi-agent intelligence and PayPal. Tell me what you're looking for, your budget, and how you intend to use it (e.g., *\"I need a laptop under ₹70,000 for programming, machine learning and occasional gaming\"*)!",
+        'PayPilot Swarm initialized. Describe your target computing requirements, use-case, and budget in natural language (e.g., *"I need a laptop under ₹70,000 for programming, machine learning and occasional gaming"*).',
       activeAgent: 'supervisor',
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     },
   ]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [activeStep, setActiveStep] = useState<string | null>(null);
+  const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
   const [auditLogs, setAuditLogs] = useState<ExecutionLog[]>([]);
   const [showAuditDrawer, setShowAuditDrawer] = useState(false);
+
+  // Active products to display in the right canvas
+  const [activeProducts, setActiveProducts] = useState<ChatResponse['rankedProducts']>([]);
 
   // Selected product for checkout modal
   const [selectedProduct, setSelectedProduct] = useState<{
@@ -67,6 +71,13 @@ function AssistantContent() {
     }
   }, [initialQuery]);
 
+  const quickPrompts = [
+    'Under ₹70,000 for ML & gaming',
+    'MacBook M3 with 16GB RAM for iOS dev',
+    'Dell XPS 14 with 32GB RAM & OLED',
+    'Ultra-budget coding laptop under $700',
+  ];
+
   const handleSendMessage = async (textToSend?: string) => {
     const text = (textToSend || inputMessage).trim();
     if (!text || isProcessing) return;
@@ -83,14 +94,24 @@ function AssistantContent() {
     setInputMessage('');
     setIsProcessing(true);
 
-    // Multi-Agent visual timeline progression
-    setActiveStep('Supervisor analyzing intent and parsing budget...');
+    // Realistic multi-agent reasoning ticker
+    setActiveStep('Supervisor Agent: parsing intent, currency & constraints...');
+    setCurrentStepIndex(1);
+
     const t1 = setTimeout(() => {
-      setActiveStep('Shopping Research querying catalog specifications...');
-    }, 800);
+      setActiveStep('Shopping Research: querying Channel3 verified catalog...');
+      setCurrentStepIndex(2);
+    }, 700);
+
     const t2 = setTimeout(() => {
-      setActiveStep('Product Analyst calculating multi-attribute ranking matrix...');
-    }, 1600);
+      setActiveStep('Product Analyst: computing GPU TGP & benchmark matrix...');
+      setCurrentStepIndex(3);
+    }, 1400);
+
+    const t3 = setTimeout(() => {
+      setActiveStep('Purchase Agent: verifying server price lock & arming PayPal checkpoint...');
+      setCurrentStepIndex(4);
+    }, 2100);
 
     try {
       const response = await api.sendMessage({
@@ -100,6 +121,7 @@ function AssistantContent() {
 
       clearTimeout(t1);
       clearTimeout(t2);
+      clearTimeout(t3);
 
       setConversationId(response.conversationId);
 
@@ -116,8 +138,10 @@ function AssistantContent() {
 
       setMessages((prev) => [...prev, assistantMsg]);
 
-      // If response requires approval and has products, pre-select top product
-      if (response.requiresApproval && response.rankedProducts && response.rankedProducts.length > 0) {
+      // Set active products for the Right Canvas
+      if (response.rankedProducts && response.rankedProducts.length > 0) {
+        setActiveProducts(response.rankedProducts);
+        // Pre-select top ranked
         const top = response.rankedProducts[0];
         setSelectedProduct({
           productId: top.productId,
@@ -129,170 +153,116 @@ function AssistantContent() {
 
       // Fetch audit logs
       if (response.conversationId) {
-        api.getExecutions(response.conversationId).then(setAuditLogs);
+        const logs = await api.getExecutions(response.conversationId);
+        setAuditLogs(logs);
       }
-    } catch (err: any) {
+    } catch (error: any) {
+      console.error('Chat error:', error);
       setMessages((prev) => [
         ...prev,
         {
           id: String(Date.now() + 1),
           role: 'assistant',
-          content: `⚠️ Error executing request: ${err.message || 'Server communication issue'}`,
-          activeAgent: 'supervisor',
+          content: `⚠️ Error executing agent workflow: ${error.message || 'Service unavailable'}. Please try again.`,
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         },
       ]);
     } finally {
-      clearTimeout(t1);
-      clearTimeout(t2);
       setIsProcessing(false);
       setActiveStep(null);
+      setCurrentStepIndex(0);
     }
   };
 
   const handleSelectProduct = (productId: string) => {
-    // Find product from recent messages
-    for (let i = messages.length - 1; i >= 0; i--) {
-      const msg = messages[i];
-      if (msg.rankedProducts) {
-        const found = msg.rankedProducts.find((p) => p.productId === productId);
-        if (found) {
-          setSelectedProduct({
-            productId: found.productId,
-            name: found.name,
-            price: found.price,
-            currency: found.currency,
-          });
-          setIsModalOpen(true);
-          return;
-        }
-      }
+    const prod = activeProducts?.find((p) => p.productId === productId);
+    if (prod) {
+      setSelectedProduct({
+        productId: prod.productId,
+        name: prod.name,
+        price: prod.price,
+        currency: prod.currency,
+      });
+      setIsModalOpen(true);
     }
   };
 
+  const heroProduct = activeProducts?.[0];
+  const runnerUps = activeProducts?.slice(1) || [];
+
   return (
-    <div className="flex flex-col h-[calc(100vh-140px)] max-h-[900px] rounded-3xl bg-[#111111] border border-[#262626] shadow-2xl overflow-hidden relative">
-      {/* Top Header / Bar */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-[#242424] bg-[#161616]/80 backdrop-blur-sm">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-[#E53935]/20 text-[#E53935] flex items-center justify-center">
-            <Bot className="w-5 h-5" />
+    <div className="flex flex-col lg:flex-row h-[calc(100vh-6.5rem)] rounded-2xl bg-[#090A0C] border border-[#23252B] overflow-hidden shadow-fintech-card">
+      {/* =========================================================================
+          LEFT PANEL (42%): CONVERSATIONAL WORKSPACE & AGENT TELEMETRY
+          ========================================================================= */}
+      <div className="flex flex-col w-full lg:w-[42%] border-b lg:border-b-0 lg:border-r border-[#23252B] bg-[#0E0F12]">
+        {/* Left Header */}
+        <div className="flex items-center justify-between px-4 py-3.5 border-b border-[#23252B] bg-[#111215]">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span className="text-xs font-mono font-bold text-white tracking-tight">AGENT WORKSPACE</span>
           </div>
-          <div>
-            <h2 className="text-sm font-bold text-white flex items-center gap-2">
-              PayPilot AI Shopping Assistant
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            </h2>
-            <p className="text-[11px] text-zinc-400">Multi-Agent State Graph with Human-Auth Checkpoint</p>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowAuditDrawer(!showAuditDrawer)}
+              className="px-3 py-1 rounded-md bg-[#17181D] hover:bg-[#202229] border border-[#23252B] text-xs font-mono text-[#8F94A0] hover:text-white flex items-center gap-1.5 transition-colors"
+            >
+              <Terminal className="w-3.5 h-3.5 text-[#E53535]" />
+              <span>Audit Trail</span>
+            </button>
+            <button
+              onClick={() => {
+                setMessages([messages[0]]);
+                setActiveProducts([]);
+              }}
+              title="Reset conversation"
+              className="p-1.5 rounded-md hover:bg-[#17181D] text-[#8F94A0] hover:text-white transition-colors"
+            >
+              <RefreshCw className="w-4 h-4" />
+            </button>
           </div>
         </div>
 
-        {/* Audit Drawer Toggle */}
-        <button
-          onClick={() => setShowAuditDrawer(!showAuditDrawer)}
-          className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
-            showAuditDrawer
-              ? 'bg-[#E53935] text-white border-[#E53935]'
-              : 'bg-[#1E1E22] text-zinc-300 border-[#2E2E34] hover:bg-[#28282E]'
-          }`}
-        >
-          <Activity className="w-3.5 h-3.5" />
-          <span>Audit Logs ({auditLogs.length})</span>
-        </button>
-      </div>
+        {/* Swarm Live Status Ticker */}
+        <div className="px-4 py-2 border-b border-[#23252B] bg-[#14151A] flex items-center gap-2 overflow-x-auto">
+          <AgentPill agentName="supervisor" isProcessing={currentStepIndex === 1} />
+          <AgentPill agentName="research" isProcessing={currentStepIndex === 2} />
+          <AgentPill agentName="analyst" isProcessing={currentStepIndex === 3} />
+          <AgentPill agentName="purchase" isProcessing={currentStepIndex === 4} />
+        </div>
 
-      {/* Main Chat Feed & Optional Drawer */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* Messages Feed */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
+        {/* Message Stream */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {messages.map((msg) => {
             const isUser = msg.role === 'user';
             return (
-              <div
-                key={msg.id}
-                className={`flex gap-3 max-w-4xl ${isUser ? 'ml-auto flex-row-reverse' : 'mr-auto'}`}
-              >
-                {/* Avatar */}
-                <div
-                  className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold ${
-                    isUser
-                      ? 'bg-zinc-700 text-white'
-                      : 'bg-gradient-to-br from-[#E53935] to-[#B71C1C] text-white shadow-md shadow-[#E53935]/30'
-                  }`}
-                >
-                  {isUser ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
+              <div key={msg.id} className={`flex flex-col ${isUser ? 'items-end' : 'items-start'} space-y-1.5`}>
+                <div className="flex items-center gap-2 px-1 text-xs font-mono text-[#8F94A0]">
+                  <span className="font-semibold text-white">{isUser ? 'You' : 'PayPilot Swarm'}</span>
+                  <span>•</span>
+                  <span>{msg.timestamp}</span>
                 </div>
 
-                {/* Message Body */}
-                <div className={`space-y-3 max-w-2xl ${isUser ? 'items-end' : 'items-start'}`}>
-                  {/* Agent Pill if Assistant */}
-                  {!isUser && msg.activeAgent && (
-                    <div>
-                      <AgentPill agentName={msg.activeAgent} />
-                    </div>
-                  )}
-
-                  <div
-                    className={`p-4 rounded-2xl text-xs sm:text-sm leading-relaxed ${
-                      isUser
-                        ? 'bg-[#E53935] text-white rounded-tr-none font-medium'
-                        : 'bg-[#18181A] text-zinc-200 border border-[#2B2B2E] rounded-tl-none whitespace-pre-line'
-                    }`}
-                  >
-                    {msg.content}
-                  </div>
-
-                  {/* Render Product Cards if Analyst Returned Recommendations */}
-                  {!isUser && msg.rankedProducts && msg.rankedProducts.length > 0 && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 w-full">
-                      {msg.rankedProducts.map((p) => (
-                        <ProductCard
-                          key={p.productId}
-                          product={p}
-                          onSelect={handleSelectProduct}
-                          isSelected={selectedProduct?.productId === p.productId}
-                        />
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Mandatory Human Authorization Prompt Banner */}
-                  {!isUser && msg.requiresApproval && (
-                    <div className="p-4 rounded-2xl bg-red-950/30 border border-[#E53935] flex items-center justify-between gap-4">
-                      <div className="flex items-center gap-2.5">
-                        <ShieldAlert className="w-5 h-5 text-[#E53935] shrink-0" />
-                        <div>
-                          <span className="text-xs font-bold text-white block">
-                            Mandatory Human Authorization Required
-                          </span>
-                          <span className="text-[11px] text-zinc-400">
-                            The AI has halted. Click below to review and authenticate via PayPal SDK.
-                          </span>
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => setIsModalOpen(true)}
-                        className="px-4 py-2 rounded-xl bg-[#E53935] hover:bg-[#C62828] text-white text-xs font-bold shrink-0 shadow-lg shadow-[#E53935]/30 flex items-center gap-1.5"
-                      >
-                        <span>Authorize Payment</span>
-                        <ChevronRight className="w-4 h-4" />
-                      </button>
-                    </div>
-                  )}
-
-                  <span className="text-[10px] text-zinc-500 block px-1">{msg.timestamp}</span>
+                <div
+                  className={`max-w-[92%] rounded-xl px-4 py-3 text-sm leading-relaxed ${
+                    isUser
+                      ? 'bg-[#1D1F26] text-white border border-[#2D3039]'
+                      : 'bg-[#111215] text-[#E5E7EB] border border-[#23252B]'
+                  }`}
+                >
+                  <div className="whitespace-pre-wrap">{msg.content}</div>
                 </div>
               </div>
             );
           })}
 
-          {/* Active Agent Step Thinking Indicator */}
-          {isProcessing && (
-            <div className="flex items-center gap-3 p-4 rounded-2xl bg-[#18181C] border border-[#2E2E36] max-w-md animate-pulse">
-              <Sparkles className="w-5 h-5 text-[#E53935] animate-spin" />
-              <div className="text-xs text-zinc-300">
-                <span className="font-bold text-white block">Orchestrating Multi-Agent Graph...</span>
-                <span>{activeStep || 'Thinking...'}</span>
+          {/* Active Reasoning Ticker */}
+          {isProcessing && activeStep && (
+            <div className="p-3.5 rounded-xl bg-[#14151A] border border-[#23252B] flex items-center gap-3">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#E53535] animate-ping" />
+              <div className="font-mono text-xs text-[#A3A8B5] truncate">
+                <span className="text-[#E53535] font-bold">[{currentStepIndex}/4]</span> {activeStep}
               </div>
             </div>
           )}
@@ -300,78 +270,166 @@ function AssistantContent() {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Audit Trail Drawer (Right Side) */}
-        {showAuditDrawer && (
-          <div className="w-80 border-l border-[#262626] bg-[#141416] p-4 overflow-y-auto space-y-4 animate-in slide-in-from-right duration-200">
-            <div className="flex items-center justify-between">
-              <h3 className="text-xs font-bold text-white uppercase tracking-wider">
-                Execution Audit Trail
+        {/* Quick Prompts Bar */}
+        <div className="px-4 pt-3 pb-2 border-t border-[#23252B] bg-[#0E0F12]">
+          <div className="text-xs font-mono uppercase tracking-wider text-[#8F94A0] mb-2 font-semibold">
+            Quick Prompts
+          </div>
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+            {quickPrompts.map((q, idx) => (
+              <button
+                key={idx}
+                onClick={() => handleSendMessage(q)}
+                disabled={isProcessing}
+                className="shrink-0 px-3 py-1.5 rounded-lg bg-[#17181D] hover:bg-[#202229] hover:border-[#3E424E] border border-[#23252B] text-xs text-[#A3A8B5] hover:text-white transition-colors"
+              >
+                {q}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Input Bar */}
+        <div className="p-4 bg-[#111215] border-t border-[#23252B]">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSendMessage();
+            }}
+            className="flex items-center gap-2 bg-[#17181D] border border-[#23252B] focus-within:border-[#E53535]/60 rounded-xl px-3.5 py-2.5 transition-colors"
+          >
+            <input
+              type="text"
+              value={inputMessage}
+              onChange={(e) => setInputMessage(e.target.value)}
+              placeholder="Describe specs, budget (₹ / $), and workload..."
+              disabled={isProcessing}
+              className="flex-1 bg-transparent text-sm text-white placeholder-[#8F94A0] outline-none"
+            />
+            <button
+              type="submit"
+              disabled={!inputMessage.trim() || isProcessing}
+              className="p-2 rounded-lg bg-[#E53535] hover:bg-[#D32F2F] disabled:opacity-30 disabled:hover:bg-[#E53535] text-white transition-colors"
+            >
+              <Send className="w-4 h-4" />
+            </button>
+          </form>
+          <div className="flex items-center justify-between text-xs font-mono text-[#8F94A0] px-1 mt-2">
+            <span>Official PayPal Sandbox Rails</span>
+            <span>Press Enter ↵ to send</span>
+          </div>
+        </div>
+      </div>
+
+      {/* =========================================================================
+          RIGHT PANEL (58%): DYNAMIC COMMERCE & SPEC EVALUATION CANVAS
+          ========================================================================= */}
+      <div className="flex-1 flex flex-col bg-[#090A0C] overflow-y-auto">
+        {activeProducts.length === 0 ? (
+          /* Idle / Discovery Canvas */
+          <div className="flex-1 flex flex-col items-center justify-center p-8 text-center space-y-6">
+            <div className="w-14 h-14 rounded-2xl bg-[#17181D] border border-[#23252B] flex items-center justify-center text-[#E53535] shadow-lg">
+              <Cpu className="w-7 h-7" />
+            </div>
+
+            <div className="max-w-md space-y-2">
+              <h3 className="text-xl font-bold text-white tracking-tight">
+                Autonomous Hardware Discovery Canvas
               </h3>
-              <span className="text-[10px] font-mono text-[#E53935] bg-[#E53935]/10 px-2 py-0.5 rounded border border-[#E53935]/30">
-                MySQL 9.3
-              </span>
+              <p className="text-xs text-[#8F94A0] leading-relaxed">
+                When you submit a request, the multi-agent swarm retrieves candidate hardware from Channel3, calculates deep benchmark matrices, and spotlights the #1 match here with price guarantees.
+              </p>
             </div>
 
-            <p className="text-[11px] text-zinc-400">
-              Live records from <code className="text-zinc-200">agent_executions</code> table.
-            </p>
+            {/* Feature Pills */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full max-w-lg text-left">
+              <div className="p-3 rounded-xl bg-[#111215] border border-[#23252B] space-y-1">
+                <span className="text-[10px] font-mono text-[#E53535] font-bold">01 / DISCOVERY</span>
+                <div className="text-xs font-bold text-white">Channel3 Catalog</div>
+                <p className="text-[11px] text-[#8F94A0]">Live hardware specs with real TGP ratings.</p>
+              </div>
+              <div className="p-3 rounded-xl bg-[#111215] border border-[#23252B] space-y-1">
+                <span className="text-[10px] font-mono text-amber-400 font-bold">02 / ANALYSIS</span>
+                <div className="text-xs font-bold text-white">Benchmark Matrix</div>
+                <p className="text-[11px] text-[#8F94A0]">Weighted 0–100 multi-attribute suitability scores.</p>
+              </div>
+              <div className="p-3 rounded-xl bg-[#111215] border border-[#23252B] space-y-1">
+                <span className="text-[10px] font-mono text-emerald-400 font-bold">03 / GOVERNANCE</span>
+                <div className="text-xs font-bold text-white">PayPal Checkpoint</div>
+                <p className="text-[11px] text-[#8F94A0]">Mandatory human approval via PayPal SDK.</p>
+              </div>
+            </div>
 
-            <div className="space-y-3">
-              {auditLogs.length === 0 ? (
-                <div className="text-center py-8 text-zinc-500 text-xs">
-                  No tool calls logged yet. Ask a question to trigger the graph.
+            <button
+              onClick={() => handleSendMessage('I need a laptop under ₹70,000 for programming, machine learning and occasional gaming')}
+              className="px-5 py-2.5 rounded-xl bg-[#17181D] hover:bg-[#202229] border border-[#23252B] text-xs font-mono font-bold text-white flex items-center gap-2 transition-all hover:scale-105"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-[#E53535]" />
+              <span>Simulate Benchmark Query (₹70,000 ML Laptop)</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        ) : (
+          /* Active Results Canvas */
+          <div className="p-6 space-y-6">
+            {/* Results Header */}
+            <div className="flex items-center justify-between pb-4 border-b border-[#23252B]">
+              <div>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-lg font-bold text-white tracking-tight">Evaluated Hardware Portfolio</h2>
+                  <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[#17181D] text-[#8F94A0] border border-[#23252B]">
+                    {activeProducts.length} Models
+                  </span>
                 </div>
-              ) : (
-                auditLogs.map((log) => (
-                  <div
-                    key={log.id}
-                    className="p-3 rounded-xl bg-black/40 border border-zinc-800 space-y-1 font-mono text-[11px]"
-                  >
-                    <div className="flex justify-between items-center">
-                      <span className="font-bold text-white">{log.toolName}</span>
-                      <span className="text-emerald-400 text-[10px]">{log.executionTime}ms</span>
-                    </div>
-                    <div className="flex justify-between text-[10px] text-zinc-400">
-                      <span>Status:</span>
-                      <span className="uppercase text-emerald-300 font-bold">{log.status}</span>
-                    </div>
-                  </div>
-                ))
-              )}
+                <p className="text-xs text-[#8F94A0] mt-0.5">
+                  Ranked against your multi-attribute workload parameters.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-mono text-emerald-400 flex items-center gap-1">
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  Anti-Tamper Lock Active
+                </span>
+              </div>
             </div>
+
+            {/* HERO SPOTLIGHT: #1 Ranked Product */}
+            {heroProduct && (
+              <ProductCard
+                product={heroProduct}
+                onSelect={handleSelectProduct}
+                isSelected={selectedProduct?.productId === heroProduct.productId}
+                isHero={true}
+              />
+            )}
+
+            {/* RUNNER-UP ALTERNATIVES */}
+            {runnerUps.length > 0 && (
+              <div className="space-y-3 pt-2">
+                <div className="text-xs font-mono font-bold uppercase tracking-wider text-[#8F94A0]">
+                  Comparative Runner-Up Options
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {runnerUps.map((product) => (
+                    <ProductCard
+                      key={product.productId}
+                      product={product}
+                      onSelect={handleSelectProduct}
+                      isSelected={selectedProduct?.productId === product.productId}
+                      isHero={false}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
 
-      {/* Input Box */}
-      <div className="p-4 border-t border-[#242424] bg-[#141414]">
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSendMessage();
-          }}
-          className="flex items-center gap-2 max-w-4xl mx-auto"
-        >
-          <input
-            type="text"
-            value={inputMessage}
-            onChange={(e) => setInputMessage(e.target.value)}
-            placeholder="e.g. I need a laptop under ₹70,000 for programming, machine learning and occasional gaming..."
-            disabled={isProcessing}
-            className="flex-1 bg-[#1A1A1E] border border-[#2E2E36] focus:border-[#E53935] focus:ring-1 focus:ring-[#E53935] rounded-xl px-4 py-3 text-xs sm:text-sm text-white placeholder-zinc-500 outline-none transition-all disabled:opacity-50"
-          />
-
-          <button
-            type="submit"
-            disabled={isProcessing || !inputMessage.trim()}
-            className="p-3 rounded-xl bg-[#E53935] hover:bg-[#C62828] text-white disabled:opacity-50 disabled:hover:bg-[#E53935] transition-all shadow-lg shadow-[#E53935]/25"
-          >
-            <Send className="w-4 h-4" />
-          </button>
-        </form>
-      </div>
-
-      {/* Human Authorization Checkout Modal */}
+      {/* =========================================================================
+          CHECKOUT MODAL (HUMAN-IN-THE-LOOP CHECKPOINT)
+          ========================================================================= */}
       {selectedProduct && (
         <CheckoutModal
           isOpen={isModalOpen}
@@ -379,16 +437,7 @@ function AssistantContent() {
           product={selectedProduct}
           conversationId={conversationId}
           onPaymentSuccess={(captureId, orderId) => {
-            setMessages((prev) => [
-              ...prev,
-              {
-                id: String(Date.now()),
-                role: 'assistant',
-                content: `🎉 **Payment Verified & Completed!**\n\n• **Order ID:** \`${orderId}\`\n• **PayPal Capture ID:** \`${captureId}\`\n• **Amount:** $${selectedProduct.price.toFixed(2)} USD\n\nYour transaction has been securely captured via the official PayPal Sandbox API and recorded in your PayPilot dashboard!`,
-                activeAgent: 'payment_verify',
-                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-              },
-            ]);
+            console.log('Payment success:', { captureId, orderId });
           }}
         />
       )}
@@ -398,13 +447,7 @@ function AssistantContent() {
 
 export default function AssistantPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="text-zinc-500 text-xs text-center py-20 font-mono">
-          Loading PayPilot Assistant...
-        </div>
-      }
-    >
+    <Suspense fallback={<div className="p-8 text-xs font-mono text-[#8F94A0]">Initializing PayPilot Swarm...</div>}>
       <AssistantContent />
     </Suspense>
   );

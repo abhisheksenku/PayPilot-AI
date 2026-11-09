@@ -2,12 +2,13 @@
 
 import React, { useEffect, useState } from 'react';
 import { api, OrderItem } from '@/lib/api';
-import { Receipt, CheckCircle, Clock, ExternalLink } from 'lucide-react';
+import { Receipt, CheckCircle2, Clock, ExternalLink, Copy, Check, ShieldCheck, ArrowRight, Bot } from 'lucide-react';
 import Link from 'next/link';
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState<OrderItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   useEffect(() => {
     api.getOrders().then((data) => {
@@ -16,95 +17,143 @@ export default function OrdersPage() {
     });
   }, []);
 
+  const handleCopy = (text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedId(text);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
+
   return (
     <div className="space-y-8 py-4">
-      {/* Header */}
-      <div>
-        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-950/40 border border-red-800/40 text-xs font-semibold text-[#E53935] mb-2">
-          <Receipt className="w-3.5 h-3.5" />
-          <span>Verified Purchase History</span>
+      {/* =========================================================================
+          PAGE HEADER
+          ========================================================================= */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-[#23252B]">
+        <div>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#111215] border border-[#23252B] text-xs font-mono text-[#8F94A0] mb-2.5">
+            <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span className="text-white font-medium">PayPal Capture Receipts</span>
+            <span className="text-[#3A3D46]">/</span>
+            <span className="text-[#E53535] font-semibold">Immutable MySQL Records</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+            Purchase Receipts & Settlement History
+          </h1>
+          <p className="text-xs sm:text-sm text-[#8F94A0] mt-1">
+            Every transaction authorized through your human-in-the-loop checkpoint is committed with official PayPal Capture IDs.
+          </p>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-          Your Orders & Receipts
-        </h1>
-        <p className="text-xs sm:text-sm text-zinc-400">
-          Every purchase is authorized by you and verified via PayPal Sandbox Orders & Captures v2.
-        </p>
+
+        <Link
+          href="/dashboard"
+          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#111215] hover:bg-[#17181D] border border-[#23252B] text-xs font-mono font-semibold text-white transition-colors"
+        >
+          <span>Open AG Grid Ledger</span>
+          <ArrowRight className="w-3.5 h-3.5 text-[#E53535]" />
+        </Link>
       </div>
 
+      {/* =========================================================================
+          RECEIPTS LIST
+          ========================================================================= */}
       {loading ? (
-        <div className="text-center py-20 text-zinc-500 font-mono text-xs">
-          Loading order history from MySQL...
+        <div className="text-center py-24 text-[#8F94A0] font-mono text-xs">
+          Loading verified receipts from database...
         </div>
       ) : orders.length === 0 ? (
-        <div className="text-center py-20 p-8 rounded-3xl bg-[#141416] border border-[#242426] space-y-4">
-          <Receipt className="w-12 h-12 text-zinc-600 mx-auto" />
-          <div>
-            <h3 className="text-base font-bold text-white">No Orders Yet</h3>
-            <p className="text-xs text-zinc-400 mt-1">
-              Ask PayPilot Assistant for product recommendations and checkout with PayPal Sandbox!
+        <div className="text-center py-20 p-8 rounded-2xl bg-[#111215] border border-[#23252B] space-y-4 max-w-lg mx-auto">
+          <div className="w-12 h-12 mx-auto rounded-2xl bg-[#17181D] border border-[#23252B] flex items-center justify-center text-[#8F94A0]">
+            <Receipt className="w-6 h-6" />
+          </div>
+          <div className="space-y-1">
+            <h3 className="text-base font-bold text-white">No Transactions Recorded Yet</h3>
+            <p className="text-xs text-[#8F94A0]">
+              Ask the PayPilot Assistant for a hardware recommendation and authorize checkout with PayPal Sandbox!
             </p>
           </div>
           <Link
             href="/assistant"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#E53935] hover:bg-[#C62828] text-white text-xs font-bold shadow-lg shadow-[#E53935]/20"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#E53535] hover:bg-[#D32F2F] text-white text-xs font-mono font-bold uppercase tracking-wider shadow-lg shadow-[#E53535]/20 transition-all hover:scale-105"
           >
-            <span>Start Shopping with AI</span>
+            <Bot className="w-4 h-4" />
+            <span>Launch Shopping Assistant</span>
           </Link>
         </div>
       ) : (
         <div className="space-y-4">
           {orders.map((order) => {
-            const isCompleted = (order.status as string)?.toLowerCase() === 'paid' || (order.status as string)?.toLowerCase() === 'completed';
+            const isCompleted =
+              (order.status as string)?.toLowerCase() === 'paid' ||
+              (order.status as string)?.toLowerCase() === 'completed';
+            const capId = order.paypalCaptureId;
+
             return (
               <div
                 key={order.id}
-                className="p-6 rounded-2xl bg-[#141416] border border-[#26262A] hover:border-zinc-700 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                className="p-5 sm:p-6 rounded-2xl bg-[#111215] border border-[#23252B] hover:border-[#383C46] transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-5 shadow-fintech-card"
               >
-                <div className="space-y-1.5">
-                  <div className="flex items-center gap-2">
+                {/* Left Info */}
+                <div className="space-y-2.5 flex-1">
+                  <div className="flex flex-wrap items-center gap-2.5">
                     <span
-                      className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-mono font-bold uppercase tracking-wider ${
                         isCompleted
-                          ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                          : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                          ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                          : 'bg-amber-500/15 text-amber-400 border border-amber-500/30'
                       }`}
                     >
-                      {isCompleted ? <CheckCircle className="w-3 h-3" /> : <Clock className="w-3 h-3" />}
-                      {order.status}
+                      <span className={`w-1.5 h-1.5 rounded-full ${isCompleted ? 'bg-emerald-400' : 'bg-amber-400'}`} />
+                      <span>{isCompleted ? 'CAPTURED (200 OK)' : 'IN ESCROW'}</span>
                     </span>
-                    <span className="text-[10px] font-mono text-zinc-500">
+
+                    <span className="text-xs font-mono text-[#8F94A0]">
                       {new Date(order.createdAt).toLocaleDateString()} at{' '}
                       {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </span>
                   </div>
 
-                  <h3 className="text-base font-bold text-white">
-                    {order.Product?.name || (order as any).product?.name || 'Verified Hardware System'}
+                  {/* Product Title */}
+                  <h3 className="text-base font-bold text-white tracking-tight">
+                    {order.Product?.name || (order as any).product?.name || 'Verified Developer Workstation'}
                   </h3>
 
-                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs font-mono text-zinc-400">
-                    <span>Order: <strong className="text-zinc-200">{order.id.substring(0, 14)}...</strong></span>
+                  {/* Monospace IDs Trail */}
+                  <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs font-mono text-[#8F94A0]">
+                    <span>
+                      Order Ref: <strong className="text-white">{order.id}</strong>
+                    </span>
                     {order.paypalOrderId && (
-                      <span>PayPal Order: <strong className="text-[#E53935]">{order.paypalOrderId}</strong></span>
+                      <span>
+                        PayPal Order: <strong className="text-[#A3A8B5]">{order.paypalOrderId}</strong>
+                      </span>
                     )}
-                    {order.paypalCaptureId && (
-                      <span>Capture ID: <strong className="text-emerald-400">{order.paypalCaptureId}</strong></span>
+                    {capId && capId !== 'PENDING_CAPTURE' && (
+                      <span className="flex items-center gap-1.5">
+                        Capture ID: <strong className="text-emerald-400">{capId}</strong>
+                        <button
+                          onClick={() => handleCopy(capId)}
+                          className="p-1 rounded bg-[#17181D] hover:text-white text-[#8F94A0] transition-colors"
+                          title="Copy Capture ID"
+                        >
+                          {copiedId === capId ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                        </button>
+                      </span>
                     )}
                   </div>
                 </div>
 
-                <div className="flex sm:flex-col items-center sm:items-end justify-between border-t sm:border-t-0 pt-3 sm:pt-0 border-zinc-800 gap-1 shrink-0">
-                  <div className="text-xl font-black text-white">
+                {/* Right Price & Audit Link */}
+                <div className="flex sm:flex-col items-center sm:items-end justify-between border-t sm:border-t-0 pt-3 sm:pt-0 border-[#23252B] gap-2 shrink-0">
+                  <div className="text-2xl font-mono font-black text-white">
                     ${Number(order.totalAmount).toFixed(2)}
-                    <span className="text-xs font-mono text-zinc-400 font-normal ml-1">USD</span>
+                    <span className="text-xs text-[#8F94A0] font-normal ml-1">USD</span>
                   </div>
                   <Link
-                    href={`/dashboard`}
-                    className="text-[11px] text-[#E53935] hover:underline flex items-center gap-1 font-semibold"
+                    href="/dashboard"
+                    className="text-xs font-mono text-[#E53535] hover:text-white flex items-center gap-1 font-semibold transition-colors"
                   >
-                    <span>View in Audit Grid</span>
-                    <ExternalLink className="w-3 h-3" />
+                    <span>Inspect in AG Grid</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
                   </Link>
                 </div>
               </div>
