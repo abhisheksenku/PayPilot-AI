@@ -13,8 +13,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className="min-h-screen bg-[#F5F7FA] text-gray-900 antialiased selection:bg-[#0070BA] selection:text-white">
+    <html lang="en" className="h-full">
+      <body className="h-full bg-[#F5F7FA] text-gray-900 antialiased selection:bg-[#0070BA] selection:text-white overflow-hidden">
         <PayPalProvider>
           {children}
         </PayPalProvider>

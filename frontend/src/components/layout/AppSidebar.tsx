@@ -87,7 +87,7 @@ export function AppSidebar({
   };
 
   const sidebarContent = (
-    <div className="flex flex-col justify-between h-full p-4 space-y-5">
+    <div className="relative z-10 flex flex-col justify-between h-full p-4 space-y-4">
       <div className="space-y-4">
         {/* Brand Header */}
         <div className="flex items-center justify-between px-1 pt-1">
@@ -118,7 +118,7 @@ export function AppSidebar({
           {/* Mobile close button */}
           <button
             onClick={onCloseMobile}
-            className="p-1 rounded-lg text-gray-400 hover:text-gray-600 lg:hidden"
+            className="p-1 rounded-lg text-gray-400 hover:text-gray-600 lg:hidden cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -129,7 +129,7 @@ export function AppSidebar({
           <div className="flex items-center bg-[#F3F4F6] p-1 rounded-xl border border-gray-200">
             <button
               onClick={() => handleEnvToggle('sandbox')}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg text-xs font-semibold transition-all ${
+              className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                 environment === 'sandbox'
                   ? 'bg-[#0070BA] text-white shadow-2xs'
                   : 'text-gray-600 hover:text-gray-900'
@@ -140,7 +140,7 @@ export function AppSidebar({
             </button>
             <button
               onClick={() => handleEnvToggle('live')}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg text-xs font-semibold transition-all ${
+              className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                 environment === 'live'
                   ? 'bg-[#0070BA] text-white shadow-2xs'
                   : 'text-gray-500 hover:text-gray-800'
@@ -208,7 +208,7 @@ export function AppSidebar({
             onOpenCredentials?.();
             onCloseMobile?.();
           }}
-          className="p-3 bg-gradient-to-r from-blue-50/80 to-indigo-50/50 border border-blue-200/80 rounded-2xl cursor-pointer hover:border-[#0070BA]/50 transition-all shadow-2xs group"
+          className="p-3 bg-gradient-to-r from-blue-50/90 to-indigo-50/60 border border-blue-200/90 rounded-2xl cursor-pointer hover:border-[#0070BA]/60 transition-all shadow-2xs group backdrop-blur-2xs"
         >
           <div className="flex items-center gap-2 mb-1.5">
             <div className="w-5 h-5 rounded-md bg-[#0070BA]/10 text-[#0070BA] flex items-center justify-center">
@@ -232,8 +232,10 @@ export function AppSidebar({
 
   return (
     <>
-      {/* Desktop Sticky Sidebar */}
-      <aside className="hidden lg:flex w-60 xl:w-64 bg-white border-r border-gray-200 flex-col h-full select-none shrink-0">
+      {/* Desktop Sticky Sidebar (100% height down to viewport bottom) */}
+      <aside className="hidden lg:flex w-60 xl:w-64 bg-white border-r border-gray-200 flex-col h-full min-h-full select-none shrink-0 relative overflow-hidden">
+        {/* Subtle ambient light blue wave at bottom matching blueprint image */}
+        <div className="absolute bottom-0 left-0 right-0 h-36 bg-gradient-to-t from-blue-100/50 via-blue-50/20 to-transparent pointer-events-none" />
         {sidebarContent}
       </aside>
 
@@ -244,7 +246,8 @@ export function AppSidebar({
             className="fixed inset-0 bg-gray-900/40 backdrop-blur-xs transition-opacity"
             onClick={onCloseMobile}
           />
-          <div className="relative w-72 max-w-[80vw] bg-white h-full shadow-2xl z-10 animate-slide-right flex flex-col">
+          <div className="relative w-72 max-w-[80vw] bg-white h-full shadow-2xl z-10 animate-slide-right flex flex-col overflow-hidden">
+            <div className="absolute bottom-0 left-0 right-0 h-36 bg-gradient-to-t from-blue-100/50 via-blue-50/20 to-transparent pointer-events-none" />
             {sidebarContent}
           </div>
         </div>

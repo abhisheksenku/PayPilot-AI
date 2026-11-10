@@ -16,16 +16,19 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#F5F7FA] text-gray-900 flex flex-col antialiased">
-      {/* Persistent App Header with Dual Banners */}
-      <AppHeader
-        onOpenTestCards={() => setIsTestCardsOpen(true)}
-        onOpenCredentials={() => setIsCredentialsOpen(true)}
-        onToggleMobileSidebar={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
-      />
+    <div className="h-screen w-screen bg-[#F5F7FA] text-gray-900 flex flex-col antialiased overflow-hidden select-none">
+      {/* Persistent App Header with Dual Banners (Fixed at top) */}
+      <div className="shrink-0 z-40">
+        <AppHeader
+          onOpenTestCards={() => setIsTestCardsOpen(true)}
+          onOpenCredentials={() => setIsCredentialsOpen(true)}
+          onToggleMobileSidebar={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
+        />
+      </div>
 
-      {/* Main Workspace with Persistent Left Sidebar */}
-      <div className="flex-1 flex overflow-hidden">
+      {/* Main Workspace (Takes remaining viewport height down to bottom of screen) */}
+      <div className="flex-1 flex min-h-0 overflow-hidden">
+        {/* Left Sidebar (Full height from header down to bottom edge) */}
         <AppSidebar
           onOpenTestCards={() => setIsTestCardsOpen(true)}
           onOpenCredentials={() => setIsCredentialsOpen(true)}
@@ -33,7 +36,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           onCloseMobile={() => setIsMobileSidebarOpen(false)}
         />
 
-        <main className="flex-1 overflow-y-auto">
+        {/* Scrollable Content Viewport */}
+        <main className="flex-1 overflow-y-auto min-h-0">
           {children}
         </main>
       </div>
