@@ -20,7 +20,6 @@ interface AppSidebarProps {
   onOpenCredentials?: () => void;
   isMobileOpen?: boolean;
   onCloseMobile?: () => void;
-  activeTab?: string;
   setActiveTab?: (tab: string) => void;
 }
 
@@ -88,32 +87,51 @@ export function AppSidebar({
   };
 
   const sidebarContent = (
-    <div className="flex flex-col justify-between h-full p-4 space-y-6">
-      <div className="space-y-5">
-        {/* Mobile Header with Close Button */}
-        <div className="flex items-center justify-between lg:hidden pb-2 border-b border-gray-100">
-          <div className="flex items-center gap-2">
-            <span className="font-extrabold text-lg tracking-tight text-[#003087]">
-              Pay<span className="text-[#0070BA]">Pal</span>
-            </span>
-            <span className="text-[11px] text-gray-500 font-medium">Developer</span>
+    <div className="flex flex-col justify-between h-full p-4 space-y-5">
+      <div className="space-y-4">
+        {/* Brand Header */}
+        <div className="flex items-center justify-between px-1 pt-1">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 flex items-center justify-center shrink-0">
+              <svg viewBox="0 0 32 32" className="w-7 h-7" fill="none">
+                <path
+                  d="M10.5 4h8.2c4.2 0 7.3 2.8 6.5 7.1-.8 4.2-4.1 6.6-8.2 6.6h-3.4L11.8 28H7l4.8-21.6c.2-.9.5-1.7 1.1-2.1.5-.3 1.1-.3 1.6-.3z"
+                  fill="#003087"
+                />
+                <path
+                  d="M14.2 11h7.8c3.9 0 6.8 2.6 6 6.6-.7 3.9-3.8 6.1-7.6 6.1h-3.2L15.4 33H11l4.4-20c.2-.8.5-1.6 1-2 .5-.3 1.1-.3 1.6-.3z"
+                  fill="#0070BA"
+                  style={{ mixBlendMode: 'multiply' }}
+                />
+              </svg>
+            </div>
+            <div>
+              <span className="font-extrabold text-xl tracking-tight text-[#003087] leading-none block">
+                Pay<span className="text-[#0070BA]">Pal</span>
+              </span>
+              <span className="text-[11px] font-medium text-gray-500 tracking-tight leading-none mt-0.5 block">
+                Developer <span className="text-gray-400">•</span> PayPilot AI
+              </span>
+            </div>
           </div>
+
+          {/* Mobile close button */}
           <button
             onClick={onCloseMobile}
-            className="p-1.5 rounded-lg text-gray-500 hover:bg-gray-100"
+            className="p-1 rounded-lg text-gray-400 hover:text-gray-600 lg:hidden"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Sandbox / Live Switcher */}
-        <div className="relative">
+        <div className="relative pt-1">
           <div className="flex items-center bg-[#F3F4F6] p-1 rounded-xl border border-gray-200">
             <button
               onClick={() => handleEnvToggle('sandbox')}
               className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg text-xs font-semibold transition-all ${
                 environment === 'sandbox'
-                  ? 'bg-[#0070BA] text-white shadow-xs'
+                  ? 'bg-[#0070BA] text-white shadow-2xs'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
@@ -124,7 +142,7 @@ export function AppSidebar({
               onClick={() => handleEnvToggle('live')}
               className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg text-xs font-semibold transition-all ${
                 environment === 'live'
-                  ? 'bg-[#0070BA] text-white shadow-xs'
+                  ? 'bg-[#0070BA] text-white shadow-2xs'
                   : 'text-gray-500 hover:text-gray-800'
               }`}
             >
@@ -135,13 +153,13 @@ export function AppSidebar({
 
           {showLiveNotice && (
             <div className="absolute top-full left-0 right-0 mt-1.5 p-2 bg-amber-50 border border-amber-200 rounded-lg text-[11px] text-amber-800 shadow-lg z-30 animate-fade-in">
-              Production live credentials are locked. Use verified PayPal Sandbox environment.
+              Production live credentials locked. Using verified PayPal Sandbox.
             </div>
           )}
         </div>
 
         {/* Navigation Items */}
-        <nav className="space-y-1">
+        <nav className="space-y-1 pt-1">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive =
@@ -160,7 +178,7 @@ export function AppSidebar({
                     onCloseMobile?.();
                   }
                 }}
-                className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[13px] font-medium transition-colors ${
+                className={`flex items-center justify-between px-3.5 py-2 rounded-xl text-[13px] font-medium transition-colors ${
                   isActive
                     ? 'bg-[#EBF5FF] text-[#0070BA] font-semibold border border-[#D0E5FF]/70 shadow-2xs'
                     : 'text-gray-700 hover:bg-gray-100/70 hover:text-gray-900'
@@ -184,7 +202,7 @@ export function AppSidebar({
       </div>
 
       {/* Bottom PayPal JS SDK v6 Status Widget */}
-      <div>
+      <div className="pt-2">
         <div
           onClick={() => {
             onOpenCredentials?.();
@@ -192,16 +210,16 @@ export function AppSidebar({
           }}
           className="p-3 bg-gradient-to-r from-blue-50/80 to-indigo-50/50 border border-blue-200/80 rounded-2xl cursor-pointer hover:border-[#0070BA]/50 transition-all shadow-2xs group"
         >
-          <div className="flex items-center gap-2.5 mb-1.5">
-            <div className="w-6 h-6 rounded-lg bg-[#0070BA]/10 text-[#0070BA] flex items-center justify-center">
-              <Code2 className="w-3.5 h-3.5" />
+          <div className="flex items-center gap-2 mb-1.5">
+            <div className="w-5 h-5 rounded-md bg-[#0070BA]/10 text-[#0070BA] flex items-center justify-center">
+              <Code2 className="w-3 h-3" />
             </div>
             <div className="text-xs font-bold text-gray-900 group-hover:text-[#0070BA] transition-colors">
               PayPal JS SDK v6
             </div>
           </div>
           <div className="flex items-center justify-between">
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-100/80 text-emerald-800 rounded-full text-[11px] font-semibold">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-100/80 text-emerald-800 rounded-full text-[10px] font-semibold">
               <CheckCircle2 className="w-3 h-3 text-emerald-600" />
               Active
             </span>
@@ -215,20 +233,17 @@ export function AppSidebar({
   return (
     <>
       {/* Desktop Sticky Sidebar */}
-      <aside className="hidden lg:flex w-60 xl:w-64 bg-white border-r border-gray-200 flex-col h-full min-h-[calc(100vh-105px)] select-none shrink-0">
+      <aside className="hidden lg:flex w-60 xl:w-64 bg-white border-r border-gray-200 flex-col h-full select-none shrink-0">
         {sidebarContent}
       </aside>
 
       {/* Mobile Drawer (Slide-Over) */}
       {isMobileOpen && (
         <div className="fixed inset-0 z-50 lg:hidden flex">
-          {/* Overlay Backdrop */}
           <div
             className="fixed inset-0 bg-gray-900/40 backdrop-blur-xs transition-opacity"
             onClick={onCloseMobile}
           />
-
-          {/* Drawer Canvas */}
           <div className="relative w-72 max-w-[80vw] bg-white h-full shadow-2xl z-10 animate-slide-right flex flex-col">
             {sidebarContent}
           </div>
