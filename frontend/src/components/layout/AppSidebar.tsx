@@ -12,11 +12,14 @@ import {
   ChevronRight,
   Code2,
   CheckCircle2,
+  X,
 } from 'lucide-react';
 
 interface AppSidebarProps {
   onOpenTestCards?: () => void;
   onOpenCredentials?: () => void;
+  isMobileOpen?: boolean;
+  onCloseMobile?: () => void;
   activeTab?: string;
   setActiveTab?: (tab: string) => void;
 }
@@ -24,11 +27,11 @@ interface AppSidebarProps {
 export function AppSidebar({
   onOpenTestCards,
   onOpenCredentials,
-  activeTab = 'studio',
+  isMobileOpen = false,
+  onCloseMobile,
   setActiveTab,
 }: AppSidebarProps) {
   const pathname = usePathname();
-
   const [environment, setEnvironment] = React.useState<'sandbox' | 'live'>('sandbox');
   const [showLiveNotice, setShowLiveNotice] = React.useState(false);
 
@@ -56,6 +59,7 @@ export function AppSidebar({
       onClick: (e: React.MouseEvent) => {
         e.preventDefault();
         onOpenTestCards?.();
+        onCloseMobile?.();
       },
     },
     {
@@ -83,40 +87,23 @@ export function AppSidebar({
     setEnvironment('sandbox');
   };
 
-  return (
-    <aside className="w-64 bg-white border-r border-gray-200 flex flex-col justify-between h-full min-h-screen select-none shrink-0">
-      <div className="p-4 space-y-6">
-        {/* Brand Header */}
-        <div className="flex items-center gap-3 px-2 pt-1">
-          {/* Official PayPal Dual-Tone Monogram */}
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0">
-            <svg viewBox="0 0 32 32" className="w-7 h-7" fill="none">
-              <path
-                d="M10.5 4h8.2c4.2 0 7.3 2.8 6.5 7.1-.8 4.2-4.1 6.6-8.2 6.6h-3.4L11.8 28H7l4.8-21.6c.2-.9.5-1.7 1.1-2.1.5-.3 1.1-.3 1.6-.3z"
-                fill="#003087"
-              />
-              <path
-                d="M14.2 11h7.8c3.9 0 6.8 2.6 6 6.6-.7 3.9-3.8 6.1-7.6 6.1h-3.2L15.4 33H11l4.4-20c.2-.8.5-1.6 1-2 .5-.3 1.1-.3 1.6-.3z"
-                fill="#0070BA"
-                style={{ mixBlendMode: 'multiply' }}
-              />
-              <path
-                d="M13.6 11.2c.2-.1.4-.2.6-.2h7.8c1.3 0 2.5.3 3.4.9-.7 3.8-3.6 5.8-7.2 5.8h-3.2l-1.4 8.3h-2.9l2.9-14.8z"
-                fill="#002568"
-                opacity="0.3"
-              />
-            </svg>
+  const sidebarContent = (
+    <div className="flex flex-col justify-between h-full p-4 space-y-6">
+      <div className="space-y-5">
+        {/* Mobile Header with Close Button */}
+        <div className="flex items-center justify-between lg:hidden pb-2 border-b border-gray-100">
+          <div className="flex items-center gap-2">
+            <span className="font-extrabold text-lg tracking-tight text-[#003087]">
+              Pay<span className="text-[#0070BA]">Pal</span>
+            </span>
+            <span className="text-[11px] text-gray-500 font-medium">Developer</span>
           </div>
-          <div>
-            <div className="flex items-center gap-1.5">
-              <span className="font-extrabold text-xl tracking-tight text-[#003087]">
-                Pay<span className="text-[#0070BA]">Pal</span>
-              </span>
-            </div>
-            <p className="text-[11px] font-medium text-gray-500 -mt-0.5 tracking-tight">
-              Developer <span className="text-gray-400">•</span> PayPilot AI
-            </p>
-          </div>
+          <button
+            onClick={onCloseMobile}
+            className="p-1.5 rounded-lg text-gray-500 hover:bg-gray-100"
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
 
         {/* Sandbox / Live Switcher */}
@@ -126,29 +113,29 @@ export function AppSidebar({
               onClick={() => handleEnvToggle('sandbox')}
               className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg text-xs font-semibold transition-all ${
                 environment === 'sandbox'
-                  ? 'bg-[#0070BA] text-white shadow-sm'
+                  ? 'bg-[#0070BA] text-white shadow-xs'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              <span className={`w-2 h-2 rounded-full ${environment === 'sandbox' ? 'bg-white' : 'bg-gray-400'}`} />
+              <span className={`w-1.5 h-1.5 rounded-full ${environment === 'sandbox' ? 'bg-white' : 'bg-gray-400'}`} />
               Sandbox
             </button>
             <button
               onClick={() => handleEnvToggle('live')}
               className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg text-xs font-semibold transition-all ${
                 environment === 'live'
-                  ? 'bg-[#0070BA] text-white shadow-sm'
+                  ? 'bg-[#0070BA] text-white shadow-xs'
                   : 'text-gray-500 hover:text-gray-800'
               }`}
             >
-              <span className="w-2 h-2 rounded-full bg-gray-400" />
+              <span className="w-1.5 h-1.5 rounded-full bg-gray-400" />
               Live
             </button>
           </div>
 
           {showLiveNotice && (
-            <div className="absolute top-full left-0 right-0 mt-1.5 p-2 bg-amber-50 border border-amber-200 rounded-lg text-[11px] text-amber-800 shadow-lg z-20 animate-fade-in">
-              Production live credentials are locked. Use verified PayPal Sandbox environment for evaluation.
+            <div className="absolute top-full left-0 right-0 mt-1.5 p-2 bg-amber-50 border border-amber-200 rounded-lg text-[11px] text-amber-800 shadow-lg z-30 animate-fade-in">
+              Production live credentials are locked. Use verified PayPal Sandbox environment.
             </div>
           )}
         </div>
@@ -168,13 +155,14 @@ export function AppSidebar({
                 onClick={(e) => {
                   if (item.onClick) {
                     item.onClick(e);
-                  } else if (setActiveTab) {
-                    setActiveTab(item.id);
+                  } else {
+                    setActiveTab?.(item.id);
+                    onCloseMobile?.();
                   }
                 }}
                 className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[13px] font-medium transition-colors ${
                   isActive
-                    ? 'bg-[#EBF5FF] text-[#0070BA] font-semibold border border-[#D0E5FF]/60 shadow-sm'
+                    ? 'bg-[#EBF5FF] text-[#0070BA] font-semibold border border-[#D0E5FF]/70 shadow-2xs'
                     : 'text-gray-700 hover:bg-gray-100/70 hover:text-gray-900'
                 }`}
               >
@@ -196,10 +184,13 @@ export function AppSidebar({
       </div>
 
       {/* Bottom PayPal JS SDK v6 Status Widget */}
-      <div className="p-4">
+      <div>
         <div
-          onClick={onOpenCredentials}
-          className="p-3 bg-gradient-to-r from-blue-50/70 to-indigo-50/40 border border-blue-200/80 rounded-2xl cursor-pointer hover:border-[#0070BA]/50 transition-all shadow-xs group"
+          onClick={() => {
+            onOpenCredentials?.();
+            onCloseMobile?.();
+          }}
+          className="p-3 bg-gradient-to-r from-blue-50/80 to-indigo-50/50 border border-blue-200/80 rounded-2xl cursor-pointer hover:border-[#0070BA]/50 transition-all shadow-2xs group"
         >
           <div className="flex items-center gap-2.5 mb-1.5">
             <div className="w-6 h-6 rounded-lg bg-[#0070BA]/10 text-[#0070BA] flex items-center justify-center">
@@ -218,6 +209,31 @@ export function AppSidebar({
           </div>
         </div>
       </div>
-    </aside>
+    </div>
+  );
+
+  return (
+    <>
+      {/* Desktop Sticky Sidebar */}
+      <aside className="hidden lg:flex w-60 xl:w-64 bg-white border-r border-gray-200 flex-col h-full min-h-[calc(100vh-105px)] select-none shrink-0">
+        {sidebarContent}
+      </aside>
+
+      {/* Mobile Drawer (Slide-Over) */}
+      {isMobileOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden flex">
+          {/* Overlay Backdrop */}
+          <div
+            className="fixed inset-0 bg-gray-900/40 backdrop-blur-xs transition-opacity"
+            onClick={onCloseMobile}
+          />
+
+          {/* Drawer Canvas */}
+          <div className="relative w-72 max-w-[80vw] bg-white h-full shadow-2xl z-10 animate-slide-right flex flex-col">
+            {sidebarContent}
+          </div>
+        </div>
+      )}
+    </>
   );
 }

@@ -13,13 +13,15 @@ interface DashboardLayoutProps {
 export function DashboardLayout({ children }: DashboardLayoutProps) {
   const [isTestCardsOpen, setIsTestCardsOpen] = useState(false);
   const [isCredentialsOpen, setIsCredentialsOpen] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#F5F7FA] text-gray-900 flex flex-col">
+    <div className="min-h-screen bg-[#F5F7FA] text-gray-900 flex flex-col antialiased">
       {/* Persistent App Header with Dual Banners */}
       <AppHeader
         onOpenTestCards={() => setIsTestCardsOpen(true)}
         onOpenCredentials={() => setIsCredentialsOpen(true)}
+        onToggleMobileSidebar={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
       />
 
       {/* Main Workspace with Persistent Left Sidebar */}
@@ -27,6 +29,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         <AppSidebar
           onOpenTestCards={() => setIsTestCardsOpen(true)}
           onOpenCredentials={() => setIsCredentialsOpen(true)}
+          isMobileOpen={isMobileSidebarOpen}
+          onCloseMobile={() => setIsMobileSidebarOpen(false)}
         />
 
         <main className="flex-1 overflow-y-auto">
