@@ -1,11 +1,13 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { LaptopVisual, LaptopModelType } from '@/components/catalog/LaptopVisual';
 import { api } from '@/lib/api';
+import { ENABLE_SEED_DATA } from '@/lib/config';
+import { Product } from '@/types/product';
 import {
   ShoppingBag,
   FileText,
@@ -26,13 +28,14 @@ interface CatalogItem {
   id: string;
   visualModel: LaptopModelType;
   name: string;
-  subtitle: string;
+  subtitle?: string;
   score: string;
   isTopPick?: boolean;
   price: number;
-  specs: [string, string, string];
-  category: 'all' | 'ml-laptops' | 'macbooks' | 'workstations';
-  brand: 'Lenovo' | 'Apple' | 'HP' | 'ASUS' | 'Dell';
+  specs: string[];
+  category: string;
+  brand: string;
+  badge?: string;
 }
 
 const CATALOG_ITEMS: CatalogItem[] = [
@@ -118,16 +121,66 @@ export default function CatalogPage() {
   const [favorites, setFavorites] = useState<Record<string, boolean>>({});
   const [showBrandDropdown, setShowBrandDropdown] = useState<boolean>(false);
 
+  const [liveProducts, setLiveProducts] = useState<Product[]>([]);
+
   useEffect(() => {
-    api.getProducts().catch(() => {});
+    api.getProducts().then((prods) => {
+      if (prods && Array.isArray(prods)) {
+        setLiveProducts(prods);
+      }
+    }).catch(() => {});
   }, []);
 
   const toggleFavorite = (id: string) => {
     setFavorites((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
+  const mappedLiveCatalog = useMemo<CatalogItem[]>(() => {
+    return liveProducts.map((p) => {
+      const visualModel: LaptopModelType = (
+        p.externalId?.includes('apple') ? 'macbook-pro' :
+        p.externalId?.includes('victus') ? 'hp-victus' :
+        p.externalId?.includes('rog') ? 'asus-rog' :
+        p.externalId?.includes('dell') ? 'dell-g15' :
+        p.externalId?.includes('nitro') ? 'lenovo-loq' :
+        'lenovo-loq'
+      );
+      const specsArr = p.specifications
+        ? Object.values(p.specifications).slice(0, 3).map(String)
+        : ['16GB DDR5', 'RTX 4060', '144Hz FHD'];
+
+      return {
+        id: p.id,
+        visualModel,
+        name: p.name,
+        category: p.category || 'ML Laptops',
+        brand: p.name.includes('Apple')
+          ? 'Apple'
+          : p.name.includes('ASUS')
+          ? 'ASUS'
+          : p.name.includes('Dell')
+          ? 'Dell'
+          : p.name.includes('HP')
+          ? 'HP'
+          : 'Lenovo',
+        price: Number(p.price || 749),
+        score: '96/100',
+        badge: 'Verified Live',
+        isTopPick: p.name.includes('LOQ') || p.name.includes('TUF'),
+        specs: specsArr,
+      };
+    });
+  }, [liveProducts]);
+
+  const activeCatalog = useMemo(() => {
+    if (!ENABLE_SEED_DATA) {
+      return mappedLiveCatalog;
+    }
+    return CATALOG_ITEMS;
+  }, [mappedLiveCatalog]);
+
   // Filter items based on active filters
-  const filteredItems = CATALOG_ITEMS.filter((item) => {
+  const filteredItems = activeCatalog.filter((item) => {
     if (selectedCategory !== 'all' && item.category !== selectedCategory) {
       return false;
     }

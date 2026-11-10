@@ -2,6 +2,8 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { api } from '@/lib/api';
+import { ENABLE_SEED_DATA } from '@/lib/config';
+import { Order } from '@/types/order';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import {
   Coins,
@@ -258,6 +260,112 @@ export default function TransactionsPage() {
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [selectedTxn, setSelectedTxn] = useState<TransactionItem | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [liveOrders, setLiveOrders] = useState<Order[]>([]);
+
+  // Fetch live orders from MySQL database
+  const fetchOrders = async () => {
+    try {
+      const orders = await api.getOrders();
+      if (orders && Array.isArray(orders)) {
+        setLiveOrders(orders);
+      }
+    } catch {
+      // ignore
+    }
+  };
+
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
+  const handleRefresh = () => {
+    setIsRefreshing(true);
+    fetchOrders().finally(() => {
+      setTimeout(() => {
+        setIsRefreshing(false);
+      }, 500);
+    });
+  };
+
+  // Map live MySQL orders to TransactionItem format
+  const mappedLiveTransactions = useMemo<TransactionItem[]>(() => {
+    return liveOrders.map((order) => {
+      const modelKey = (
+        order.Product?.externalId?.includes('apple') ? 'macbook-pro' :
+        order.Product?.externalId?.includes('victus') ? 'hp-victus' :
+        order.Product?.externalId?.includes('rog') ? 'asus-rog' :
+        order.Product?.externalId?.includes('dell') ? 'dell-g15' :
+        order.Product?.externalId?.includes('legion') ? 'lenovo-legion' :
+        'lenovo-loq'
+      ) as TransactionItem['modelKey'];
+
+      const isCaptured =
+        order.status === 'CAPTURED' ||
+        (order as any).status === 'paid' ||
+        (order as any).status === 'completed';
+      const status: TransactionItem['status'] = isCaptured ? 'CAPTURED' : 'ON_HOLD';
+
+      return {
+        id: `TXN-${order.id.slice(0, 8).toUpperCase()}`,
+        orderId: order.paypalOrderId || `ORD-${order.id.slice(0, 8).toUpperCase()}`,
+        captureId: order.paypalCaptureId || 'C-PENDING-CAPTURE',
+        name: order.Product?.name || 'Lenovo LOQ 15 Gaming & ML Laptop',
+        specs: (order.Product as any)?.specifications
+          ? Object.values((order.Product as any).specifications).slice(0, 3).join(' • ')
+          : 'RTX 4060 • 16GB • 100% sRGB',
+        brand: order.Product?.name?.includes('Apple') ? 'Apple' : 'Lenovo',
+        modelKey,
+        amount: `$${Number(order.totalAmount || 749).toFixed(2)} USD`,
+        amountNumeric: Number(order.totalAmount || 749),
+        currency: order.currency || 'USD',
+        status,
+        date: new Date(order.createdAt || Date.now()).toLocaleDateString('en-US', {
+          month: 'short',
+          day: '2-digit',
+          year: 'numeric',
+        }),
+        time: new Date(order.createdAt || Date.now()).toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit',
+        }),
+        sellerProtection: 'ELIGIBLE',
+        paymentMethod: 'PayPal Balance / Instant',
+      };
+    });
+  }, [liveOrders]);
+
+  // Combined dataset governed by NEXT_PUBLIC_ENABLE_SEED_DATA rule
+  const allTransactions = useMemo<TransactionItem[]>(() => {
+    if (!ENABLE_SEED_DATA) {
+      return mappedLiveTransactions;
+    }
+    const liveIds = new Set(mappedLiveTransactions.map((t) => t.orderId));
+    const dedupedSeed = INITIAL_TRANSACTIONS.filter((t) => !liveIds.has(t.orderId));
+    return [...mappedLiveTransactions, ...dedupedSeed];
+  }, [mappedLiveTransactions]);
+
+  // Dynamic KPI Metrics
+  const totalVolumeFormatted = useMemo(() => {
+    if (ENABLE_SEED_DATA && mappedLiveTransactions.length === 0) {
+      return '$4,215.00';
+    }
+    const sum = allTransactions.reduce((acc, t) => acc + t.amountNumeric, 0);
+    return `$${sum.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  }, [allTransactions, mappedLiveTransactions.length]);
+
+  const settledCapturesCount = useMemo(() => {
+    if (ENABLE_SEED_DATA && mappedLiveTransactions.length === 0) {
+      return 6;
+    }
+    return allTransactions.filter((t) => t.status === 'CAPTURED').length;
+  }, [allTransactions, mappedLiveTransactions.length]);
+
+  const activeEscrowsCount = useMemo(() => {
+    if (ENABLE_SEED_DATA && mappedLiveTransactions.length === 0) {
+      return 1;
+    }
+    return allTransactions.filter((t) => t.status === 'ON_HOLD').length;
+  }, [allTransactions, mappedLiveTransactions.length]);
 
   // Copy helper with animated checkmark
   const handleCopy = (text: string, key: string) => {
@@ -270,7 +378,7 @@ export default function TransactionsPage() {
 
   // Filtered transactions
   const filteredTransactions = useMemo(() => {
-    return INITIAL_TRANSACTIONS.filter((txn) => {
+    return allTransactions.filter((txn) => {
       const matchesSearch =
         txn.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
         txn.orderId.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -282,7 +390,7 @@ export default function TransactionsPage() {
 
       return matchesSearch && matchesStatus;
     });
-  }, [searchQuery, statusFilter]);
+  }, [allTransactions, searchQuery, statusFilter]);
 
   // Export CSV generator
   const handleExportCSV = () => {
@@ -326,19 +434,6 @@ export default function TransactionsPage() {
     link.click();
     document.body.removeChild(link);
   };
-
-  const handleRefresh = () => {
-    setIsRefreshing(true);
-    api.getOrders().finally(() => {
-      setTimeout(() => {
-        setIsRefreshing(false);
-      }, 500);
-    });
-  };
-
-  useEffect(() => {
-    api.getOrders().catch(() => {});
-  }, []);
 
   return (
     <DashboardLayout>
@@ -408,7 +503,7 @@ export default function TransactionsPage() {
                 </span>
                 <div className="flex items-baseline gap-1.5 mt-0.5">
                   <span className="text-2xl font-black text-gray-900 tracking-tight font-mono">
-                    $4,215.00
+                    {totalVolumeFormatted}
                   </span>
                   <span className="text-xs font-bold text-gray-500 font-mono">USD</span>
                   <span className="inline-flex items-center gap-0.5 text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 ml-1">
@@ -416,7 +511,7 @@ export default function TransactionsPage() {
                   </span>
                 </div>
                 <span className="text-[11px] text-gray-400 font-medium block mt-0.5">
-                  Sandbox (Test) • Last 7 days
+                  {ENABLE_SEED_DATA ? 'Sandbox (Test) • Last 7 days' : 'Live MySQL Orders • PayPal Sandbox'}
                 </span>
               </div>
             </div>
@@ -434,10 +529,10 @@ export default function TransactionsPage() {
                 </span>
                 <div className="flex items-baseline gap-1.5 mt-0.5">
                   <span className="text-2xl font-black text-gray-900 tracking-tight font-mono">
-                    6
+                    {settledCapturesCount}
                   </span>
                   <span className="inline-flex items-center gap-0.5 text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 ml-1">
-                    ▲ +6
+                    ▲ +{settledCapturesCount}
                   </span>
                 </div>
                 <span className="text-[11px] text-gray-400 font-medium block mt-0.5">
@@ -459,7 +554,7 @@ export default function TransactionsPage() {
                 </span>
                 <div className="flex items-baseline gap-1.5 mt-0.5">
                   <span className="text-2xl font-black text-gray-900 tracking-tight font-mono">
-                    1
+                    {activeEscrowsCount}
                   </span>
                   <span className="inline-flex items-center gap-0.5 text-[11px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200 ml-1">
                     — 0%
@@ -744,9 +839,15 @@ export default function TransactionsPage() {
                       <tr>
                         <td colSpan={8} className="py-12 text-center text-gray-500">
                           <Search className="w-8 h-8 text-gray-300 mx-auto mb-2" />
-                          <p className="font-medium text-gray-700">No matching transactions found</p>
+                          <p className="font-medium text-gray-700">
+                            {!ENABLE_SEED_DATA && allTransactions.length === 0
+                              ? 'No Live Transactions in MySQL Database'
+                              : 'No matching transactions found'}
+                          </p>
                           <p className="text-xs text-gray-400 mt-1">
-                            Try adjusting your search query or status filter.
+                            {!ENABLE_SEED_DATA && allTransactions.length === 0
+                              ? 'Pure Live Mode is active (NEXT_PUBLIC_ENABLE_SEED_DATA=false). Complete a checkout in Shopping Studio to generate your first live PayPal ledger entry.'
+                              : 'Try adjusting your search query or status filter.'}
                           </p>
                         </td>
                       </tr>

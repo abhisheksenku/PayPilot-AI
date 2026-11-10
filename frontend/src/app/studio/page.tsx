@@ -31,8 +31,57 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { LenovoLaptopHero } from '@/components/studio/LenovoLaptopHero';
 import { PayPalCheckoutModal } from '@/components/modals/PayPalCheckoutModal';
 import { api, fallbackProduct } from '@/lib/api';
+import { ENABLE_SEED_DATA } from '@/lib/config';
 import { RankedProduct } from '@/types/product';
 import { AgentExecutionLog } from '@/types/agent';
+import { Order } from '@/types/order';
+
+const INITIAL_LOGS: AgentExecutionLog[] = [
+  {
+    id: 'log-1',
+    agentRole: 'supervisor',
+    stepIndex: 1,
+    toolName: 'parseIntent',
+    inputSummary: 'I need a laptop under ₹70,000 for programming, machine learning, and occasional gaming.',
+    outputSummary: 'Intent parsed: Developer ML & Gaming Hardware.',
+    status: 'completed',
+    executionTimeMs: 140,
+    timestamp: '10:24:31 AM',
+  },
+  {
+    id: 'log-2',
+    agentRole: 'research',
+    stepIndex: 2,
+    toolName: 'queryChannel3Catalog',
+    inputSummary: 'Querying catalog with 115W TGP GPU and >= 16GB RAM constraint',
+    outputSummary: '12 models discovered from Channel3 catalog.',
+    status: 'completed',
+    executionTimeMs: 280,
+    timestamp: '10:24:38 AM',
+  },
+  {
+    id: 'log-3',
+    agentRole: 'analyst',
+    stepIndex: 3,
+    toolName: 'benchmarkScoring',
+    inputSummary: 'Benchmarking PyTorch FP16 matrix operations and thermals',
+    outputSummary: 'Lenovo LOQ 15 ranked #1 (98/100 score, 115W TGP).',
+    status: 'completed',
+    executionTimeMs: 320,
+    timestamp: '10:24:46 AM',
+  },
+  {
+    id: 'log-4',
+    agentRole: 'purchase',
+    stepIndex: 4,
+    toolName: 'createPriceLockOrderDraft',
+    inputSummary: 'Server price lock evaluation against budget cap $824 USD',
+    outputSummary: 'Server price locked at $749.00 USD ($75 under budget).',
+    status: 'completed',
+    executionTimeMs: 95,
+    timestamp: '10:24:52 AM',
+  },
+];
 
 export default function StudioPage() {
   const [activeSubTab, setActiveSubTab] = useState<'studio' | 'orders' | 'logs'>('studio');
@@ -46,6 +95,7 @@ export default function StudioPage() {
   const [product, setProduct] = useState<RankedProduct>(fallbackProduct);
   const [budgetINR, setBudgetINR] = useState(70000);
   const [budgetUSD, setBudgetUSD] = useState(824.0);
+  const [studioOrders, setStudioOrders] = useState<Order[]>([]);
   const [paymentSuccess, setPaymentSuccess] = useState<{
     captureId: string;
     orderId: string;
@@ -57,58 +107,36 @@ export default function StudioPage() {
       ? product.price
       : parseFloat(String(product.price)) || 749.0;
 
-  const [logs, setLogs] = useState<AgentExecutionLog[]>([
-    {
-      id: 'log-1',
-      agentRole: 'supervisor',
-      stepIndex: 1,
-      toolName: 'parseIntent',
-      inputSummary: 'I need a laptop under ₹70,000 for programming, machine learning, and occasional gaming.',
-      outputSummary: 'Intent parsed: Developer ML & Gaming Hardware.',
-      status: 'completed',
-      executionTimeMs: 140,
-      timestamp: '10:24:31 AM',
-    },
-    {
-      id: 'log-2',
-      agentRole: 'research',
-      stepIndex: 2,
-      toolName: 'queryChannel3Catalog',
-      inputSummary: 'Querying catalog with 115W TGP GPU and >= 16GB RAM constraint',
-      outputSummary: '12 models discovered from Channel3 catalog.',
-      status: 'completed',
-      executionTimeMs: 280,
-      timestamp: '10:24:38 AM',
-    },
-    {
-      id: 'log-3',
-      agentRole: 'analyst',
-      stepIndex: 3,
-      toolName: 'benchmarkScoring',
-      inputSummary: 'Benchmarking PyTorch FP16 matrix operations and thermals',
-      outputSummary: 'Lenovo LOQ 15 ranked #1 (98/100 score, 115W TGP).',
-      status: 'completed',
-      executionTimeMs: 320,
-      timestamp: '10:24:46 AM',
-    },
-    {
-      id: 'log-4',
-      agentRole: 'purchase',
-      stepIndex: 4,
-      toolName: 'createPriceLockOrderDraft',
-      inputSummary: 'Server price lock evaluation against budget cap $824 USD',
-      outputSummary: 'Server price locked at $749.00 USD ($75 under budget).',
-      status: 'completed',
-      executionTimeMs: 95,
-      timestamp: '10:24:52 AM',
-    },
-  ]);
+  const [logs, setLogs] = useState<AgentExecutionLog[]>(ENABLE_SEED_DATA ? INITIAL_LOGS : []);
 
   const checkoutRef = useRef<HTMLDivElement>(null);
 
-  // Fetch initial product catalog from backend on mount
+  const fetchOrders = () => {
+    api.getOrders().then((orders) => {
+      if (orders && Array.isArray(orders)) {
+        setStudioOrders(orders);
+      }
+    }).catch(() => {});
+  };
+
+  // Fetch initial product catalog & orders from backend on mount
   useEffect(() => {
-    api.getProducts().catch(() => {});
+    api.getProducts().then((prods) => {
+      if (prods && prods.length > 0) {
+        const lenovo = prods.find((p) => p.name.includes('Lenovo')) || prods[0];
+        setProduct((prev) => ({
+          ...prev,
+          id: lenovo.id,
+          externalId: lenovo.externalId,
+          name: lenovo.name,
+          price: typeof lenovo.price === 'string' ? parseFloat(lenovo.price) : lenovo.price,
+          description: lenovo.description || prev.description,
+          imageUrl: lenovo.imageUrl || prev.imageUrl,
+          specifications: lenovo.specifications || prev.specifications,
+        }));
+      }
+    }).catch(() => {});
+    fetchOrders();
   }, []);
 
   // Handle prompt submission to backend swarm
@@ -154,6 +182,7 @@ export default function StudioPage() {
       orderId,
       amount: numericPrice,
     });
+    fetchOrders();
   };
 
   return (
@@ -271,142 +300,133 @@ export default function StudioPage() {
                     </div>
                     <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/80">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                      4 Agents Active
+                      {logs.length > 0 ? `${logs.length} Agents Logged` : 'Swarm Standby'}
                     </span>
                   </div>
 
-                  {/* Vertical Step Timeline */}
-                  <div className="relative pl-5 sm:pl-6 space-y-2.5 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-[2px] before:bg-blue-100">
-                    {/* Step 1: Supervisor */}
-                    <div className="relative group">
-                      <div className="absolute -left-5 sm:-left-6 top-1.5 w-4 h-4 rounded-full bg-white border-2 border-violet-500 flex items-center justify-center">
-                        <div className="w-1.5 h-1.5 rounded-full bg-violet-600" />
+                  {/* Vertical Step Timeline or Standby Prompt */}
+                  {logs.length === 0 ? (
+                    <div className="py-8 px-4 text-center space-y-3 bg-gray-50/70 rounded-xl border border-dashed border-gray-200 my-2">
+                      <div className="w-10 h-10 rounded-full bg-blue-50 text-[#0070BA] flex items-center justify-center mx-auto">
+                        <Bot className="w-5 h-5" />
                       </div>
-                      <div className="p-2.5 bg-violet-50/40 hover:bg-violet-50 rounded-xl border border-violet-100 transition-colors">
-                        <div className="flex items-center justify-between mb-0.5">
-                          <div className="flex items-center gap-1.5">
-                            <div className="w-5 h-5 rounded-md bg-violet-100 text-violet-700 flex items-center justify-center">
-                              <Bot className="w-3 h-3" />
-                            </div>
-                            <span className="font-bold text-[11px] text-violet-900 bg-violet-100/70 px-2 py-0.5 rounded-md">
-                              Supervisor Agent
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-1 text-[10px] font-medium text-emerald-700">
-                            <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                            <span>Completed 10:24:31 AM</span>
-                          </div>
-                        </div>
-                        <p className="text-xs text-gray-700 pl-7">
-                          Intent parsed: Developer ML & Gaming Hardware.
+                      <div className="space-y-1">
+                        <h4 className="text-xs font-bold text-gray-900">Multi-Agent Swarm Ready</h4>
+                        <p className="text-[11px] text-gray-500 max-w-xs mx-auto leading-relaxed">
+                          Submit a hardware shopping query or click one of the prompt chips below to trigger live LangGraph reasoning across Supervisor, Channel3, Analyst, and PayPal Purchase agents.
                         </p>
                       </div>
+                      <button
+                        type="button"
+                        onClick={() => handleRunSwarm('I need a laptop under ₹70,000 for programming, machine learning and occasional gaming')}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#0070BA] hover:bg-[#003087] text-white rounded-lg text-[11px] font-semibold transition-colors cursor-pointer shadow-2xs"
+                      >
+                        <Sparkles className="w-3 h-3" />
+                        <span>Run Sample Query</span>
+                      </button>
                     </div>
+                  ) : (
+                    <div className="relative pl-5 sm:pl-6 space-y-2.5 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-[2px] before:bg-blue-100">
+                      {logs.map((log, idx) => {
+                        const isSupervisor = log.agentRole === 'supervisor';
+                        const isResearch = log.agentRole === 'research';
+                        const isAnalyst = log.agentRole === 'analyst';
 
-                    {/* Step 2: Shopping Research Agent */}
-                    <div className="relative group">
-                      <div className="absolute -left-5 sm:-left-6 top-1.5 w-4 h-4 rounded-full bg-white border-2 border-teal-500 flex items-center justify-center">
-                        <div className="w-1.5 h-1.5 rounded-full bg-teal-600" />
-                      </div>
-                      <div className="p-2.5 bg-teal-50/40 hover:bg-teal-50 rounded-xl border border-teal-100 transition-colors">
-                        <div className="flex items-center justify-between mb-0.5">
-                          <div className="flex items-center gap-1.5">
-                            <div className="w-5 h-5 rounded-md bg-teal-100 text-teal-700 flex items-center justify-center">
-                              <Search className="w-3 h-3" />
-                            </div>
-                            <span className="font-bold text-[11px] text-teal-900 bg-teal-100/70 px-2 py-0.5 rounded-md">
-                              Shopping Research Agent
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-1 text-[10px] font-medium text-emerald-700">
-                            <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                            <span>Completed 10:24:38 AM</span>
-                          </div>
-                        </div>
-                        <p className="text-xs text-gray-700 pl-7">
-                          12 models discovered from Channel3 catalog.
-                        </p>
-                      </div>
-                    </div>
+                        const colorClasses = isSupervisor
+                          ? {
+                              border: 'border-violet-500',
+                              dot: 'bg-violet-600',
+                              cardBg: 'bg-violet-50/40 hover:bg-violet-50 border-violet-100',
+                              iconBg: 'bg-violet-100 text-violet-700',
+                              badge: 'text-violet-900 bg-violet-100/70',
+                              title: 'Supervisor Agent',
+                            }
+                          : isResearch
+                          ? {
+                              border: 'border-teal-500',
+                              dot: 'bg-teal-600',
+                              cardBg: 'bg-teal-50/40 hover:bg-teal-50 border-teal-100',
+                              iconBg: 'bg-teal-100 text-teal-700',
+                              badge: 'text-teal-900 bg-teal-100/70',
+                              title: 'Shopping Research Agent',
+                            }
+                          : isAnalyst
+                          ? {
+                              border: 'border-purple-500',
+                              dot: 'bg-purple-600',
+                              cardBg: 'bg-purple-50/40 hover:bg-purple-50 border-purple-100',
+                              iconBg: 'bg-purple-100 text-purple-700',
+                              badge: 'text-purple-900 bg-purple-100/70',
+                              title: 'Product Analyst Agent',
+                            }
+                          : {
+                              border: 'border-[#0070BA]',
+                              dot: 'bg-[#0070BA]',
+                              cardBg: 'bg-blue-50/40 hover:bg-blue-50 border-blue-100',
+                              iconBg: 'bg-blue-100 text-[#0070BA]',
+                              badge: 'text-blue-900 bg-blue-100/70',
+                              title: 'Purchase Guardrail Agent',
+                            };
 
-                    {/* Step 3: Product Analyst Agent */}
-                    <div className="relative group">
-                      <div className="absolute -left-5 sm:-left-6 top-1.5 w-4 h-4 rounded-full bg-white border-2 border-purple-500 flex items-center justify-center">
-                        <div className="w-1.5 h-1.5 rounded-full bg-purple-600" />
-                      </div>
-                      <div className="p-2.5 bg-purple-50/40 hover:bg-purple-50 rounded-xl border border-purple-100 transition-colors">
-                        <div className="flex items-center justify-between mb-0.5">
-                          <div className="flex items-center gap-1.5">
-                            <div className="w-5 h-5 rounded-md bg-purple-100 text-purple-700 flex items-center justify-center">
-                              <BarChart3 className="w-3 h-3" />
-                            </div>
-                            <span className="font-bold text-[11px] text-purple-900 bg-purple-100/70 px-2 py-0.5 rounded-md">
-                              Product Analyst Agent
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-1 text-[10px] font-medium text-emerald-700">
-                            <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                            <span>Completed 10:24:46 AM</span>
-                          </div>
-                        </div>
-                        <p className="text-xs text-gray-700 pl-7">
-                          Lenovo LOQ 15 ranked #1 (98/100 score, 115W TGP).
-                        </p>
-                      </div>
-                    </div>
+                        const StepIcon = isSupervisor ? Bot : isResearch ? Search : isAnalyst ? BarChart3 : Shield;
 
-                    {/* Step 4: Purchase Guardrail Agent */}
-                    <div className="relative group">
-                      <div className="absolute -left-5 sm:-left-6 top-1.5 w-4 h-4 rounded-full bg-white border-2 border-[#0070BA] flex items-center justify-center">
-                        <div className="w-1.5 h-1.5 rounded-full bg-[#0070BA]" />
-                      </div>
-                      <div className="p-2.5 bg-blue-50/40 hover:bg-blue-50 rounded-xl border border-blue-100 transition-colors">
-                        <div className="flex items-center justify-between mb-0.5">
-                          <div className="flex items-center gap-1.5">
-                            <div className="w-5 h-5 rounded-md bg-blue-100 text-[#0070BA] flex items-center justify-center">
-                              <Shield className="w-3 h-3" />
+                        return (
+                          <div key={log.id || idx} className="relative group">
+                            <div className={`absolute -left-5 sm:-left-6 top-1.5 w-4 h-4 rounded-full bg-white border-2 ${colorClasses.border} flex items-center justify-center`}>
+                              <div className={`w-1.5 h-1.5 rounded-full ${colorClasses.dot}`} />
                             </div>
-                            <span className="font-bold text-[11px] text-blue-900 bg-blue-100/70 px-2 py-0.5 rounded-md">
-                              Purchase Guardrail Agent
-                            </span>
+                            <div className={`p-2.5 rounded-xl border transition-colors ${colorClasses.cardBg}`}>
+                              <div className="flex items-center justify-between mb-0.5">
+                                <div className="flex items-center gap-1.5">
+                                  <div className={`w-5 h-5 rounded-md flex items-center justify-center ${colorClasses.iconBg}`}>
+                                    <StepIcon className="w-3 h-3" />
+                                  </div>
+                                  <span className={`font-bold text-[11px] px-2 py-0.5 rounded-md ${colorClasses.badge}`}>
+                                    {colorClasses.title}
+                                  </span>
+                                </div>
+                                <div className="flex items-center gap-1 text-[10px] font-medium text-emerald-700">
+                                  <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                                  <span>Completed {log.timestamp || '10:24 AM'}</span>
+                                </div>
+                              </div>
+                              <p className="text-xs text-gray-700 pl-7">
+                                {log.outputSummary || log.inputSummary}
+                              </p>
+                            </div>
                           </div>
-                          <div className="flex items-center gap-1 text-[10px] font-medium text-emerald-700">
-                            <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                            <span>Completed 10:24:52 AM</span>
-                          </div>
-                        </div>
-                        <p className="text-xs text-gray-700 pl-7">
-                          Server price locked at ${numericPrice.toFixed(2)} USD ($75 under budget).
-                        </p>
-                      </div>
+                        );
+                      })}
                     </div>
-                  </div>
+                  )}
                 </div>
 
                 {/* Bottom Actions of Swarm Card */}
-                <div className="space-y-2.5 pt-2">
-                  {/* Amber Warning Checkpoint */}
-                  <div className="bg-[#FFFBEB] border border-[#FDE68A] rounded-xl p-2.5 sm:p-3 flex items-start gap-2">
-                    <AlertTriangle className="w-3.5 h-3.5 text-[#B45309] shrink-0 mt-0.5" />
-                    <div>
-                      <h4 className="text-xs font-bold text-[#92400E]">
-                        Execution Halted at Human-in-the-Loop Checkpoint
-                      </h4>
-                      <p className="text-[11px] text-[#B45309] mt-0.5 leading-relaxed">
-                        Please review the recommended product, locked price, and authorize the purchase via PayPal.
-                      </p>
+                {logs.length > 0 && (
+                  <div className="space-y-2.5 pt-2">
+                    {/* Amber Warning Checkpoint */}
+                    <div className="bg-[#FFFBEB] border border-[#FDE68A] rounded-xl p-2.5 sm:p-3 flex items-start gap-2">
+                      <AlertTriangle className="w-3.5 h-3.5 text-[#B45309] shrink-0 mt-0.5" />
+                      <div>
+                        <h4 className="text-xs font-bold text-[#92400E]">
+                          Execution Halted at Human-in-the-Loop Checkpoint
+                        </h4>
+                        <p className="text-[11px] text-[#B45309] mt-0.5 leading-relaxed">
+                          Please review the recommended product, locked price, and authorize the purchase via PayPal.
+                        </p>
+                      </div>
                     </div>
-                  </div>
 
-                  {/* Big Blue CTA Button */}
-                  <button
-                    onClick={() => setIsCheckoutModalOpen(true)}
-                    className="w-full py-2.5 px-4 bg-[#0070BA] hover:bg-[#005ea6] text-white font-bold text-xs sm:text-sm rounded-xl shadow-2xs hover:shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer group"
-                  >
-                    <span className="font-black text-sm tracking-tight">P</span>
-                    <span>Review Price Lock & Authorize via PayPal (${numericPrice.toFixed(2)}) →</span>
-                  </button>
-                </div>
+                    {/* Big Blue CTA Button */}
+                    <button
+                      onClick={() => setIsCheckoutModalOpen(true)}
+                      className="w-full py-2.5 px-4 bg-[#0070BA] hover:bg-[#005ea6] text-white font-bold text-xs sm:text-sm rounded-xl shadow-2xs hover:shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer group"
+                    >
+                      <span className="font-black text-sm tracking-tight">P</span>
+                      <span>Review Price Lock & Authorize via PayPal (${numericPrice.toFixed(2)}) →</span>
+                    </button>
+                  </div>
+                )}
               </div>
 
               {/* Card 3: Prompt & Chat Input */}
@@ -658,38 +678,83 @@ export default function StudioPage() {
                 <p className="text-xs text-gray-500">Live ledger of purchases authorized through PayPal</p>
               </div>
               <span className="text-xs font-semibold px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-full border border-emerald-200">
-                1 Active Record
+                {studioOrders.length > 0
+                  ? `${studioOrders.length} Active Record${studioOrders.length > 1 ? 's' : ''}`
+                  : ENABLE_SEED_DATA
+                  ? '1 Active Record'
+                  : '0 Active Records'}
               </span>
             </div>
 
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
-                <thead>
-                  <tr className="bg-gray-50 text-gray-600 font-semibold border-b border-gray-200">
-                    <th className="py-3 px-4">Order Reference</th>
-                    <th className="py-3 px-4">Hardware Item</th>
-                    <th className="py-3 px-4">Amount</th>
-                    <th className="py-3 px-4">PayPal Order ID</th>
-                    <th className="py-3 px-4">Status</th>
-                    <th className="py-3 px-4">Date</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100 text-gray-800">
-                  <tr className="hover:bg-gray-50/70 transition-colors">
-                    <td className="py-3 px-4 font-mono font-semibold text-[#0070BA]">ORD-2026-8842</td>
-                    <td className="py-3 px-4 font-medium">Lenovo LOQ 15 Gaming & ML Laptop</td>
-                    <td className="py-3 px-4 font-bold font-mono">$749.00 USD</td>
-                    <td className="py-3 px-4 font-mono text-gray-600">57H46888ER9629107</td>
-                    <td className="py-3 px-4">
-                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-800">
-                        <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                        CAPTURED
-                      </span>
-                    </td>
-                    <td className="py-3 px-4 text-gray-500">Today, 10:25 AM</td>
-                  </tr>
-                </tbody>
-              </table>
+              {studioOrders.length === 0 && !ENABLE_SEED_DATA ? (
+                <div className="py-12 text-center text-xs text-gray-500 space-y-2">
+                  <div className="w-8 h-8 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center mx-auto">
+                    <ShoppingBag className="w-4 h-4" />
+                  </div>
+                  <p className="font-semibold text-gray-700">No live orders recorded yet</p>
+                  <p className="text-gray-400">Complete an order via PayPal in the Studio tab to see real ledger entries here.</p>
+                </div>
+              ) : (
+                <table className="w-full text-left text-xs">
+                  <thead>
+                    <tr className="bg-gray-50 text-gray-600 font-semibold border-b border-gray-200">
+                      <th className="py-3 px-4">Order Reference</th>
+                      <th className="py-3 px-4">Hardware Item</th>
+                      <th className="py-3 px-4">Amount</th>
+                      <th className="py-3 px-4">PayPal Order ID</th>
+                      <th className="py-3 px-4">Status</th>
+                      <th className="py-3 px-4">Date</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100 text-gray-800">
+                    {studioOrders.length > 0 ? (
+                      studioOrders.map((ord) => (
+                        <tr key={ord.id} className="hover:bg-gray-50/70 transition-colors">
+                          <td className="py-3 px-4 font-mono font-semibold text-[#0070BA]">
+                            ORD-{ord.id.slice(0, 8).toUpperCase()}
+                          </td>
+                          <td className="py-3 px-4 font-medium">
+                            {ord.Product?.name || 'Lenovo LOQ 15 Gaming & ML Laptop'}
+                          </td>
+                          <td className="py-3 px-4 font-bold font-mono">
+                            ${Number(ord.totalAmount || 749).toFixed(2)} USD
+                          </td>
+                          <td className="py-3 px-4 font-mono text-gray-600">
+                            {ord.paypalOrderId || ord.id}
+                          </td>
+                          <td className="py-3 px-4">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-800">
+                              <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                              {ord.status || 'CAPTURED'}
+                            </span>
+                          </td>
+                          <td className="py-3 px-4 text-gray-500">
+                            {new Date(ord.createdAt || Date.now()).toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: '2-digit',
+                            })}
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr className="hover:bg-gray-50/70 transition-colors">
+                        <td className="py-3 px-4 font-mono font-semibold text-[#0070BA]">ORD-2026-8842</td>
+                        <td className="py-3 px-4 font-medium">Lenovo LOQ 15 Gaming & ML Laptop</td>
+                        <td className="py-3 px-4 font-bold font-mono">$749.00 USD</td>
+                        <td className="py-3 px-4 font-mono text-gray-600">57H46888ER9629107</td>
+                        <td className="py-3 px-4">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-800">
+                            <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                            CAPTURED
+                          </span>
+                        </td>
+                        <td className="py-3 px-4 text-gray-500">Today, 10:25 AM</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              )}
             </div>
           </div>
         )}
@@ -702,21 +767,33 @@ export default function StudioPage() {
                 <h3 className="text-base font-bold text-gray-900">Multi-Agent Swarm Audit Trail</h3>
                 <p className="text-xs text-gray-500">Chronological telemetry of tool execution and state transitions</p>
               </div>
-              <span className="text-xs font-mono text-gray-500">4 Events Captured</span>
+              <span className="text-xs font-mono text-gray-500">
+                {logs.length} Event{logs.length === 1 ? '' : 's'} Captured
+              </span>
             </div>
 
-            <div className="space-y-3">
-              {logs.map((log) => (
-                <div key={log.id} className="p-4 bg-gray-50 rounded-xl border border-gray-200 font-mono text-xs space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <span className="font-bold text-[#0070BA] uppercase">[{log.agentRole}] {log.toolName}</span>
-                    <span className="text-gray-500 text-[11px]">{log.timestamp} • {log.executionTimeMs}ms</span>
-                  </div>
-                  <div className="text-gray-700"><strong>Input:</strong> {log.inputSummary}</div>
-                  <div className="text-emerald-700"><strong>Result:</strong> {log.outputSummary}</div>
+            {logs.length === 0 ? (
+              <div className="py-12 text-center text-xs text-gray-500 space-y-2">
+                <div className="w-8 h-8 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center mx-auto">
+                  <Activity className="w-4 h-4" />
                 </div>
-              ))}
-            </div>
+                <p className="font-semibold text-gray-700">No agent telemetry logged yet</p>
+                <p className="text-gray-400">Trigger a prompt in the Studio tab to stream live multi-agent execution events.</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {logs.map((log) => (
+                  <div key={log.id} className="p-4 bg-gray-50 rounded-xl border border-gray-200 font-mono text-xs space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-[#0070BA] uppercase">[{log.agentRole}] {log.toolName}</span>
+                      <span className="text-gray-500 text-[11px]">{log.timestamp} • {log.executionTimeMs}ms</span>
+                    </div>
+                    <div className="text-gray-700"><strong>Input:</strong> {log.inputSummary}</div>
+                    <div className="text-emerald-700"><strong>Result:</strong> {log.outputSummary}</div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </div>

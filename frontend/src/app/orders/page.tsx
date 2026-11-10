@@ -2,6 +2,8 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { api } from '@/lib/api';
+import { ENABLE_SEED_DATA } from '@/lib/config';
+import { Order } from '@/types/order';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import {
   ShoppingCart,
@@ -253,22 +255,100 @@ export default function OrdersPage() {
   const [dateFilter, setDateFilter] = useState('7d');
   const [isSentNotice, setIsSentNotice] = useState(false);
   const [isManualModalOpen, setIsManualModalOpen] = useState(false);
+  const [liveOrders, setLiveOrders] = useState<Order[]>([]);
 
   useEffect(() => {
-    api.getOrders().catch(() => {});
+    api.getOrders().then((orders) => {
+      if (orders && Array.isArray(orders)) {
+        setLiveOrders(orders);
+      }
+    }).catch(() => {});
   }, []);
+
+  const mappedLiveOrders = useMemo<OrderItem[]>(() => {
+    return liveOrders.map((order) => {
+      const modelKey = (
+        order.Product?.externalId?.includes('apple') ? 'macbook-pro' :
+        order.Product?.externalId?.includes('victus') ? 'hp-victus' :
+        order.Product?.externalId?.includes('rog') ? 'asus-rog' :
+        order.Product?.externalId?.includes('dell') ? 'dell-g15' :
+        order.Product?.externalId?.includes('legion') ? 'lenovo-legion' :
+        'lenovo-loq'
+      ) as OrderItem['modelKey'];
+
+      const isDelivered =
+        order.status === 'CAPTURED' ||
+        (order as any).status === 'paid' ||
+        (order as any).status === 'completed';
+      const status: OrderItem['status'] = isDelivered ? 'DELIVERED' : 'IN_TRANSIT';
+
+      return {
+        id: order.paypalOrderId || `ORD-${order.id.slice(0, 8).toUpperCase()}`,
+        transactionId: order.paypalCaptureId || `TXN-${order.id.slice(0, 8).toUpperCase()}`,
+        customerName: 'Abhishek UthukotaSriram',
+        customerEmail: 'abhishek.sriram@example.com',
+        name: order.Product?.name || 'Lenovo LOQ 15 Gaming & ML Laptop',
+        specs: (order.Product as any)?.specifications
+          ? Object.values((order.Product as any).specifications).slice(0, 3).join(' • ')
+          : 'RTX 4060 • 16GB DDR5 • 115W TGP',
+        modelKey,
+        amount: `$${Number(order.totalAmount || 749).toFixed(2)} USD`,
+        amountNumeric: Number(order.totalAmount || 749),
+        paymentMethod: 'PayPal Balance',
+        status,
+        date: new Date(order.createdAt || Date.now()).toLocaleDateString('en-US', {
+          month: 'short',
+          day: '2-digit',
+          year: 'numeric',
+        }),
+        time: new Date(order.createdAt || Date.now()).toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit',
+        }) + ' (IST)',
+        shipping: 'Free',
+        tax: '$0.00',
+      };
+    });
+  }, [liveOrders]);
+
+  // Combined dataset governed by NEXT_PUBLIC_ENABLE_SEED_DATA rule
+  const allOrders = useMemo<OrderItem[]>(() => {
+    if (!ENABLE_SEED_DATA) {
+      return mappedLiveOrders;
+    }
+    const liveIds = new Set(mappedLiveOrders.map((o) => o.id));
+    const dedupedSeed = INITIAL_ORDERS.filter((o) => !liveIds.has(o.id));
+    return [...mappedLiveOrders, ...dedupedSeed];
+  }, [mappedLiveOrders]);
+
+  // Dynamic KPI Metrics
+  const totalOrdersCount = useMemo(() => {
+    if (ENABLE_SEED_DATA && mappedLiveOrders.length === 0) {
+      return 6;
+    }
+    return allOrders.length;
+  }, [allOrders, mappedLiveOrders.length]);
+
+  const netInvoicedVolume = useMemo(() => {
+    if (ENABLE_SEED_DATA && mappedLiveOrders.length === 0) {
+      return '$6,874.00';
+    }
+    const sum = allOrders.reduce((acc, o) => acc + o.amountNumeric, 0);
+    return `$${sum.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  }, [allOrders, mappedLiveOrders.length]);
 
   // Selected Order
   const selectedOrder = useMemo(() => {
     return (
-      INITIAL_ORDERS.find((o) => o.id === selectedOrderId) ||
+      allOrders.find((o) => o.id === selectedOrderId) ||
+      allOrders[0] ||
       INITIAL_ORDERS[0]
     );
-  }, [selectedOrderId]);
+  }, [allOrders, selectedOrderId]);
 
   // Filtered Orders
   const filteredOrders = useMemo(() => {
-    return INITIAL_ORDERS.filter((order) => {
+    return allOrders.filter((order) => {
       const q = searchQuery.toLowerCase();
       return (
         order.id.toLowerCase().includes(q) ||
@@ -277,7 +357,7 @@ export default function OrdersPage() {
         order.transactionId.toLowerCase().includes(q)
       );
     });
-  }, [searchQuery]);
+  }, [allOrders, searchQuery]);
 
   const handleResend = () => {
     setIsSentNotice(true);
@@ -346,14 +426,14 @@ export default function OrdersPage() {
                 </span>
                 <div className="flex items-baseline gap-1.5 mt-0.5">
                   <span className="text-2xl font-black text-gray-900 tracking-tight font-mono">
-                    6 Orders
+                    {totalOrdersCount} Orders
                   </span>
                   <span className="inline-flex items-center gap-0.5 text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 ml-1">
                     ▲ +100%
                   </span>
                 </div>
                 <span className="text-[11px] text-gray-400 font-medium block mt-0.5">
-                  All Sandbox Settled
+                  {ENABLE_SEED_DATA ? 'All Sandbox Settled' : 'Live Verified Orders'}
                 </span>
               </div>
             </div>
@@ -375,7 +455,7 @@ export default function OrdersPage() {
                   </span>
                 </div>
                 <span className="text-[11px] text-gray-400 font-medium block mt-0.5">
-                  6 Delivered / In Transit
+                  {totalOrdersCount} Delivered / In Transit
                 </span>
               </div>
             </div>
@@ -393,7 +473,7 @@ export default function OrdersPage() {
                 </span>
                 <div className="flex items-baseline gap-1.5 mt-0.5">
                   <span className="text-2xl font-black text-gray-900 tracking-tight font-mono">
-                    $6,874.00
+                    {netInvoicedVolume}
                   </span>
                   <span className="text-xs font-bold text-gray-500 font-mono">USD</span>
                 </div>
@@ -587,8 +667,17 @@ export default function OrdersPage() {
 
                     {filteredOrders.length === 0 && (
                       <tr>
-                        <td colSpan={7} className="py-10 text-center text-gray-400">
-                          No matching orders found.
+                        <td colSpan={7} className="py-12 text-center text-gray-400">
+                          <p className="font-medium text-gray-700">
+                            {!ENABLE_SEED_DATA && allOrders.length === 0
+                              ? 'No Live Orders in MySQL Database'
+                              : 'No matching orders found'}
+                          </p>
+                          <p className="text-xs text-gray-400 mt-1">
+                            {!ENABLE_SEED_DATA && allOrders.length === 0
+                              ? 'Pure Live Mode is active (NEXT_PUBLIC_ENABLE_SEED_DATA=false). Complete a checkout in Shopping Studio to generate your first live order & receipt.'
+                              : 'Try adjusting your search query.'}
+                          </p>
                         </td>
                       </tr>
                     )}
