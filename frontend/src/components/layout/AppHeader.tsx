@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { api } from '@/lib/api';
 import {
   Search,
   Shield,
@@ -30,6 +31,16 @@ export function AppHeader({
   const [searchQuery, setSearchQuery] = useState('');
   const [showGuardrailMenu, setShowGuardrailMenu] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [isRailsActive, setIsRailsActive] = useState(true);
+
+  useEffect(() => {
+    // Initial health check against backend Express server
+    api.checkHealth().then((healthy) => {
+      setIsRailsActive(healthy);
+    }).catch(() => {
+      setIsRailsActive(false);
+    });
+  }, []);
 
   return (
     <header className="sticky top-0 z-40 w-full flex flex-col bg-white border-b border-gray-200">
@@ -151,11 +162,11 @@ export function AppHeader({
           {/* Rails Status */}
           <div className="hidden lg:flex items-center gap-1.5 text-xs font-semibold text-gray-800 bg-gray-50 border border-gray-200 px-2.5 py-1 rounded-lg">
             <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+              <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${isRailsActive ? 'bg-emerald-400' : 'bg-amber-400'}`} />
+              <span className={`relative inline-flex rounded-full h-2 w-2 ${isRailsActive ? 'bg-emerald-500' : 'bg-amber-500'}`} />
             </span>
-            <Radio className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Rails Active</span>
+            <Radio className={`w-3.5 h-3.5 ${isRailsActive ? 'text-emerald-600' : 'text-amber-600'}`} />
+            <span>{isRailsActive ? 'Rails Active' : 'Rails (Sandbox)'}</span>
           </div>
 
           {/* User Profile Avatar */}

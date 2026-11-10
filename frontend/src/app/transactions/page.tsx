@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { api } from '@/lib/api';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import {
   Coins,
@@ -328,10 +329,16 @@ export default function TransactionsPage() {
 
   const handleRefresh = () => {
     setIsRefreshing(true);
-    setTimeout(() => {
-      setIsRefreshing(false);
-    }, 600);
+    api.getOrders().finally(() => {
+      setTimeout(() => {
+        setIsRefreshing(false);
+      }, 500);
+    });
   };
+
+  useEffect(() => {
+    api.getOrders().catch(() => {});
+  }, []);
 
   return (
     <DashboardLayout>

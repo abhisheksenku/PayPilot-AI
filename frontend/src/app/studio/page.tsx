@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import confetti from 'canvas-confetti';
 import {
   Coins,
@@ -105,6 +105,11 @@ export default function StudioPage() {
   ]);
 
   const checkoutRef = useRef<HTMLDivElement>(null);
+
+  // Fetch initial product catalog from backend on mount
+  useEffect(() => {
+    api.getProducts().catch(() => {});
+  }, []);
 
   // Handle prompt submission to backend swarm
   const handleRunSwarm = async (queryText?: string) => {

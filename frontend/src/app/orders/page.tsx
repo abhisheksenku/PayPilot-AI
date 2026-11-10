@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { api } from '@/lib/api';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import {
   ShoppingCart,
@@ -252,6 +253,10 @@ export default function OrdersPage() {
   const [dateFilter, setDateFilter] = useState('7d');
   const [isSentNotice, setIsSentNotice] = useState(false);
   const [isManualModalOpen, setIsManualModalOpen] = useState(false);
+
+  useEffect(() => {
+    api.getOrders().catch(() => {});
+  }, []);
 
   // Selected Order
   const selectedOrder = useMemo(() => {

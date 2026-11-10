@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { LaptopVisual, LaptopModelType } from '@/components/catalog/LaptopVisual';
+import { api } from '@/lib/api';
 import {
   ShoppingBag,
   FileText,
@@ -116,6 +117,10 @@ export default function CatalogPage() {
   const [isBudgetFilterActive, setIsBudgetFilterActive] = useState<boolean>(false);
   const [favorites, setFavorites] = useState<Record<string, boolean>>({});
   const [showBrandDropdown, setShowBrandDropdown] = useState<boolean>(false);
+
+  useEffect(() => {
+    api.getProducts().catch(() => {});
+  }, []);
 
   const toggleFavorite = (id: string) => {
     setFavorites((prev) => ({ ...prev, [id]: !prev[id] }));
