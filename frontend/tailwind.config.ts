@@ -13,17 +13,29 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Deep Space Navy & Slate Palette
-        navy: {
-          DEFAULT: '#080C15',
-          canvas: '#080C15',
-          surface: '#0F172A',
-          elevated: '#1E293B',
-          card: '#0D1424',
-          border: 'rgba(255, 255, 255, 0.08)',
-          'border-subtle': '#1E293B',
+        // Official PayPal Light Theme Tokens
+        pp: {
+          canvas: '#F5F7FA',       // PayPal Light Gray / Off-white page canvas
+          surface: '#FFFFFF',      // Pure white card and drawer backgrounds
+          elevated: '#F9FAFB',     // Subtle elevated card sections
+          border: '#E5E7EB',       // Clean 1px hairline border
+          'border-subtle': '#F3F4F6',
+          'border-focus': '#0070BA',
+          text: '#111827',         // Primary dark charcoal text (ultra-readable)
+          subtext: '#545D68',      // Slate secondary text
+          muted: '#6B7280',        // Form labels and timestamps
+          blue: '#0070BA',         // PayPal Classic Electric Blue
+          'blue-hover': '#005EA6',
+          'blue-tint': '#EBF5FF',  // Active nav pill background
+          dark: '#003087',         // Dark PayPal Navy
+          gold: '#FFC439',         // PayPal Yellow
+          'gold-hover': '#F2BA36',
+          green: '#047857',        // Success / Settlement green
+          'green-tint': '#ECFDF5', // Success badge tint
+          amber: '#B45309',        // Sandbox alert amber
+          'amber-tint': '#FFFBEB', // Sandbox alert banner background
         },
-        // PayPal Brand & Financial Trust Rails
+        // Direct PayPal Shortcuts
         paypal: {
           DEFAULT: '#0070BA',
           blue: '#0070BA',
@@ -31,27 +43,15 @@ const config: Config = {
           dark: '#003087',
           cobalt: '#2563EB',
           gold: '#FFC439',
-          'gold-hover': '#F2BA36',
-          cyan: '#00CFDE',
+          cyan: '#0070BA',
         },
-        // Specialized Agent Swarm Palette
+        // Multi-Agent Swarm Semantic Palette
         agent: {
-          supervisor: '#6366F1', // Indigo
-          research: '#06B6D4',   // Cyan
-          analyst: '#8B5CF6',    // Purple
+          supervisor: '#4F46E5', // Indigo
+          research: '#0891B2',   // Cyan
+          analyst: '#7C3AED',    // Purple
           purchase: '#0070BA',   // PayPal Blue
-          guardrail: '#10B981',  // Emerald Mint
-        },
-        // Muted & Meta Typography
-        slate: {
-          950: '#080C15',
-          900: '#0F172A',
-          850: '#131D31',
-          800: '#1E293B',
-          700: '#334155',
-          400: '#94A3B8',
-          300: '#CBD5E1',
-          100: '#F1F5F9',
+          guardrail: '#059669',  // Emerald Mint
         },
       },
       fontFamily: {
@@ -59,10 +59,9 @@ const config: Config = {
         mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
       },
       boxShadow: {
-        'fintech-card': '0 4px 20px -2px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.08)',
-        'fintech-glow': '0 0 25px -5px rgba(0, 112, 186, 0.35)',
-        'fintech-gold-glow': '0 0 25px -5px rgba(255, 196, 57, 0.35)',
-        'fintech-modal': '0 25px 60px -15px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.12)',
+        'fintech-card': '0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03)',
+        'fintech-hover': '0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04)',
+        'fintech-glow': '0 0 16px rgba(0, 112, 186, 0.2)',
       },
     },
   },

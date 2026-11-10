@@ -5,83 +5,79 @@
 @tailwind utilities;
 
 :root {
-  --background: #080C15;
-  --foreground: #F8FAFC;
+  --background: #F5F7FA;
+  --foreground: #111827;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
   font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
   overflow-x: hidden;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.01em;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Ambient Radial Glow */
-.bg-ambient-radial {
-  background: radial-gradient(circle at 50% 0%, rgba(0, 112, 186, 0.14) 0%, rgba(8, 12, 21, 0) 65%);
+/* PayPal Selection Color */
+::selection {
+  background-color: #0070BA;
+  color: #FFFFFF;
 }
 
-.bg-ambient-card {
-  background: linear-gradient(180deg, rgba(15, 23, 42, 0.8) 0%, rgba(13, 20, 36, 0.95) 100%);
-}
-
-/* Custom Sleek Scrollbar */
+/* Custom Light Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #080C15;
+  background: #F1F5F9;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1E293B;
+  background: #CBD5E1;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+  background: #94A3B8;
 }
 
-/* Selection Color - PayPal Electric Blue */
-::selection {
-  background-color: rgba(0, 112, 186, 0.35);
-  color: #FFFFFF;
-}
-
-/* Institutional AG Grid Dark Fintech Theme */
-.ag-theme-quartz-dark {
-  --ag-background-color: #0F172A !important;
-  --ag-header-background-color: #0D1527 !important;
-  --ag-odd-row-background-color: #0F172A !important;
-  --ag-border-color: rgba(255, 255, 255, 0.08) !important;
-  --ag-header-foreground-color: #94A3B8 !important;
-  --ag-foreground-color: #F8FAFC !important;
-  --ag-row-hover-color: #1E293B !important;
-  --ag-selected-row-background-color: rgba(0, 112, 186, 0.15) !important;
-  --ag-font-size: 13px !important;
-  --ag-header-height: 44px !important;
-  --ag-row-height: 50px !important;
-  border-radius: 14px !important;
+/* =========================================================================
+   OFFICIAL PAYPAL AG GRID LIGHT THEME
+   ========================================================================= */
+.ag-theme-quartz {
+  --ag-background-color: #FFFFFF !important;
+  --ag-header-background-color: #F8FAFC !important;
+  --ag-odd-row-background-color: #FFFFFF !important;
+  --ag-border-color: #E2E8F0 !important;
+  --ag-header-foreground-color: #475569 !important;
+  --ag-foreground-color: #0F172A !important;
+  --ag-row-hover-color: #F8FAFC !important;
+  --ag-selected-row-background-color: #EFF6FF !important;
+  --ag-font-size: 14px !important;
+  --ag-header-height: 48px !important;
+  --ag-row-height: 54px !important;
+  border-radius: 12px !important;
   overflow: hidden !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid #E2E8F0 !important;
 }
 
-.ag-theme-quartz-dark .ag-header-cell {
+.ag-theme-quartz .ag-header-cell {
   font-family: 'JetBrains Mono', ui-monospace, monospace !important;
-  font-size: 11px !important;
+  font-size: 12px !important;
   text-transform: uppercase !important;
-  letter-spacing: 0.06em !important;
+  letter-spacing: 0.05em !important;
   font-weight: 700 !important;
 }
 
-.ag-theme-quartz-dark .ag-cell {
+.ag-theme-quartz .ag-cell {
   display: flex !important;
   align-items: center !important;
   font-family: 'JetBrains Mono', ui-monospace, monospace !important;
-  font-size: 12px !important;
+  font-size: 13.5px !important;
+  color: #0F172A !important;
 }
