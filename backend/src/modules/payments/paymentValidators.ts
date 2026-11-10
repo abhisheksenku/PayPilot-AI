@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
 export const createOrderSchema = z.object({
-  userId: z.string().uuid().optional().default('00000000-0000-0000-0000-000000000001'),
-  productId: z.string().uuid({ message: 'Valid product UUID is required' }),
+  userId: z.string().optional().default('00000000-0000-0000-0000-000000000001'),
+  productId: z.string().min(1, { message: 'Product ID is required' }),
   quantity: z.number().int().positive().default(1),
   returnUrl: z.string().url().optional(),
   cancelUrl: z.string().url().optional(),

@@ -725,6 +725,7 @@ export default function StudioPage() {
       <PayPalCheckoutModal
         isOpen={isCheckoutModalOpen}
         onClose={() => setIsCheckoutModalOpen(false)}
+        productId={product.id || '769d593b-4db0-49ee-a3f3-ea81dd010ff8'}
         productName={product.name}
         amount={numericPrice}
         onSuccess={triggerPaymentSuccess}

@@ -7,6 +7,7 @@ import { api } from '@/lib/api';
 interface PayPalCheckoutModalProps {
   isOpen: boolean;
   onClose: () => void;
+  productId?: string;
   productName: string;
   amount: number;
   currency?: string;
@@ -16,6 +17,7 @@ interface PayPalCheckoutModalProps {
 export function PayPalCheckoutModal({
   isOpen,
   onClose,
+  productId,
   productName,
   amount,
   currency = 'USD',
@@ -32,8 +34,9 @@ export function PayPalCheckoutModal({
   const handleAuthorize = async () => {
     setIsProcessing(true);
     try {
-      // 1. Create order on backend PayPal Sandbox
-      const orderRes = await api.createPayPalOrder('prod-lenovo-loq', amount);
+      // 1. Create order on backend PayPal Sandbox with genuine catalog UUID
+      const targetProductId = productId || '769d593b-4db0-49ee-a3f3-ea81dd010ff8';
+      const orderRes = await api.createPayPalOrder(targetProductId, amount);
       const paypalOrderId = orderRes?.paypalOrderId || '57H46888ER9629107';
 
       // 2. Capture order on backend PayPal Sandbox
