@@ -38,7 +38,7 @@ interface OrderItem {
   amount: string;
   amountNumeric: number;
   paymentMethod: string;
-  status: 'DELIVERED' | 'IN_TRANSIT';
+  status: 'DELIVERED' | 'IN_TRANSIT' | 'ON_HOLD';
   date: string;
   time: string;
   shipping: string;
@@ -145,6 +145,23 @@ const INITIAL_ORDERS: OrderItem[] = [
     status: 'IN_TRANSIT',
     date: 'Nov 07, 2026',
     time: '06:21 PM (IST)',
+    shipping: 'Free',
+    tax: '$0.00',
+  },
+  {
+    id: 'ORD-8812',
+    transactionId: 'TXN-E7P4W1KQ',
+    customerName: 'Vikramaditya Sen',
+    customerEmail: 'vikram.sen@example.com',
+    name: 'ASUS ROG Zephyrus G16',
+    specs: 'RTX 4070 • 32GB DDR5 • 240Hz (Escrow)',
+    modelKey: 'asus-rog',
+    amount: '$1,499.00 USD',
+    amountNumeric: 1499.0,
+    paymentMethod: 'PayPal Escrow Rails',
+    status: 'ON_HOLD',
+    date: 'Nov 07, 2026',
+    time: '02:14 PM (IST)',
     shipping: 'Free',
     tax: '$0.00',
   },
@@ -540,15 +557,22 @@ export default function OrdersPage() {
 
                           {/* Status */}
                           <td className="py-3 px-3 whitespace-nowrap">
-                            {order.status === 'DELIVERED' ? (
+                            {order.status === 'DELIVERED' && (
                               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                                 <CheckCircle2 className="w-2.5 h-2.5 text-emerald-600" />
                                 DELIVERED
                               </span>
-                            ) : (
+                            )}
+                            {order.status === 'IN_TRANSIT' && (
                               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                                 <Truck className="w-2.5 h-2.5 text-emerald-600" />
                                 IN TRANSIT
+                              </span>
+                            )}
+                            {order.status === 'ON_HOLD' && (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                                <ShieldCheck className="w-2.5 h-2.5 text-amber-600" />
+                                ON_HOLD (ESCROW)
                               </span>
                             )}
                           </td>
@@ -790,17 +814,31 @@ export default function OrdersPage() {
               </div>
 
               {/* PayPal Seller Protection Guarantee Pill */}
-              <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-2.5 flex items-start gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                <div>
-                  <span className="font-bold text-emerald-800 text-xs block leading-tight">
-                    ✔ PayPal Verified Merchant Paid
-                  </span>
-                  <span className="text-[11px] text-emerald-700 block mt-0.5 leading-snug">
-                    This transaction is protected by PayPal Seller Protection.
-                  </span>
+              {selectedOrder.status === 'ON_HOLD' ? (
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-2.5 flex items-start gap-2">
+                  <ShieldCheck className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-bold text-amber-800 text-xs block leading-tight">
+                      ⚠️ PayPal Sandbox Escrow Hold Active
+                    </span>
+                    <span className="text-[11px] text-amber-700 block mt-0.5 leading-snug">
+                      Funds securely locked in escrow rail. Merchant capture will trigger on verified courier handover.
+                    </span>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-2.5 flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-bold text-emerald-800 text-xs block leading-tight">
+                      ✔ PayPal Verified Merchant Paid
+                    </span>
+                    <span className="text-[11px] text-emerald-700 block mt-0.5 leading-snug">
+                      This transaction is protected by PayPal Seller Protection.
+                    </span>
+                  </div>
+                </div>
+              )}
 
               {/* Receipt Actions */}
               <div className="grid grid-cols-2 gap-2 pt-1">

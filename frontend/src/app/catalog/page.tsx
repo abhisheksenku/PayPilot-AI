@@ -18,6 +18,7 @@ import {
   ChevronDown,
   X,
   Filter,
+  Search,
 } from 'lucide-react';
 
 interface CatalogItem {
@@ -393,6 +394,28 @@ export default function CatalogPage() {
               </div>
             </div>
           ))}
+
+          {filteredItems.length === 0 && (
+            <div className="col-span-1 md:col-span-2 lg:col-span-3 py-16 text-center bg-white rounded-2xl border border-gray-200 p-8 space-y-3">
+              <div className="w-12 h-12 rounded-full bg-blue-50 text-[#0070BA] flex items-center justify-center mx-auto">
+                <Search className="w-6 h-6" />
+              </div>
+              <h3 className="text-sm font-bold text-gray-900">No hardware models match the selected filters</h3>
+              <p className="text-xs text-gray-500 max-w-sm mx-auto">
+                Try disabling the budget constraint pill or selecting &quot;All Brands&quot; to view all Channel3 verified models.
+              </p>
+              <button
+                onClick={() => {
+                  setSelectedCategory('all');
+                  setSelectedBrand('all');
+                  setIsBudgetFilterActive(false);
+                }}
+                className="px-4 py-1.5 bg-[#0070BA] hover:bg-[#005ea6] text-white text-xs font-semibold rounded-lg transition-colors cursor-pointer"
+              >
+                Reset All Filters
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </DashboardLayout>

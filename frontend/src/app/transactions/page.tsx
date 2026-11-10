@@ -35,7 +35,7 @@ interface TransactionItem {
   amount: string;
   amountNumeric: number;
   currency: string;
-  status: 'CAPTURED' | 'ON_HOLD' | 'PENDING';
+  status: 'CAPTURED' | 'ON_HOLD' | 'PENDING' | 'REFUNDED';
   date: string;
   time: string;
   sellerProtection: 'ELIGIBLE' | 'PARTIALLY_ELIGIBLE' | 'INELIGIBLE';
@@ -144,6 +144,23 @@ const INITIAL_TRANSACTIONS: TransactionItem[] = [
     time: '06:21 PM',
     sellerProtection: 'ELIGIBLE',
     paymentMethod: 'PayPal Balance / Instant',
+  },
+  {
+    id: 'TXN-E7P4W1KQ',
+    orderId: 'O-5B9T2K8M3P7Q',
+    captureId: 'C-PENDING-ESCROW',
+    name: 'ASUS ROG Zephyrus G16 (Escrow Hold)',
+    specs: 'RTX 4070 • 32GB • 240Hz',
+    brand: 'ASUS',
+    modelKey: 'asus-rog',
+    amount: '$1,499.00 USD',
+    amountNumeric: 1499.0,
+    currency: 'USD',
+    status: 'ON_HOLD',
+    date: 'Nov 07, 2026',
+    time: '02:14 PM',
+    sellerProtection: 'ELIGIBLE',
+    paymentMethod: 'PayPal Authorized Escrow',
   },
 ];
 
@@ -681,10 +698,24 @@ export default function TransactionsPage() {
 
                           {/* Status */}
                           <td className="py-3.5 px-4 whitespace-nowrap">
-                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                              <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                              {txn.status}
-                            </span>
+                            {txn.status === 'CAPTURED' && (
+                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                                CAPTURED
+                              </span>
+                            )}
+                            {txn.status === 'ON_HOLD' && (
+                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                                <Clock className="w-3 h-3 text-amber-600" />
+                                ON_HOLD (ESCROW)
+                              </span>
+                            )}
+                            {txn.status === 'REFUNDED' && (
+                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                                <Clock className="w-3 h-3 text-rose-600" />
+                                REFUNDED
+                              </span>
+                            )}
                           </td>
 
                           {/* Created At */}
