@@ -122,15 +122,41 @@ npm install
 npm run build
 node dist/server.js
 ```
+### Option A: 1-Click Launch with Docker Compose (Recommended)
+```bash
+# Bootstraps MySQL 8, Backend API, and Next.js Frontend simultaneously
+docker compose up --build
+```
+- **Studio Interface:** `http://localhost:3000/studio`
+- **Backend API:** `http://localhost:5000/api`
+
+---
+
+### Option B: Manual Local Development
+
+#### 1. Start the Backend API (Port 5000)
+```bash
+cd backend
+npm install
+npm run dev
+```
 The backend initializes the database connection and serves endpoints at `http://localhost:5000/api`.
 
-### 2. Start the Next.js Frontend (Port 3000)
+#### 2. Start the Next.js Frontend (Port 3000)
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
 Open **[http://localhost:3000](http://localhost:3000)** in your browser.
+
+---
+
+## ☁️ Cloud & Google Cloud Run Deployment
+
+PayPilot AI is architected for zero-configuration containerized deployment on **Google Cloud Run** in `asia-south1` (Mumbai) and **Google Cloud SQL**.
+
+For step-by-step instructions on deploying the frontend and backend to Google Cloud Run, see the comprehensive [Deployment Guide](docs/deployment/DEPLOYMENT_GUIDE.md).
 
 ---
 
@@ -141,16 +167,16 @@ The repository includes automated live verification scripts:
 1. **PayPal Sandbox REST API v2 Test**:
    ```bash
    cd backend
-   npx ts-node src/scripts/testPayPal.ts
+   npx tsx src/scripts/testPayPal.ts
    ```
    *Connects to MySQL, queries the catalog, and creates an authentic live order on `api-m.sandbox.paypal.com`.*
 
-2. **Multi-Agent Engine Test**:
+2. **Multi-Agent Engine Test (Flagship ₹85,000 ML Query)**:
    ```bash
    cd backend
-   npx ts-node src/scripts/testAgentLive.ts
+   npx tsx src/scripts/testAgentLive.ts
    ```
-   *Executes the complete Supervisor $\to$ Research $\to$ Analyst agent loop and logs the execution audit trail to MySQL.*
+   *Executes the complete Supervisor $\to$ Research $\to$ Analyst agent loop with Gemini 3.5 & Google Search Grounding, logging the audit trail to MySQL.*
 
 3. **Frontend Lint & Type Check**:
    ```bash

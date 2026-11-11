@@ -93,5 +93,8 @@ PayPilot AI converts complex natural-language hardware constraints into verified
 **Q: Why focus specifically on developer and ML hardware?**  
 *A:* High-ticket technical purchases (\$700–\$2,500+) suffer from the highest shopper confusion and regret due to deceptive specs (TGP wattage, soldered RAM, thermal limits). Technical buyers evaluate hardware objectively, allowing our Product Analyst Agent to provide mathematically grounded benchmark scores (0–100) that directly drive purchase conviction.
 
-**Q: How is Google AI utilized in the architecture?**  
-*A:* Google Gemini (`gemini-2.5-flash`) powers the Supervisor Agent for structured JSON constraint extraction and currency normalization, and synthesizes comparative natural language trade-off summaries in the Product Analyst Agent.
+**Q: How is Google AI and Google Cloud utilized in the architecture?**  
+*A:* 
+1. **Google Gemini Intelligence**: Google Gemini (`gemini-3.5-flash` with a resilient cascade to `gemini-3.5-flash-lite`) powers the Supervisor Agent for structured JSON constraint extraction and INR-to-USD currency normalization, and synthesizes multi-turn technical trade-off evaluations in the Product Analyst Agent.
+2. **Google Search Grounding**: Product analysis supports Google Search Grounding (`google_search` tool) to pull real-time web citations and pricing verification, logging grounding telemetry to our MySQL audit ledger.
+3. **Google Cloud Run Serverless Architecture**: Both the Next.js standalone frontend and Express multi-agent backend are containerized with multi-stage Dockerfiles and `cloudbuild.yaml` pipelines for sub-second cold starts and seamless scaling on Google Cloud Run in `asia-south1` (Mumbai). See [Deployment Guide](docs/deployment/DEPLOYMENT_GUIDE.md).
