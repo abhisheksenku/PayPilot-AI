@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import { config } from './config/env';
 import { requestLogger } from './middleware/requestLogger';
 import { errorHandler } from './middleware/errorHandler';
+import { cookieMiddleware } from './middleware/cookieMiddleware';
 import apiRoutes from './routes';
 
 const app: Application = express();
@@ -39,9 +40,10 @@ app.use(
   })
 );
 
-// Body parsing
+// Body parsing & Cookie extraction
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(cookieMiddleware);
 
 // Logging
 if (config.env !== 'test') {

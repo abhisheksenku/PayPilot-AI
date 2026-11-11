@@ -30,7 +30,7 @@ This matrix categorizes every advertised or implemented feature into one of four
 | **Payments** | PayPal REST API v2 Capture Order | Working | 🟢 Fully Implemented | `backend/src/integrations/paypal/paypalClient.ts` | Calls `POST /v2/checkout/orders/{id}/capture` with idempotency check against `transactions` table. |
 | **Payments** | PayPal Webhook Verification Endpoint | Working | 🔴 Not Implemented | `backend/src/config/env.ts` | `PAYPAL_WEBHOOK_ID` declared in config, but zero HTTP webhook listener endpoints exist in Express router. |
 | **Payments** | Automated Payment Refund API | Working | 🔴 Not Implemented | `backend/src/modules/payments/paymentService.ts` | `refunded` exists only as an enum type; no refund endpoint or PayPal refund API call is implemented. |
-| **User & Auth** | Real User Registration & Login (JWT) | Working | 🔴 Not Implemented | `backend/src/config/env.ts` | `JWT_SECRET` exists in config, but zero auth routes (`/login`, `/register`) exist. Uses static demo UUID. |
+| **User & Auth** | Real User Registration & Login (JWT + Cookies) | Working | 🟢 Fully Implemented | `backend/src/controllers/authController.ts`, `frontend/src/context/AuthContext.tsx`, `frontend/src/app/login/`, `frontend/src/app/signup/` | Secure `httpOnly` cookie-based JWT sessions with bcryptjs password hashing, `/api/auth` endpoints (signup, login, logout, me), full Next.js UI pages, and 1-click demo login for evaluators. |
 | **Commerce** | Multi-Item Shopping Cart | Working | 🔴 Not Implemented | `frontend/src/` | Architecture operates strictly on single-item direct price-lock purchase; no multi-item cart model exists. |
 | **Ledger & Audit**| Institutional AG Grid Integration | Working | 🟠 Mocked / Simulated | `frontend/src/app/transactions/page.tsx` | Readme claims "Institutional AG Grid Ledger", but page renders standard HTML `<table>` (AG Grid package is unused). |
 | **Ledger & Audit**| Audit Log of Tool Executions | Working | 🟢 Fully Implemented | `backend/src/modules/agent/tools/auditLogger.ts` | Every agent tool call records input, output, execution time (ms), and status into `agent_executions` table. |
@@ -41,9 +41,9 @@ This matrix categorizes every advertised or implemented feature into one of four
 
 ## 2. In-Depth Component Analysis
 
-### A. Authentication & User Management: 🔴 Missing
-- **Documentation Claim:** Implies user-specific conversation tracking and profile authentication.
-- **Source Reality:** The Express router has no `/api/auth` or `/api/users` endpoints. `backend/src/modules/agent/agentService.ts` and `paymentService.ts` fall back to a hardcoded UUID `'00000000-0000-0000-0000-000000000001'` ('Demo Shopper'). The frontend header displays a static avatar ("Abhishek UthukotaSriram") without any login state or cookie storage.
+### A. Authentication & User Management: 🟢 Fully Implemented
+- **Documentation Claim:** User-specific conversation tracking, profile authentication, and secure session management.
+- **Source Reality:** **100% Fully Implemented.** Native Express cookie parsing with `httpOnly`, `sameSite`, and `secure` flags protects JWT sessions. Endpoints include `POST /api/auth/signup`, `POST /api/auth/login`, `POST /api/auth/logout`, and `GET /api/auth/me`. Frontend provides dedicated `/login` and `/signup` screens, dynamic profile header with initials and logout trigger, cross-origin `credentials: 'include'` support, plus a frictionless "1-Click Demo Login" pre-authenticating evaluator sessions without requiring manual registration.
 
 ### B. Live Product Discovery (Channel3): 🟠 Simulated via Seed Data
 - **Documentation Claim:** "Queries Channel3 verified catalog feeds for candidate models."

@@ -1,5 +1,6 @@
 import { connectDatabase } from '../config/database';
-import { Product } from '../models';
+import { Product, User } from '../models';
+import bcrypt from 'bcryptjs';
 
 const sampleProducts = [
   {
@@ -147,6 +148,27 @@ export async function seedProducts() {
 
   const count = await Product.count();
   console.log(`✅ Catalog populated with ${count} total products across all price tiers.`);
+
+  // Seed default single-tenant developer demo account
+  const demoUserId = '00000000-0000-0000-0000-000000000001';
+  const demoHash = await bcrypt.hash('password123', 10);
+  const [demoUser, userCreated] = await User.findOrCreate({
+    where: { id: demoUserId },
+    defaults: {
+      id: demoUserId,
+      name: 'Abhishek UthukotaSriram',
+      email: 'demo@paypilot.ai',
+      passwordHash: demoHash,
+    },
+  });
+  if (!userCreated) {
+    await demoUser.update({
+      name: 'Abhishek UthukotaSriram',
+      email: 'demo@paypilot.ai',
+      passwordHash: demoHash,
+    });
+  }
+  console.log(`✅ Verified demo user: demo@paypilot.ai (password: password123)`);
 }
 
 if (require.main === module) {

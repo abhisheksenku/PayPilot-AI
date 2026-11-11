@@ -1,7 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { api } from '@/lib/api';
+import { useAuth } from '@/context/AuthContext';
 import {
   Search,
   Shield,
@@ -14,6 +16,9 @@ import {
   X,
   ExternalLink,
   Menu,
+  LogOut,
+  LogIn,
+  UserPlus,
 } from 'lucide-react';
 
 interface AppHeaderProps {
@@ -27,6 +32,7 @@ export function AppHeader({
   onOpenCredentials,
   onToggleMobileSidebar,
 }: AppHeaderProps) {
+  const { user, logout, demoLogin } = useAuth();
   const [showSdkBanner, setShowSdkBanner] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [showGuardrailMenu, setShowGuardrailMenu] = useState(false);
@@ -35,12 +41,25 @@ export function AppHeader({
 
   useEffect(() => {
     // Initial health check against backend Express server
-    api.checkHealth().then((healthy) => {
-      setIsRailsActive(healthy);
-    }).catch(() => {
-      setIsRailsActive(false);
-    });
+    api
+      .checkHealth()
+      .then((healthy) => {
+        setIsRailsActive(healthy);
+      })
+      .catch(() => {
+        setIsRailsActive(false);
+      });
   }, []);
+
+  const getInitials = (name?: string) => {
+    if (!name) return 'AU';
+    const parts = name.trim().split(/\s+/);
+    if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  };
+
+  const displayName = user ? user.name : 'Abhishek UthukotaSriram';
+  const displayInitials = user ? getInitials(user.name) : 'AU';
 
   return (
     <header className="sticky top-0 z-40 w-full flex flex-col bg-white border-b border-gray-200">
@@ -62,7 +81,7 @@ export function AppHeader({
           <button
             onClick={() => setShowSdkBanner(false)}
             aria-label="Dismiss banner"
-            className="text-white/80 hover:text-white p-0.5 rounded transition-colors shrink-0 ml-2"
+            className="text-white/80 hover:text-white p-0.5 rounded transition-colors shrink-0 ml-2 cursor-pointer"
           >
             <X className="w-3.5 h-3.5" />
           </button>
@@ -75,7 +94,7 @@ export function AppHeader({
         <span className="truncate">You&apos;re in sandbox mode. Transactions simulate real PayPal checkout.</span>
         <button
           onClick={onOpenTestCards}
-          className="text-[11px] font-semibold text-[#0070BA] hover:underline ml-1 hidden md:inline-flex items-center gap-0.5 shrink-0"
+          className="text-[11px] font-semibold text-[#0070BA] hover:underline ml-1 hidden md:inline-flex items-center gap-0.5 shrink-0 cursor-pointer"
         >
           View Test Cards →
         </button>
@@ -88,7 +107,7 @@ export function AppHeader({
           <button
             onClick={onToggleMobileSidebar}
             aria-label="Open navigation menu"
-            className="p-1.5 -ml-1 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 lg:hidden"
+            className="p-1.5 -ml-1 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 lg:hidden cursor-pointer"
           >
             <Menu className="w-5 h-5" />
           </button>
@@ -98,7 +117,7 @@ export function AppHeader({
               <User className="w-3.5 h-3.5" />
             </div>
             <span className="font-bold text-xs sm:text-sm text-gray-900 hidden sm:inline truncate max-w-[170px] xl:max-w-none">
-              Abhishek UthukotaSriram
+              {displayName}
             </span>
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-2xs shrink-0">
               <CheckCircle2 className="w-3 h-3 text-emerald-600" />
@@ -121,7 +140,7 @@ export function AppHeader({
           </div>
         </div>
 
-        {/* Right: Security, Telemetry, Avatar */}
+        {/* Right: Security, Telemetry, Auth Buttons, Avatar */}
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           {/* Guardrail Status */}
           <div className="relative">
@@ -162,12 +181,38 @@ export function AppHeader({
           {/* Rails Status */}
           <div className="hidden lg:flex items-center gap-1.5 text-xs font-semibold text-gray-800 bg-gray-50 border border-gray-200 px-2.5 py-1 rounded-lg">
             <span className="relative flex h-2 w-2">
-              <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${isRailsActive ? 'bg-emerald-400' : 'bg-amber-400'}`} />
-              <span className={`relative inline-flex rounded-full h-2 w-2 ${isRailsActive ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+              <span
+                className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
+                  isRailsActive ? 'bg-emerald-400' : 'bg-amber-400'
+                }`}
+              />
+              <span
+                className={`relative inline-flex rounded-full h-2 w-2 ${
+                  isRailsActive ? 'bg-emerald-500' : 'bg-amber-500'
+                }`}
+              />
             </span>
             <Radio className={`w-3.5 h-3.5 ${isRailsActive ? 'text-emerald-600' : 'text-amber-600'}`} />
             <span>{isRailsActive ? 'Rails Active' : 'Rails (Sandbox)'}</span>
           </div>
+
+          {/* Guest Sign-in Links if unauthenticated */}
+          {!user && (
+            <div className="hidden sm:flex items-center gap-1.5">
+              <Link
+                href="/login"
+                className="px-2.5 py-1 text-xs font-semibold text-gray-700 hover:text-gray-900 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors cursor-pointer"
+              >
+                Sign In
+              </Link>
+              <Link
+                href="/signup"
+                className="px-2.5 py-1 text-xs font-semibold text-white bg-[#0070BA] hover:bg-[#005ea6] rounded-lg transition-colors shadow-2xs cursor-pointer"
+              >
+                Sign Up
+              </Link>
+            </div>
+          )}
 
           {/* User Profile Avatar */}
           <div className="relative">
@@ -175,35 +220,84 @@ export function AppHeader({
               onClick={() => setShowProfileMenu(!showProfileMenu)}
               className="w-8 h-8 rounded-full bg-[#0070BA] text-white font-bold text-xs flex items-center justify-center hover:opacity-95 shadow-2xs ring-2 ring-[#0070BA]/20 transition-all cursor-pointer"
             >
-              AU
+              {displayInitials}
             </button>
 
             {showProfileMenu && (
-              <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-200 py-2 z-50 text-xs animate-fade-in">
-                <div className="px-4 py-2 border-b border-gray-100">
-                  <p className="font-bold text-gray-900">Abhishek UthukotaSriram</p>
-                  <p className="text-[11px] text-gray-500">Merchant Account</p>
-                </div>
-                <button
-                  onClick={() => {
-                    setShowProfileMenu(false);
-                    onOpenCredentials?.();
-                  }}
-                  className="w-full text-left px-4 py-2 hover:bg-gray-50 text-gray-700 flex items-center justify-between"
-                >
-                  <span>PayPal Credentials</span>
-                  <ExternalLink className="w-3.5 h-3.5 text-gray-400" />
-                </button>
-                <button
-                  onClick={() => {
-                    setShowProfileMenu(false);
-                    onOpenTestCards?.();
-                  }}
-                  className="w-full text-left px-4 py-2 hover:bg-gray-50 text-gray-700 flex items-center justify-between"
-                >
-                  <span>Sandbox Test Cards</span>
-                  <ExternalLink className="w-3.5 h-3.5 text-gray-400" />
-                </button>
+              <div className="absolute right-0 mt-2 w-60 bg-white rounded-xl shadow-xl border border-gray-200 py-2 z-50 text-xs animate-fade-in">
+                {user ? (
+                  <>
+                    <div className="px-4 py-2 border-b border-gray-100">
+                      <p className="font-bold text-gray-900 truncate">{user.name}</p>
+                      <p className="text-[11px] text-gray-500 truncate">{user.email}</p>
+                    </div>
+                    <button
+                      onClick={() => {
+                        setShowProfileMenu(false);
+                        onOpenCredentials?.();
+                      }}
+                      className="w-full text-left px-4 py-2 hover:bg-gray-50 text-gray-700 flex items-center justify-between cursor-pointer"
+                    >
+                      <span>PayPal Credentials</span>
+                      <ExternalLink className="w-3.5 h-3.5 text-gray-400" />
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowProfileMenu(false);
+                        onOpenTestCards?.();
+                      }}
+                      className="w-full text-left px-4 py-2 hover:bg-gray-50 text-gray-700 flex items-center justify-between cursor-pointer"
+                    >
+                      <span>Sandbox Test Cards</span>
+                      <ExternalLink className="w-3.5 h-3.5 text-gray-400" />
+                    </button>
+                    <div className="border-t border-gray-100 my-1 pt-1">
+                      <button
+                        onClick={() => {
+                          setShowProfileMenu(false);
+                          logout();
+                        }}
+                        className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-600 font-semibold flex items-center justify-between cursor-pointer"
+                      >
+                        <span>Log Out</span>
+                        <LogOut className="w-3.5 h-3.5 text-red-500" />
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="px-4 py-2 border-b border-gray-100">
+                      <p className="font-bold text-gray-900">Guest Session</p>
+                      <p className="text-[11px] text-gray-500">Not authenticated</p>
+                    </div>
+                    <Link
+                      href="/login"
+                      onClick={() => setShowProfileMenu(false)}
+                      className="w-full text-left px-4 py-2 hover:bg-gray-50 text-gray-700 flex items-center justify-between"
+                    >
+                      <span>Sign In</span>
+                      <LogIn className="w-3.5 h-3.5 text-gray-400" />
+                    </Link>
+                    <Link
+                      href="/signup"
+                      onClick={() => setShowProfileMenu(false)}
+                      className="w-full text-left px-4 py-2 hover:bg-gray-50 text-gray-700 flex items-center justify-between"
+                    >
+                      <span>Create Account</span>
+                      <UserPlus className="w-3.5 h-3.5 text-gray-400" />
+                    </Link>
+                    <button
+                      onClick={() => {
+                        setShowProfileMenu(false);
+                        demoLogin();
+                      }}
+                      className="w-full text-left px-4 py-2 hover:bg-blue-50 text-[#0070BA] font-semibold flex items-center justify-between cursor-pointer"
+                    >
+                      <span>1-Click Demo Login</span>
+                      <CheckCircle2 className="w-3.5 h-3.5 text-[#0070BA]" />
+                    </button>
+                  </>
+                )}
               </div>
             )}
           </div>

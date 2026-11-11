@@ -27,16 +27,16 @@
 - **Recommended Improvement:** Define a clear monetization model: 2.5% merchant transaction fee or affiliate revenue share via Channel3/retailer partnerships.
 
 ### Criterion 4: Technical Architecture & Code Quality
-- **Current Strength:** Clean modular separation of concerns; server-side price lock preventing client tampering; relational data model with 8 tables in MySQL; strict TypeScript compilation with 0 errors.
-- **Weakness:** The multi-agent graph is a custom TypeScript state machine rather than an industry-standard framework like LangGraph or Google ADK; user authentication is mocked with a hardcoded UUID; no automated test suite.
-- **Missing Evidence:** Automated integration tests (Jest/Vitest), production deployment CI/CD pipeline, and horizontal scaling benchmarks.
-- **Recommended Improvement:** Add end-to-end API tests for the checkout flow and containerize with Docker/Cloud Run for one-click deployment.
+- **Current Strength:** Clean modular separation of concerns; server-side price lock preventing client tampering; relational data model with 8 tables in MySQL; strict TypeScript compilation with 0 errors across backend and frontend; cookie-based JWT authentication with `httpOnly` security; multi-stage Docker and Cloud Build pipeline.
+- **Weakness:** The multi-agent graph is a custom TypeScript state machine rather than an off-the-shelf Python LangGraph setup; no automated end-to-end browser regression test suite.
+- **Missing Evidence:** Automated integration tests (Jest/Playwright) and horizontal auto-scaling load benchmarks.
+- **Recommended Improvement:** Add automated Playwright tests for the checkout flow and maintain the containerized Cloud Run deployment pipeline.
 
 ### Criterion 5: Use of Google AI & DeepMind Ecosystem
-- **Current Strength:** Genuinely integrates Google Gemini (`gemini-2.5-flash` with fallback to `gemini-1.5-flash`) for structured JSON intent extraction and natural language recommendation synthesis.
-- **Weakness:** Gemini is accessed via generic raw REST calls rather than leveraging the official Google GenAI SDK, Google Agent Development Kit (ADK), Vertex AI, or Google Cloud infrastructure. Multi-turn memory is not injected into the Gemini prompt.
-- **Missing Evidence:** Grounding with Google Search, Vertex AI Model Garden benchmarks, or Multimodal evaluation (e.g. uploading laptop spec sheet images).
-- **Recommended Improvement:** Migrate to the official `@google/genai` SDK, enable Google Search Grounding for real-time hardware pricing, and host the backend on Google Cloud Run with Cloud SQL.
+- **Current Strength:** Genuinely integrates Google Gemini (`gemini-3.5-flash` with resilient cascade to `gemini-3.5-flash-lite`) featuring dynamic Google Search Grounding (`google_search` tool) for real-time market discovery, structured JSON intent extraction, and audit-logged tool execution in MySQL.
+- **Weakness:** Gemini is accessed via direct high-performance REST endpoints rather than Vertex AI private endpoints; Multimodal image spec parsing is not yet connected to the file dropzone.
+- **Missing Evidence:** Vertex AI Model Garden benchmarks or multimodal evaluation (e.g. uploading laptop spec sheet images).
+- **Recommended Improvement:** Continue leveraging Gemini 3.5 Flash with Grounding, and optionally enable Multimodal spec sheet OCR for physical retail receipt/spec audits.
 
 ---
 

@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import healthRoutes from './healthRoutes';
+import authRoutes from './authRoutes';
 import paymentRoutes from '../modules/payments/paymentRoutes';
 import agentRoutes from '../modules/agent/agentRoutes';
 import productRoutes from '../modules/products/productRoutes';
@@ -8,6 +9,10 @@ const router = Router();
 
 // Health check
 router.use('/health', healthRoutes);
+
+// Authentication API (Cookies & JWT Session)
+router.use('/auth', authRoutes);
+router.use('/v1/auth', authRoutes);
 
 // Payments API
 router.use('/payments', paymentRoutes);
