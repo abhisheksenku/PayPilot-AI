@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
@@ -8,12 +8,18 @@ import { Shield, Lock, Mail, ArrowRight, CheckCircle2, Sparkles, AlertCircle } f
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login, demoLogin, isLoading } = useAuth();
+  const { user, login, demoLogin, isLoading } = useAuth();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (!isLoading && user) {
+      router.replace('/studio');
+    }
+  }, [user, isLoading, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

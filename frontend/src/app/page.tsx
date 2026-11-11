@@ -1,7 +1,7 @@
 'use client';
 
-import StudioPage from './studio/page';
+import { SignupView } from '@/components/auth/SignupView';
 
 export default function RootPage() {
-  return <StudioPage />;
+  return <SignupView />;
 }
