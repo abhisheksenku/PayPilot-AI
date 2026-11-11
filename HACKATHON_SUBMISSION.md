@@ -48,7 +48,7 @@ PayPilot AI converts complex natural-language hardware constraints into verified
 - **Payments:** Official PayPal JavaScript SDK (`@paypal/react-paypal-js`), PayPal Sandbox REST APIs v2 (`/v2/checkout/orders` & `/v2/payments/captures`).
 - **Backend:** Node.js, Express.js, TypeScript, Sequelize ORM.
 - **Database:** MySQL 8/9 (`paypilot_ai` schema, 8 relational tables for users, conversations, messages, products, orders, transactions, agent executions, and approvals).
-- **Artificial Intelligence:** Google Gemini (`gemini-2.5-flash` / `gemini-1.5-flash`) for structured constraint extraction and comparative natural language synthesis, coordinated by a multi-agent state machine with deterministic fallbacks.
+- **Artificial Intelligence:** Google Gemini (`gemini-3.5-flash` with resilient cascade to `gemini-3.5-flash-lite`) with Google Search Grounding for real-time web verification, structured constraint extraction, and comparative technical synthesis, coordinated by a multi-agent state machine.
 - **Fail-Safe Resilience:** Built-in `NEXT_PUBLIC_ENABLE_SEED_DATA` environment toggle supporting both pure live MySQL/PayPal mode and demo visual blueprint mode.
 
 ---
@@ -98,3 +98,16 @@ PayPilot AI converts complex natural-language hardware constraints into verified
 1. **Google Gemini Intelligence**: Google Gemini (`gemini-3.5-flash` with a resilient cascade to `gemini-3.5-flash-lite`) powers the Supervisor Agent for structured JSON constraint extraction and INR-to-USD currency normalization, and synthesizes multi-turn technical trade-off evaluations in the Product Analyst Agent.
 2. **Google Search Grounding**: Product analysis supports Google Search Grounding (`google_search` tool) to pull real-time web citations and pricing verification, logging grounding telemetry to our MySQL audit ledger.
 3. **Google Cloud Run Serverless Architecture**: Both the Next.js standalone frontend and Express multi-agent backend are containerized with multi-stage Dockerfiles and `cloudbuild.yaml` pipelines for sub-second cold starts and seamless scaling on Google Cloud Run in `asia-south1` (Mumbai). See [Deployment Guide](docs/deployment/DEPLOYMENT_GUIDE.md).
+
+---
+
+## 4. Google Evaluation Criteria Alignment Matrix
+
+| Criterion | What Judges Look For | PayPilot AI Implementation & Evidence |
+|---|---|---|
+| **1. Founder Profile** | High-velocity full-stack execution & technical clarity | Solo builder execution delivering an institutional-grade multi-agent purchasing engine, real PayPal REST API v2 token exchange, Next.js 14 standalone containerization, and zero-error TypeScript typing across the entire monorepo. |
+| **2. Product Potential** | Solving a genuine, non-trivial problem in AI commerce | Solves the fundamental blocker to Agentic Commerce: the *Financial Autonomy Dilemma*. Replaces passive link-recommenders and unsafe auto-buyers with an intelligent purchasing agent protected by a mandatory Human-in-the-Loop financial checkpoint. |
+| **3. Market Viability** | Commercial defensibility & monetization | Focuses on high-ticket developer & ML hardware (\$700–\$2,500+) where technical specs directly determine purchase conviction. Clear revenue paths through affiliate procurement margins, B2B hardware team seat licensing, and merchant integration fees. |
+| **4. Technical Architecture** | Sound engineering, zero buzzword inflation | State graph orchestration (Supervisor $\to$ Research $\to$ Analyst $\to$ Purchase $\to$ Payment Verification), server-side price validation locking amounts directly in trusted database records, relational MySQL persistence (8 tables), and clean audit telemetry. |
+| **5. Use of Google AI & Cloud** | Deep, authentic Google technology integration | **Google Gemini 3.5 Flash** for multi-turn conversational reasoning and structured JSON intent parsing; **Google Search Grounding** for real-time web verification and pricing telemetry; **Google Cloud Run** containerization (`cloudbuild.yaml` & Docker standalone) in `asia-south1` (Mumbai). |
+
