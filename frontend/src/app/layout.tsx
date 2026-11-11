@@ -15,7 +15,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="h-full">
-      <body className="h-full bg-[#F5F7FA] text-gray-900 antialiased selection:bg-[#0070BA] selection:text-white overflow-hidden">
+      <body className="min-h-full bg-[#F5F7FA] text-gray-900 antialiased selection:bg-[#0070BA] selection:text-white overflow-x-hidden">
         <AuthProvider>
           <PayPalProvider>
             {children}
