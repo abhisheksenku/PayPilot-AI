@@ -209,10 +209,10 @@ const SEED_TURN_2: ChatTurn = {
 };
 
 const SUGGESTED_PROMPTS = [
+  'I need a laptop under ₹85,000 for running local LLMs and ML',
   'Find a gaming laptop under ₹70,000',
   'Can you find a better option with 32GB RAM?',
   'Compare with Apple MacBook Air M3',
-  'Find lightweight laptops under 1.8kg for ML',
 ];
 
 export default function StudioPage() {
