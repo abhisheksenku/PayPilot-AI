@@ -6,7 +6,7 @@ export class GeminiClient {
 
   constructor() {
     this.apiKey = config.gemini.apiKey;
-    this.model = 'gemini-2.5-flash';
+    this.model = 'gemini-3.5-flash';
   }
 
   public isAvailable(): boolean {
@@ -42,9 +42,9 @@ export class GeminiClient {
       });
 
       if (!response.ok) {
-        // Fallback to gemini-1.5-flash if 2.5-flash endpoint is not yet in the region
-        if (response.status === 404 && this.model !== 'gemini-1.5-flash') {
-          this.model = 'gemini-1.5-flash';
+        // Fallback to gemini-flash-latest if needed
+        if (response.status === 404 && this.model !== 'gemini-flash-latest') {
+          this.model = 'gemini-flash-latest';
           return this.generateText(prompt, systemInstruction);
         }
         const errorText = await response.text();
@@ -91,8 +91,8 @@ export class GeminiClient {
       });
 
       if (!response.ok) {
-        if (response.status === 404 && this.model !== 'gemini-1.5-flash') {
-          this.model = 'gemini-1.5-flash';
+        if (response.status === 404 && this.model !== 'gemini-flash-latest') {
+          this.model = 'gemini-flash-latest';
           return this.generateStructured<T>(prompt, schemaDescription);
         }
         return null;

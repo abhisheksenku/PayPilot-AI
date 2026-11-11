@@ -8,7 +8,7 @@ async function run() {
   await connectDatabase();
 
   console.log('\n--- Sending query to PayPilot AI Multi-Agent Engine ---');
-  const userMessage = 'I need a laptop under ₹70,000 for programming, machine learning and occasional gaming';
+  const userMessage = 'I need a laptop under ₹85,000 for running local LLMs, machine learning experiments and software development';
   console.log('User Prompt:', userMessage);
 
   const startTime = Date.now();

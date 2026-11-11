@@ -21,7 +21,7 @@ export async function supervisorNode(state: AgentState): Promise<Partial<AgentSt
       }>(
         text,
         `{
-          "intent": "SHOPPING_RESEARCH" | "PRODUCT_COMPARISON" | "PURCHASE_INTENT" | "PAYMENT_STATUS" | "GENERAL_CONVERSATION",
+          "intent": "SHOPPING_RESEARCH (when user is searching, needing a product, or asking for recommendations)" | "PRODUCT_COMPARISON (comparing specific models or features)" | "PURCHASE_INTENT (ONLY when user explicitly asks to buy, order, or checkout a specific product)" | "PAYMENT_STATUS" | "GENERAL_CONVERSATION",
           "category": "laptop" | "smartphone" | "monitor" | "audio" | "accessories",
           "budget": number (in USD, convert INR to USD by dividing by 85 if mentioned in Rs/INR),
           "currency": "USD",
@@ -32,6 +32,13 @@ export async function supervisorNode(state: AgentState): Promise<Partial<AgentSt
 
       if (aiParsed && aiParsed.intent) {
         intent = aiParsed.intent;
+        // Guard: If classified as PURCHASE_INTENT without explicit buy/checkout action verb, treat as SHOPPING_RESEARCH
+        if (
+          intent === 'PURCHASE_INTENT' &&
+          !textLower.match(/\b(buy|checkout|order now|proceed to pay|pay for|purchase this)\b/)
+        ) {
+          intent = 'SHOPPING_RESEARCH';
+        }
         if (aiParsed.category) requirements.category = aiParsed.category;
         if (aiParsed.budget) requirements.budget = aiParsed.budget;
         if (aiParsed.currency) requirements.currency = aiParsed.currency;

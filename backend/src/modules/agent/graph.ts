@@ -40,6 +40,16 @@ export class CommerceAgentGraph {
     // Conditional Routing
     switch (state.intent) {
       case 'PURCHASE_INTENT': {
+        // If no product is selected or ranked yet, discover and rank candidates first
+        if (!state.selectedProductId && (!state.rankedProducts || state.rankedProducts.length === 0)) {
+          const researchUpdate = await researchNode(state);
+          state = { ...state, ...researchUpdate };
+
+          const analystUpdate = await analystNode(state);
+          state = { ...state, ...analystUpdate };
+          break;
+        }
+
         // Node 3: Purchase Agent (Draft order + PayPal Sandbox order + Human approval checkpoint)
         const purchaseUpdate = await purchaseNode(state);
         state = { ...state, ...purchaseUpdate };
