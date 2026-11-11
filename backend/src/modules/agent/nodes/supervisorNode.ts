@@ -27,7 +27,8 @@ export async function supervisorNode(state: AgentState): Promise<Partial<AgentSt
           "currency": "USD",
           "preferences": string[],
           "useCase": string
-        }`
+        }`,
+        { history: state.history }
       );
 
       if (aiParsed && aiParsed.intent) {

@@ -1,6 +1,7 @@
 import { AgentState } from '../state';
 import { compareProducts, rankProducts } from '../tools/compareAndRank';
 import { geminiClient } from '../../../integrations/ai/geminiClient';
+import { AgentExecution } from '../../../models';
 
 export async function analystNode(state: AgentState): Promise<Partial<AgentState>> {
   const { conversationId, searchResults, requirements } = state;
@@ -29,7 +30,7 @@ export async function analystNode(state: AgentState): Promise<Partial<AgentState
 
   const topProduct = ranked[0];
 
-  // 3. Try Gemini for dynamic natural language synthesis if available
+  // 3. Try Gemini for dynamic natural language synthesis with Search Grounding
   let dynamicAnalysis: string | null = null;
   if (geminiClient.isAvailable() && topProduct) {
     const prompt = `User Request: "${state.userMessage}"
@@ -38,13 +39,33 @@ ${ranked
   .slice(0, 3)
   .map(
     (p) =>
-      `- ${p.rank}. ${p.name} ($${p.price}): Strengths: [${p.strengths.join(', ')}], Trade-offs: [${p.tradeoffs.join(', ')}]`
+      `- #${p.rank}. ${p.name} ($${p.price}): Strengths: [${p.strengths.join(', ')}], Trade-offs: [${p.tradeoffs.join(', ')}]`
   )
   .join('\n')}
 
 Task: As an AI shopping assistant for PayPilot AI, provide a concise, professional comparison of these options. Explain why the #${topProduct.rank} (${topProduct.name}) is the best recommendation. Conclude by asking if they would like you to prepare the order and PayPal checkout.`;
 
-    dynamicAnalysis = await geminiClient.generateText(prompt);
+    dynamicAnalysis = await geminiClient.generateText(prompt, {
+      enableSearchGrounding: true,
+      history: state.history,
+    });
+
+    // If Google Search Grounding metadata was captured, log it into the MySQL audit trail
+    const grounding = geminiClient.getLastGroundingMetadata();
+    if (grounding && conversationId) {
+      AgentExecution.create({
+        conversationId,
+        toolName: 'googleSearchGrounding',
+        input: { prompt: state.userMessage, toolsRequested: ['google_search'] },
+        output: {
+          webSearchQueries: grounding.webSearchQueries || [],
+          groundedChunksCount: grounding.searchChunks?.length || 0,
+          model: geminiClient.getLastModelUsed(),
+        },
+        status: 'completed',
+        executionTime: 120,
+      }).catch(() => {});
+    }
   }
 
   // 4. Fallback to deterministic template if Gemini is unavailable
