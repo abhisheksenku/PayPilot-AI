@@ -361,13 +361,6 @@ function OrdersViewContent() {
         hub: 'Inter-State Priority',
         status: 'ACTIVE',
       },
-      {
-        id: 'res-agent-ai',
-        name: 'PayPal Autonomous Dispatcher',
-        role: 'Escrow Settlement',
-        hub: 'Fintech Rail (India)',
-        status: 'ONLINE',
-      },
     ],
     []
   );
@@ -377,51 +370,25 @@ function OrdersViewContent() {
     allOrders.forEach((order, index) => {
       const isRog = order.modelKey === 'asus-rog';
       const isMac = order.modelKey === 'macbook-pro';
-      const hubId = isRog || isMac ? 'res-hub-1' : 'res-hub-2';
       const carrierId = isMac ? 'res-carrier-dhl' : 'res-carrier-fedex';
+      const hubName = isRog || isMac ? 'Bengaluru Hub' : 'Gurugram Depot';
+      const carrierName = carrierId === 'res-carrier-dhl' ? 'DHL Express' : 'Blue Dart Air';
       const color = isRog ? 'purple' : isMac ? 'indigo' : 'green';
 
-      const baseDay = 8 + (index % 4);
-      const startHour = 8 + ((index * 2) % 6);
-      const startHourPad = String(startHour).padStart(2, '0');
+      const baseDay = 9 + (index % 3);
       const startDayPad = String(baseDay).padStart(2, '0');
-      const midDayPad = String(baseDay + 1).padStart(2, '0');
       const endDayPad = String(baseDay + 2).padStart(2, '0');
 
       events.push({
-        id: `evt-hub-${order.id}`,
-        resourceId: hubId,
-        name: `${order.id}: ${order.name} (Allocation & QA)`,
-        orderId: order.id,
-        startDate: `2026-11-${startDayPad} ${startHourPad}:00`,
-        endDate: `2026-11-${midDayPad} 13:00`,
-        eventColor: color,
-        iconCls: 'b-fa b-fa-box-check',
-        status: order.status === 'DELIVERED' ? 'Completed' : 'Processing',
-      });
-
-      events.push({
-        id: `evt-carrier-${order.id}`,
+        id: `evt-route-${order.id}`,
         resourceId: carrierId,
-        name: `${order.id}: ${carrierId === 'res-carrier-dhl' ? 'DHL Express India' : 'Blue Dart Air Express'} (${order.name})`,
+        name: `${order.id}: ${order.name} (${hubName} ➔ ${carrierName})`,
         orderId: order.id,
-        startDate: `2026-11-${midDayPad} 14:00`,
+        startDate: `2026-11-${startDayPad} 09:00`,
         endDate: `2026-11-${endDayPad} 18:00`,
-        eventColor: carrierId === 'res-carrier-dhl' ? 'orange' : 'blue',
-        iconCls: 'b-fa b-fa-plane',
+        eventColor: color,
+        iconCls: 'b-fa b-fa-truck',
         status: order.status === 'DELIVERED' ? 'Delivered' : 'In Transit',
-      });
-
-      events.push({
-        id: `evt-escrow-${order.id}`,
-        resourceId: 'res-agent-ai',
-        name: `${order.id}: PayPal Smart Lock (${order.amount})`,
-        orderId: order.id,
-        startDate: `2026-11-${startDayPad} ${startHourPad}:00`,
-        endDate: `2026-11-${endDayPad} 18:00`,
-        eventColor: 'cyan',
-        iconCls: 'b-fa b-fa-lock',
-        status: 'Escrow Protected',
       });
     });
 
