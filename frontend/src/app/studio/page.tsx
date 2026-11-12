@@ -318,35 +318,43 @@ export default function StudioPage() {
   const [inspectingProduct, setInspectingProduct] = useState<RankedProduct | null>(null);
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
 
-  // Multi-Turn Conversation State (restores active chat from session, clean slate for new users)
-  const [turns, setTurns] = useState<ChatTurn[]>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const saved = sessionStorage.getItem('paypilot_studio_turns');
-        if (saved) return JSON.parse(saved);
-      } catch {}
-    }
-    return [];
-  });
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Multi-Turn Conversation State (clean slate for SSR, restored on client mount)
+  const [turns, setTurns] = useState<ChatTurn[]>([]);
 
   // Selected Spotlight Product
   const [selectedProduct, setSelectedProduct] = useState<RankedProduct>(fallbackProduct);
 
-  const hasLoadedSessionRef = useRef(false);
-
-  // Initialize turn history based on user session (pre-seed only for demo account if empty)
+  // Client-side initialization after mount (prevents SSR hydration mismatch and fetches DB history)
   useEffect(() => {
-    if (hasLoadedSessionRef.current) return;
+    setIsMounted(true);
 
-    if (turns.length === 0 && user?.email === 'demo@paypilot.ai' && ENABLE_SEED_DATA) {
-      hasLoadedSessionRef.current = true;
+    // 1. Try to restore active turns from sessionStorage first
+    try {
+      const saved = sessionStorage.getItem('paypilot_studio_turns');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setTurns(parsed);
+          setSelectedProduct(parsed[parsed.length - 1].product);
+          return;
+        }
+      }
+    } catch {}
+
+    // 2. If demo account and enabled seed data, show turn 1
+    if (user?.email === 'demo@paypilot.ai' && ENABLE_SEED_DATA) {
       setTurns([SEED_TURN_1]);
       setSelectedProduct(SEED_TURN_1.product);
-    } else if (turns.length === 0 && user && user.email !== 'demo@paypilot.ai') {
-      // Query MySQL database for user's past conversation messages
-      api.getConversations().then((convs) => {
-        if (convs && convs.length > 0 && turns.length === 0) {
-          hasLoadedSessionRef.current = true;
+      return;
+    }
+
+    // 3. Fetch past conversations and messages from MySQL database
+    api
+      .getConversations()
+      .then((convs) => {
+        if (convs && Array.isArray(convs) && convs.length > 0) {
           const latestConv = convs[0];
           setActiveConversationId(latestConv.id);
 
@@ -364,7 +372,9 @@ export default function StudioPage() {
                   hour: 'numeric',
                   minute: '2-digit',
                 }),
-                assistantSummary: am?.content || "I've evaluated the catalog and identified the optimal hardware recommendation:",
+                assistantSummary:
+                  am?.content ||
+                  "I've evaluated the catalog and identified the optimal hardware recommendation:",
                 agentSteps: SEED_TURN_1.agentSteps,
                 product: fallbackProduct,
                 alternativeProducts: SEED_TURN_1.alternativeProducts,
@@ -378,22 +388,23 @@ export default function StudioPage() {
             }
           }
         }
-      }).catch(() => {});
-    }
-  }, [user?.email, user?.id, turns.length]);
+      })
+      .catch((err) => {
+        console.warn('Failed to load past conversations from DB', err);
+      });
+  }, [user?.email, user?.id]);
 
   // Persist turns to sessionStorage so page refresh preserves ongoing conversation
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        if (turns.length > 0) {
-          sessionStorage.setItem('paypilot_studio_turns', JSON.stringify(turns));
-        } else {
-          sessionStorage.removeItem('paypilot_studio_turns');
-        }
-      } catch {}
-    }
-  }, [turns]);
+    if (!isMounted) return;
+    try {
+      if (turns.length > 0) {
+        sessionStorage.setItem('paypilot_studio_turns', JSON.stringify(turns));
+      } else {
+        sessionStorage.removeItem('paypilot_studio_turns');
+      }
+    } catch {}
+  }, [turns, isMounted]);
 
   const [paymentSuccess, setPaymentSuccess] = useState<{
     captureId: string;
@@ -928,7 +939,7 @@ export default function StudioPage() {
                                             : 'bg-slate-100 hover:bg-[#0070BA] hover:text-white text-slate-700'
                                         }`}
                                       >
-                                        {isSpotlighted ? '✓ In Spotlight' : 'Swap to Spotlight'}
+                                        <span>{isSpotlighted ? '✓ In Spotlight' : 'Swap to Spotlight'}</span>
                                       </button>
                                     </div>
                                   </div>
