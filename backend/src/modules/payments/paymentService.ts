@@ -83,7 +83,7 @@ export class PaymentService {
     // 2. Compute verified amount
     const verifiedPrice = Number(product.price);
     const totalAmount = Number((verifiedPrice * quantity).toFixed(2));
-    const currency = product.currency || 'USD';
+    const currency = product.currency || 'INR';
 
     // 3. Draft order in MySQL
     const order = await Order.create({

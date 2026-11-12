@@ -70,7 +70,7 @@ Order.init(
     currency: {
       type: DataTypes.STRING(10),
       allowNull: false,
-      defaultValue: 'USD',
+      defaultValue: 'INR',
     },
     status: {
       type: DataTypes.ENUM('pending', 'approved', 'paid', 'cancelled', 'failed'),

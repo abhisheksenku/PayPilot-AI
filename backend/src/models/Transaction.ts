@@ -61,7 +61,7 @@ Transaction.init(
     currency: {
       type: DataTypes.STRING(10),
       allowNull: false,
-      defaultValue: 'USD',
+      defaultValue: 'INR',
     },
     status: {
       type: DataTypes.ENUM('created', 'approved', 'completed', 'failed', 'refunded'),

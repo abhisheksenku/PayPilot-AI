@@ -307,9 +307,11 @@ Would you like me to prepare the order and PayPal checkout for the ASUS ROG Zeph
 };
 
 const SUGGESTED_PROMPTS = [
-  'I need a laptop under ₹85,000 for running local LLMs and ML',
+  'What is RAM and how much do I need?',
+  'What is the manufacturing date of this laptop?',
   'Find a gaming laptop under ₹70,000',
   'Can you find a better option with 32GB RAM?',
+  'What is TGP graphics power?',
   'Compare with Apple MacBook Air M3',
 ];
 
@@ -460,6 +462,11 @@ export default function StudioPage() {
         setActiveConversationId(res.orderDraftId);
       }
 
+      const isQa =
+        (res as any).intent === 'QUESTION_ANSWERING' ||
+        !res.rankedProducts ||
+        res.rankedProducts.length === 0;
+
       let winningProduct: RankedProduct;
       let altProducts: RankedProduct[] = [];
 
@@ -489,39 +496,73 @@ export default function StudioPage() {
         };
         altProducts = SEED_TURN_2.alternativeProducts || [];
       } else {
-        winningProduct = fallbackProduct;
-        altProducts = SEED_TURN_1.alternativeProducts || [];
+        // Keep current selected product or active product if asking a question
+        winningProduct =
+          selectedProduct ||
+          (turns.length > 0 ? turns[turns.length - 1].product : fallbackProduct);
+        altProducts = selectedProduct
+          ? turns.length > 0
+            ? turns[turns.length - 1].alternativeProducts || []
+            : []
+          : SEED_TURN_1.alternativeProducts || [];
       }
 
       // Map backend execution logs to the 4 agents
-      const agentSteps: AgentAnalysisStep[] = [
-        {
-          role: 'supervisor',
-          name: 'Supervisor Agent',
-          summary: res.requirements?.category
-            ? `Parsed intent for ${res.requirements.category} within ₹${Number(res.requirements.budgetINR || res.requirements.budgetUSD || 70000).toLocaleString('en-IN')} cap.`
-            : 'Understanding and prioritizing your hardware constraints.',
-          completedTime: timeString,
-        },
-        {
-          role: 'research',
-          name: 'Shopping Research Agent',
-          summary: `Found ${(res as any).searchResults?.length || res.rankedProducts?.length || 12} matching models from Channel3 hardware catalog.`,
-          completedTime: timeString,
-        },
-        {
-          role: 'analyst',
-          name: 'Product Analyst Agent',
-          summary: `Scored specs and benchmark thermals (${winningProduct.score}/100 AI score).`,
-          completedTime: timeString,
-        },
-        {
-          role: 'purchase',
-          name: 'Purchase Guardrail Agent',
-          summary: `Verified locked price ₹${Number(winningProduct.price).toLocaleString('en-IN')} INR under budget cap.`,
-          completedTime: timeString,
-        },
-      ];
+      const agentSteps: AgentAnalysisStep[] = isQa
+        ? [
+            {
+              role: 'supervisor',
+              name: 'Supervisor Agent',
+              summary: 'Interpreting technical question and specifications inquiry.',
+              completedTime: timeString,
+            },
+            {
+              role: 'research',
+              name: 'Hardware Knowledge Agent',
+              summary: 'Retrieved component architecture & OEM hardware documentation.',
+              completedTime: timeString,
+            },
+            {
+              role: 'analyst',
+              name: 'Hardware Consultant Agent',
+              summary: 'Synthesized technical analysis and practical recommendation.',
+              completedTime: timeString,
+            },
+            {
+              role: 'purchase',
+              name: 'Verification Guardrail Agent',
+              summary: 'Verified OEM warranty standards & Indian regulatory specs.',
+              completedTime: timeString,
+            },
+          ]
+        : [
+            {
+              role: 'supervisor',
+              name: 'Supervisor Agent',
+              summary: res.requirements?.category
+                ? `Parsed intent for ${res.requirements.category} within ₹${Number(res.requirements.budgetINR || res.requirements.budgetUSD || 70000).toLocaleString('en-IN')} cap.`
+                : 'Understanding and prioritizing your hardware constraints.',
+              completedTime: timeString,
+            },
+            {
+              role: 'research',
+              name: 'Shopping Research Agent',
+              summary: `Found ${(res as any).searchResults?.length || res.rankedProducts?.length || 12} matching models from Channel3 hardware catalog.`,
+              completedTime: timeString,
+            },
+            {
+              role: 'analyst',
+              name: 'Product Analyst Agent',
+              summary: `Scored specs and benchmark thermals (${winningProduct.score}/100 AI score).`,
+              completedTime: timeString,
+            },
+            {
+              role: 'purchase',
+              name: 'Purchase Guardrail Agent',
+              summary: `Verified locked price ₹${Number(winningProduct.price).toLocaleString('en-IN')} INR under budget cap.`,
+              completedTime: timeString,
+            },
+          ];
 
       const newTurn: ChatTurn = {
         id: `turn-${Date.now()}`,

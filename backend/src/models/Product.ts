@@ -61,7 +61,7 @@ Product.init(
     currency: {
       type: DataTypes.STRING(10),
       allowNull: false,
-      defaultValue: 'USD',
+      defaultValue: 'INR',
     },
     imageUrl: {
       type: DataTypes.STRING(1000),

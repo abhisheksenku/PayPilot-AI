@@ -89,7 +89,7 @@ export class Channel3Client {
       name: raw.title || 'Product',
       description: raw.description || '',
       price: isNaN(parsedPrice) ? 0 : parsedPrice,
-      currency: raw.currency || 'USD',
+      currency: raw.currency || 'INR',
       imageUrl: raw.image_url || (raw.images && raw.images[0]) || null,
       specifications: raw.specifications || {},
       source: 'channel3_live',

@@ -30,6 +30,11 @@ export async function analystNode(state: AgentState): Promise<Partial<AgentState
 
   const topProduct = ranked[0];
 
+  const formatInr = (price: number, currency = 'INR') => {
+    const num = currency === 'INR' || price > 2000 ? price : Math.round(price * 85);
+    return `₹${Number(num).toLocaleString('en-IN')} INR`;
+  };
+
   // 3. Try Gemini for dynamic natural language synthesis with Search Grounding
   let dynamicAnalysis: string | null = null;
   if (geminiClient.isAvailable() && topProduct) {
@@ -39,11 +44,11 @@ ${ranked
   .slice(0, 3)
   .map(
     (p) =>
-      `- #${p.rank}. ${p.name} ($${p.price}): Strengths: [${p.strengths.join(', ')}], Trade-offs: [${p.tradeoffs.join(', ')}]`
+      `- #${p.rank}. ${p.name} (${formatInr(p.price, p.currency)}): Strengths: [${p.strengths.join(', ')}], Trade-offs: [${p.tradeoffs.join(', ')}]`
   )
   .join('\n')}
 
-Task: As an AI shopping assistant for PayPilot AI, provide a concise, professional comparison of these options. Explain why the #${topProduct.rank} (${topProduct.name}) is the best recommendation. Conclude by asking if they would like you to prepare the order and PayPal checkout.`;
+Task: As an AI shopping assistant for PayPilot AI, provide a concise, professional comparison of these options. Strictly use Indian Rupees (₹ / INR) for all prices and never mention USD or $. Explain why the #${topProduct.rank} (${topProduct.name}) is the best recommendation. Conclude by asking if they would like you to prepare the order and PayPal checkout.`;
 
     dynamicAnalysis = await geminiClient.generateText(prompt, {
       enableSearchGrounding: true,
@@ -74,7 +79,7 @@ Task: As an AI shopping assistant for PayPilot AI, provide a concise, profession
     responseText = `Here are the top ${Math.min(ranked.length, 3)} options I evaluated for your needs (${requirements.useCase || 'General'}):\n\n`;
 
     ranked.slice(0, 3).forEach((item) => {
-      responseText += `**${item.rank}. ${item.name}** — $${item.price.toFixed(2)} (Score: ${item.score}/100)\n`;
+      responseText += `**${item.rank}. ${item.name}** — ${formatInr(item.price, item.currency)} (Score: ${item.score}/100)\n`;
       responseText += `• *Strengths:* ${item.strengths.join('; ')}\n`;
       responseText += `• *Trade-offs:* ${item.tradeoffs.join('; ')}\n\n`;
     });

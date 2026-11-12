@@ -30,8 +30,13 @@ export async function purchaseNode(state: AgentState): Promise<Partial<AgentStat
     quantity: selectedQuantity || 1,
   });
 
+  const formattedAmount =
+    orderResult.currency === 'INR' || Number(orderResult.amount) > 2000
+      ? `₹${Number(orderResult.amount).toLocaleString('en-IN')} INR`
+      : `$${Number(orderResult.amount).toFixed(2)} ${orderResult.currency}`;
+
   const responseText =
-    `I have prepared your order for **${productData.name}** at the verified price of **$${orderResult.amount} ${orderResult.currency}**.\n\n` +
+    `I have prepared your order for **${productData.name}** at the verified price of **${formattedAmount}**.\n\n` +
     `💳 **PayPal Order ID:** \`${orderResult.paypalOrderId}\`\n\n` +
     `⚠️ **Mandatory Approval Required:** As an AI agent, I cannot capture payments without your explicit authorization. Please click the PayPal checkout button below to approve this payment.`;
 

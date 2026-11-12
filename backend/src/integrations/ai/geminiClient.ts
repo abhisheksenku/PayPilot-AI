@@ -19,8 +19,8 @@ export interface GenerateStructuredOptions {
 
 export class GeminiClient {
   private apiKey: string;
-  private primaryModel = 'gemini-3.5-flash';
-  private fallbackModels = ['gemini-3.5-flash-lite', 'gemini-flash-latest'];
+  private primaryModel = 'gemini-flash-latest';
+  private fallbackModels = ['gemini-2.5-flash-lite', 'gemini-pro-latest', 'gemini-3-flash-preview'];
   private lastGroundingMetadata: GroundingMetadata | null = null;
   private lastModelUsed: string | null = null;
 

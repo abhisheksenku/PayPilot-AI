@@ -35,7 +35,10 @@ export async function compareProducts(
 
           switch (feature) {
             case 'Price':
-              val = `$${Number(p.price).toFixed(2)} ${p.currency}`;
+              val =
+                p.currency === 'INR' || Number(p.price) > 2000
+                  ? `₹${Number(p.price).toLocaleString('en-IN')} INR`
+                  : `$${Number(p.price).toFixed(2)} ${p.currency}`;
               break;
             case 'Processor / CPU':
               val = specs.processor || specs.cpu || 'Multi-core High Performance';
@@ -99,14 +102,14 @@ export async function rankProducts(
           const savings = budget - price;
           if (savings > 0 && budget !== Infinity) {
             score += 10;
-            strengths.push(`Within budget with $${savings.toFixed(0)} to spare`);
+            strengths.push(`Within budget with ₹${Math.round(savings).toLocaleString('en-IN')} to spare`);
           } else {
             score += 5;
             strengths.push('Optimal utilization of target budget');
           }
         } else {
           score -= 15;
-          tradeoffs.push(`Exceeds specified budget by $${(price - budget).toFixed(0)}`);
+          tradeoffs.push(`Exceeds specified budget by ₹${Math.round(price - budget).toLocaleString('en-IN')}`);
         }
 
         // 2. Machine Learning & High RAM evaluation

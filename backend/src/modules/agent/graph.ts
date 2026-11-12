@@ -5,6 +5,7 @@ import { researchNode } from './nodes/researchNode';
 import { analystNode } from './nodes/analystNode';
 import { purchaseNode } from './nodes/purchaseNode';
 import { paymentVerifyNode } from './nodes/paymentVerifyNode';
+import { questionAnswerNode } from './nodes/questionAnswerNode';
 
 export class CommerceAgentGraph {
   /**
@@ -65,7 +66,14 @@ export class CommerceAgentGraph {
 
       case 'GENERAL_CONVERSATION': {
         state.agentResponse =
-          "👋 Hello! I am **PayPilot AI**, your autonomous shopping assistant. You can tell me what you're looking for (e.g. *\"I need a laptop under $1200 for coding and machine learning\"*) and I will research the best options, compare specs, and prepare your PayPal checkout!";
+          "👋 Hello! I am **PayPilot AI**, your autonomous hardware and shopping consultant. You can ask me technical questions (e.g. *\"What is RAM?\"*, *\"What is the manufacturing date of this laptop?\"*) or ask me to recommend verified hardware (e.g. *\"Find a gaming & ML laptop under ₹70,000\"*). How can I assist your workflow today?";
+        break;
+      }
+
+      case 'QUESTION_ANSWERING': {
+        // Node: Hardware & Knowledge Consultant Agent
+        const qaUpdate = await questionAnswerNode(state);
+        state = { ...state, ...qaUpdate };
         break;
       }
 

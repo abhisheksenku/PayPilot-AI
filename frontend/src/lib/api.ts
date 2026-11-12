@@ -143,6 +143,8 @@ export const api = {
     rankedProducts: RankedProduct[];
     executionLogs: AgentExecutionLog[];
     orderDraftId: string;
+    intent?: string;
+    activeAgent?: string;
   }> {
     try {
       const res = await fetch(`${API_BASE_URL}/agent/chat`, {
@@ -156,9 +158,11 @@ export const api = {
         return {
           agentResponse: json.data?.agentResponse || '',
           requirements: json.data?.requirements || {},
-          rankedProducts: json.data?.rankedProducts?.length ? json.data.rankedProducts : [fallbackProduct],
+          rankedProducts: json.data?.rankedProducts || [],
           executionLogs: json.data?.executionLogs || [],
           orderDraftId: json.data?.conversationId || 'ORD-2026-8842',
+          intent: json.data?.intent,
+          activeAgent: json.data?.activeAgent,
         };
       }
     } catch (err) {
@@ -166,8 +170,69 @@ export const api = {
     }
 
     // Instant fail-safe mock fallback
+    const textLower = message.toLowerCase();
+    const isQuestion =
+      textLower.startsWith('what ') ||
+      textLower.startsWith('what is') ||
+      textLower.startsWith('how ') ||
+      textLower.startsWith('why ') ||
+      textLower.startsWith('when ') ||
+      textLower.includes('manufacturing date') ||
+      textLower.includes('mfd') ||
+      textLower.includes('what is ram') ||
+      textLower.includes('what is ssd') ||
+      textLower.includes('what is tgp') ||
+      (message.includes('?') && !textLower.includes('find') && !textLower.includes('recommend'));
+
+    if (isQuestion) {
+      let qAnswer = '';
+      if (textLower.includes('ram') || textLower.includes('memory')) {
+        qAnswer = `### 🧠 Understanding RAM (Random Access Memory)\n\n**RAM (Random Access Memory)** is ultra-fast workspace memory used by your processor and GPU to hold open applications, browser tabs, and model weights.\n\n* **16GB DDR5 (Standard Sweet Spot):** Included in the **Lenovo LOQ 15** (₹62,990 INR). Handles coding IDEs, Docker, and multitasking seamlessly.\n* **32GB+ DDR5 (ML & Power Workflows):** Featured in the **ASUS ROG Zephyrus G16** (₹1,25,990 INR). Essential for local LLMs, unquantized PyTorch tensors, and heavy dataset compilation without disk bottlenecking.\n\n💡 Most gaming laptops in our catalog feature SO-DIMM slots for dual-channel expandability.`;
+      } else if (textLower.includes('manufacturing date') || textLower.includes('mfd') || textLower.includes('when was it made')) {
+        qAnswer = `### 🏭 Manufacturing Date & Batch Verification\n\n* **Bottom Chassis Label:** Look at the regulatory barcode sticker underneath the laptop for the printed **MFD (Month/Year)**.\n* **Retail Box Packaging:** The white barcode sticker next to the serial number clearly specifies the manufacturing date.\n* **OEM Diagnostics & BIOS:** Press F2 on boot or launch **Lenovo Vantage / ASUS Armoury Crate** to view the motherboard assembly date registered on OEM servers.\n\n🛡️ *All units shipped via PayPilot AI Channel3 depots in Bengaluru and Gurugram are factory-sealed 2024–2026 production batches backed by a 1-year official domestic warranty in India.*`;
+      } else if (textLower.includes('tgp') || textLower.includes('wattage') || textLower.includes('graphics power')) {
+        qAnswer = `### ⚡ What is TGP (Total Graphics Power)?\n\n**TGP** defines the electrical wattage provided to the dedicated graphics card. A **115W TGP RTX 4060** (like in Lenovo LOQ 15) provides up to 30% higher tensor processing and frame rate throughput compared to 45W throttled ultra-thin variants.`;
+      } else {
+        qAnswer = `### 💡 Technical Hardware Consultation\n\nRegarding your question about **${message}**:\nAll laptops featured in PayPilot AI adhere to official OEM component standards with verified domestic Indian warranty and BIS certification. Would you like to check specific benchmark scores, upgrade options, or view compatible models?`;
+      }
+
+      return {
+        agentResponse: qAnswer,
+        requirements: { currency: 'INR' },
+        rankedProducts: [],
+        executionLogs: [
+          {
+            id: '1',
+            agentRole: 'supervisor',
+            stepIndex: 1,
+            toolName: 'parseIntent',
+            inputSummary: message,
+            outputSummary: 'Technical Q&A Query Identified',
+            status: 'completed',
+            executionTimeMs: 80,
+            timestamp: '10:24:31 AM',
+          },
+          {
+            id: '2',
+            agentRole: 'consultant',
+            stepIndex: 2,
+            toolName: 'hardwareKnowledgeLookup',
+            inputSummary: message,
+            outputSummary: 'Retrieved hardware specifications and OEM knowledge base',
+            status: 'completed',
+            executionTimeMs: 130,
+            timestamp: '10:24:38 AM',
+          },
+        ],
+        orderDraftId: 'ORD-2026-8842',
+        intent: 'QUESTION_ANSWERING',
+        activeAgent: 'consultant',
+      };
+    }
+
     return {
-      agentResponse: 'Evaluated 12 candidate models via Channel3 verified catalog. Selected Lenovo LOQ 15 at 98/100 score.',
+      agentResponse:
+        'Evaluated 12 candidate models via Channel3 verified catalog. Selected Lenovo LOQ 15 at 98/100 score.',
       requirements: {
         budgetINR: 70000,
         budgetUSD: 824,

@@ -21,10 +21,10 @@ export async function supervisorNode(state: AgentState): Promise<Partial<AgentSt
       }>(
         text,
         `{
-          "intent": "SHOPPING_RESEARCH (when user is searching, needing a product, or asking for recommendations)" | "PRODUCT_COMPARISON (comparing specific models or features)" | "PURCHASE_INTENT (ONLY when user explicitly asks to buy, order, or checkout a specific product)" | "PAYMENT_STATUS" | "GENERAL_CONVERSATION",
+          "intent": "SHOPPING_RESEARCH (when user is searching, needing a product, or asking for recommendations)" | "PRODUCT_COMPARISON (comparing specific models or features)" | "PURCHASE_INTENT (ONLY when user explicitly asks to buy, order, or checkout a specific product)" | "PAYMENT_STATUS" | "GENERAL_CONVERSATION" | "QUESTION_ANSWERING (when user asks an informational, technical, or product question such as 'what is ram', 'what is the manufacturing date', 'what does TGP mean', or specs questions)",
           "category": "laptop" | "smartphone" | "monitor" | "audio" | "accessories",
-          "budget": number (in USD, convert INR to USD by dividing by 85 if mentioned in Rs/INR),
-          "currency": "USD",
+          "budget": number (in INR, e.g. 70000),
+          "currency": "INR",
           "preferences": string[],
           "useCase": string
         }`,
@@ -42,7 +42,7 @@ export async function supervisorNode(state: AgentState): Promise<Partial<AgentSt
         }
         if (aiParsed.category) requirements.category = aiParsed.category;
         if (aiParsed.budget) requirements.budget = aiParsed.budget;
-        if (aiParsed.currency) requirements.currency = aiParsed.currency;
+        requirements.currency = 'INR';
         if (aiParsed.preferences) requirements.preferences = aiParsed.preferences;
         if (aiParsed.useCase) requirements.useCase = aiParsed.useCase;
 
@@ -58,6 +58,32 @@ export async function supervisorNode(state: AgentState): Promise<Partial<AgentSt
   }
 
   // Deterministic Intent Detection (Shield & Fallback)
+  const isQuestion =
+    textLower.startsWith('what ') ||
+    textLower.startsWith('what is') ||
+    textLower.startsWith('what are') ||
+    textLower.startsWith('how ') ||
+    textLower.startsWith('why ') ||
+    textLower.startsWith('when ') ||
+    textLower.startsWith('where ') ||
+    textLower.startsWith('can i ') ||
+    textLower.startsWith('does it ') ||
+    textLower.startsWith('is it ') ||
+    textLower.startsWith('explain ') ||
+    textLower.startsWith('tell me about ') ||
+    textLower.includes('meaning of') ||
+    textLower.includes('manufacturing date') ||
+    textLower.includes('manufacture date') ||
+    textLower.includes('mfd') ||
+    textLower.includes('what is ram') ||
+    textLower.includes('what is ssd') ||
+    textLower.includes('what is tgp') ||
+    (text.includes('?') &&
+      !textLower.includes('find') &&
+      !textLower.includes('recommend') &&
+      !textLower.includes('suggest') &&
+      !textLower.includes('show me'));
+
   if (
     textLower.includes('buy') ||
     textLower.includes('checkout') ||
@@ -83,6 +109,8 @@ export async function supervisorNode(state: AgentState): Promise<Partial<AgentSt
     textLower.includes('track order')
   ) {
     intent = 'PAYMENT_STATUS';
+  } else if (isQuestion) {
+    intent = 'QUESTION_ANSWERING';
   } else if (
     textLower.startsWith('hi') ||
     textLower.startsWith('hello') ||
@@ -96,17 +124,20 @@ export async function supervisorNode(state: AgentState): Promise<Partial<AgentSt
   const budgetMatchINR = text.match(/(?:₹|rs\.?|inr)\s*([\d,]+)/i) || text.match(/under\s*₹?\s*([\d,]+)/i);
   const budgetMatchUSD = text.match(/\$\s*([\d,]+)/i) || text.match(/(?:under|below|budget)\s*(?:\$)?\s*([\d,]+)\s*(?:usd|dollars)?/i);
 
+  requirements.currency = 'INR';
+
   if (budgetMatchINR) {
     const rawNum = parseFloat(budgetMatchINR[1].replace(/,/g, ''));
     if (!isNaN(rawNum)) {
-      requirements.budget = text.includes('₹') || /rs|inr/i.test(text) ? Math.round(rawNum / 85) : rawNum;
-      requirements.currency = 'USD';
+      requirements.budget = rawNum;
+      requirements.currency = 'INR';
     }
   } else if (budgetMatchUSD) {
     const rawNum = parseFloat(budgetMatchUSD[1].replace(/,/g, ''));
     if (!isNaN(rawNum)) {
-      requirements.budget = rawNum;
-      requirements.currency = 'USD';
+      // Convert USD to INR
+      requirements.budget = Math.round(rawNum * 85);
+      requirements.currency = 'INR';
     }
   }
 

@@ -35,7 +35,8 @@ export interface AgentState {
     | 'PRODUCT_COMPARISON'
     | 'PURCHASE_INTENT'
     | 'PAYMENT_STATUS'
-    | 'GENERAL_CONVERSATION';
+    | 'GENERAL_CONVERSATION'
+    | 'QUESTION_ANSWERING';
   requirements: ExtractedRequirements;
   searchResults: any[];
   comparisonMatrix?: ProductComparisonSpec[];
@@ -54,7 +55,9 @@ export interface AgentState {
     | 'research'
     | 'analyst'
     | 'purchase'
-    | 'payment_verify';
+    | 'payment_verify'
+    | 'consultant';
+  productContext?: any;
   history?: Array<{ role: 'user' | 'assistant'; content: string }>;
   error?: string;
 }

@@ -6,6 +6,7 @@ export type AgentRole =
   | 'analyst'
   | 'purchase'
   | 'verifier'
+  | 'consultant'
   | 'memory';
 
 export interface AgentExecutionLog {
