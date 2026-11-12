@@ -33,6 +33,7 @@ import { LaptopVisual, LaptopModelType } from '@/components/catalog/LaptopVisual
 import { PayPalCheckoutModal } from '@/components/modals/PayPalCheckoutModal';
 import { api, fallbackProduct } from '@/lib/api';
 import { ENABLE_SEED_DATA } from '@/lib/config';
+import { useAuth } from '@/context/AuthContext';
 import { RankedProduct } from '@/types/product';
 import { Order } from '@/types/order';
 
@@ -216,19 +217,39 @@ const SUGGESTED_PROMPTS = [
 ];
 
 export default function StudioPage() {
+  const { user } = useAuth();
+
+  const getInitials = (name?: string) => {
+    if (!name) return 'AU';
+    const parts = name.trim().split(/\s+/);
+    if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  };
+
+  const userInitials = user ? getInitials(user.name) : 'AU';
+
   const [promptInput, setPromptInput] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
   const [showHistoryDropdown, setShowHistoryDropdown] = useState(false);
   const [inspectingProduct, setInspectingProduct] = useState<RankedProduct | null>(null);
 
-  // Multi-Turn Conversation State
-  const [turns, setTurns] = useState<ChatTurn[]>(ENABLE_SEED_DATA ? [SEED_TURN_1] : []);
+  // Multi-Turn Conversation State (clean slate for newly registered users)
+  const [turns, setTurns] = useState<ChatTurn[]>([]);
 
-  // Selected Spotlight Product (defaults to latest turn product, or Lenovo fallback)
-  const [selectedProduct, setSelectedProduct] = useState<RankedProduct>(
-    ENABLE_SEED_DATA ? SEED_TURN_1.product : fallbackProduct
-  );
+  // Selected Spotlight Product
+  const [selectedProduct, setSelectedProduct] = useState<RankedProduct>(fallbackProduct);
+
+  // Initialize turn history based on user session (pre-seed only for demo account)
+  useEffect(() => {
+    if (user?.email === 'demo@paypilot.ai' && ENABLE_SEED_DATA) {
+      setTurns([SEED_TURN_1]);
+      setSelectedProduct(SEED_TURN_1.product);
+    } else {
+      setTurns([]);
+      setSelectedProduct(fallbackProduct);
+    }
+  }, [user?.email]);
 
   const [paymentSuccess, setPaymentSuccess] = useState<{
     captureId: string;
@@ -522,10 +543,10 @@ export default function StudioPage() {
                   </div>
                   <div className="space-y-1 max-w-md mx-auto">
                     <h3 className="text-base font-bold text-gray-900">
-                      Welcome to PayPilot AI Hardware Studio
+                      Welcome to PayPilot AI Hardware Studio{user?.name ? `, ${user.name}` : ''}
                     </h3>
                     <p className="text-xs text-gray-500 leading-relaxed">
-                      Ask any hardware or developer laptop question. Our multi-agent swarm will query Channel3, benchmark FP16 tensors, lock the best price, and prepare instant PayPal rails.
+                      Ask any hardware or developer laptop question. Our 4-agent swarm will query live market specs, benchmark tensors, lock the best price, and stage your verified PayPal order.
                     </p>
                   </div>
                   <div className="pt-2 flex flex-wrap gap-2 justify-center">
@@ -585,7 +606,7 @@ export default function StudioPage() {
                         <p className="text-[10px] text-gray-400 text-right">{turn.timestamp}</p>
                       </div>
                       <div className="w-8 h-8 rounded-full bg-[#0070BA] text-white font-bold text-xs flex items-center justify-center shadow-2xs shrink-0">
-                        AU
+                        {userInitials}
                       </div>
                     </div>
 
@@ -791,7 +812,7 @@ export default function StudioPage() {
               <div className="flex items-center justify-between pb-3 border-b border-gray-100">
                 <div className="flex items-center gap-1.5 text-xs font-bold text-[#0070BA]">
                   <Star className="w-4 h-4 fill-[#0070BA]" />
-                  <span>Current Recommendation</span>
+                  <span>{turns.length === 0 ? 'Featured Hardware Match' : 'Current Recommendation'}</span>
                 </div>
                 <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
                   Price Locked
