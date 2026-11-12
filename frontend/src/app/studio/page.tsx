@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
+import Link from 'next/link';
 import confetti from 'canvas-confetti';
 import {
   Sparkles,
@@ -52,6 +53,7 @@ interface ChatTurn {
   assistantSummary: string;
   agentSteps: AgentAnalysisStep[];
   product: RankedProduct;
+  alternativeProducts?: RankedProduct[];
   isLogsExpanded: boolean;
   isTurnCollapsed: boolean;
 }
@@ -140,6 +142,46 @@ const SEED_TURN_1: ChatTurn = {
       tgp: '115W Max Graphics Power',
     },
   },
+  alternativeProducts: [
+    {
+      id: 'prod-hp-victus',
+      externalId: 'CH3-HP-VICTUS-15',
+      name: 'HP Victus 15',
+      description: 'Intel Core i5-13420H, 16GB DDR5, 512GB SSD, RTX 3050 (95W TGP), 144Hz FHD.',
+      price: 699.0,
+      currency: 'USD',
+      imageUrl: 'https://images.unsplash.com/photo-1544652478-6653e09f18a2',
+      score: 87,
+      strengths: ['Affordable $699 budget price', '16GB DDR5 4800MHz', '144Hz FHD display'],
+      tradeoffs: ['95W TGP RTX 3050 has lower VRAM than RTX 4060'],
+      specifications: {
+        processor: 'Intel Core i5-13420H',
+        graphics: 'NVIDIA RTX 3050 6GB GDDR6 (95W TGP)',
+        ram: '16GB DDR5 4800MHz',
+        storage: '512GB NVMe SSD',
+        display: '15.6" FHD 144Hz',
+      },
+    },
+    {
+      id: 'prod-dell-g15',
+      externalId: 'CH3-DELL-G15',
+      name: 'Dell G15 Gaming',
+      description: 'Intel Core i5-13450HX, 16GB DDR5, 512GB SSD, RTX 4050 (140W TGP), 165Hz FHD.',
+      price: 779.0,
+      currency: 'USD',
+      imageUrl: 'https://images.unsplash.com/photo-1593642632823-8f785ba67e45',
+      score: 89,
+      strengths: ['140W high TGP RTX 4050', '165Hz smooth display', 'Dual-channel DDR5'],
+      tradeoffs: ['6GB VRAM constraint for larger batch sizes'],
+      specifications: {
+        processor: 'Intel Core i5-13450HX',
+        graphics: 'NVIDIA RTX 4050 6GB (140W TGP)',
+        ram: '16GB DDR5 4800MHz',
+        storage: '512GB NVMe SSD',
+        display: '15.6" FHD 165Hz',
+      },
+    },
+  ],
   isLogsExpanded: true,
   isTurnCollapsed: false,
 };
@@ -205,6 +247,47 @@ const SEED_TURN_2: ChatTurn = {
       tgp: '140W Max Graphics Power',
     },
   },
+  alternativeProducts: [
+    {
+      id: 'prod-lenovo-legion',
+      externalId: 'CH3-LENOVO-LEGION-PRO5',
+      name: 'Lenovo Legion Pro 5',
+      description: 'AMD Ryzen 7 7745HX, 32GB DDR5 RAM, 1TB SSD, NVIDIA RTX 4060 140W TGP, 16" WQXGA 240Hz.',
+      price: 1299.0,
+      currency: 'USD',
+      imageUrl: 'https://images.unsplash.com/photo-1593642632823-8f785ba67e45',
+      score: 97,
+      strengths: ['32GB DDR5 5600MHz RAM', '140W TGP RTX 4060', '16" 240Hz WQXGA 100% sRGB'],
+      tradeoffs: ['2.5 kg weight requires large charger'],
+      specifications: {
+        processor: 'AMD Ryzen 7 7745HX (8 cores, 16 threads)',
+        graphics: 'NVIDIA GeForce RTX 4060 (140W Max TGP)',
+        ram: '32GB DDR5 5600MHz',
+        storage: '1TB PCIe NVMe SSD',
+        display: '16" WQXGA 240Hz IPS',
+        tgp: '140W Max TGP',
+      },
+    },
+    {
+      id: 'prod-macbook-pro',
+      externalId: 'CH3-APPLE-MBP-14-M3',
+      name: 'Apple MacBook Pro 14 M3 Pro',
+      description: 'Apple M3 Pro 12-core CPU, 18-core GPU, 36GB Unified Memory, 512GB SSD, 14.2" Liquid Retina XDR.',
+      price: 1849.0,
+      currency: 'USD',
+      imageUrl: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8',
+      score: 94,
+      strengths: ['36GB Unified Memory with 150GB/s bandwidth', '14.2" Liquid Retina XDR', 'Extreme battery life'],
+      tradeoffs: ['Premium price point', 'Metal/MPS acceleration instead of CUDA'],
+      specifications: {
+        processor: 'Apple M3 Pro (12-core CPU, 18-core GPU)',
+        graphics: 'Apple 18-core GPU',
+        ram: '36GB Unified Memory',
+        storage: '512GB SSD',
+        display: '14.2" Liquid Retina XDR (3024x1964)',
+      },
+    },
+  ],
   isLogsExpanded: true,
   isTurnCollapsed: false,
 };
@@ -313,8 +396,11 @@ export default function StudioPage() {
       const res = await api.runAgentChat(text);
 
       let winningProduct: RankedProduct;
+      let altProducts: RankedProduct[] = [];
+
       if (res.rankedProducts && res.rankedProducts.length > 0) {
         winningProduct = res.rankedProducts[0];
+        altProducts = res.rankedProducts.slice(1, 3);
       } else if (text.toLowerCase().includes('macbook') || text.toLowerCase().includes('apple')) {
         winningProduct = {
           id: 'CH3-APPLE-MBA-M3',
@@ -336,8 +422,10 @@ export default function StudioPage() {
             weight: '1.51 kg',
           },
         };
+        altProducts = SEED_TURN_2.alternativeProducts || [];
       } else {
         winningProduct = fallbackProduct;
+        altProducts = SEED_TURN_1.alternativeProducts || [];
       }
 
       // Map backend execution logs to the 4 agents
@@ -378,6 +466,7 @@ export default function StudioPage() {
         assistantSummary: `I've found the best options for you! Here's my top recommendation:`,
         agentSteps,
         product: winningProduct,
+        alternativeProducts: altProducts,
         isLogsExpanded: true,
         isTurnCollapsed: false,
       };
@@ -395,6 +484,7 @@ export default function StudioPage() {
         assistantSummary: "I've analyzed the catalog and locked in our top benchmark recommendation:",
         agentSteps: SEED_TURN_1.agentSteps,
         product: fallbackProduct,
+        alternativeProducts: SEED_TURN_1.alternativeProducts,
         isLogsExpanded: true,
         isTurnCollapsed: false,
       };
@@ -729,6 +819,70 @@ export default function StudioPage() {
                             </button>
                           </div>
                         </div>
+
+                        {/* Other Options Evaluated (Runners-Up) */}
+                        {turn.alternativeProducts && turn.alternativeProducts.length > 0 && (
+                          <div className="bg-slate-50/90 border border-slate-200 rounded-2xl p-3.5 space-y-2.5 shadow-2xs">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                                <Layers className="w-3.5 h-3.5 text-[#0070BA]" />
+                                <span>Other Options Evaluated ({turn.alternativeProducts.length} Runners-Up)</span>
+                              </span>
+                              <Link
+                                href="/catalog"
+                                className="text-[11px] font-bold text-[#0070BA] hover:underline inline-flex items-center gap-1"
+                              >
+                                <span>View all in Catalog</span>
+                                <ArrowRight className="w-3 h-3" />
+                              </Link>
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                              {turn.alternativeProducts.map((alt) => {
+                                const isSpotlighted = selectedProduct.id === alt.id;
+                                return (
+                                  <div
+                                    key={alt.id}
+                                    onClick={() => handleSelectProduct(alt)}
+                                    className={`p-3 rounded-xl border transition-all cursor-pointer flex flex-col justify-between gap-2 ${
+                                      isSpotlighted
+                                        ? 'bg-blue-50/90 border-[#0070BA] ring-2 ring-[#0070BA]/20 shadow-xs'
+                                        : 'bg-white hover:bg-blue-50/40 border-slate-200 hover:border-blue-200'
+                                    }`}
+                                  >
+                                    <div className="flex items-start justify-between gap-1">
+                                      <div className="font-bold text-xs text-slate-900 truncate">
+                                        {alt.name}
+                                      </div>
+                                      <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded shrink-0">
+                                        {alt.score}/100
+                                      </span>
+                                    </div>
+                                    <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1 border-t border-slate-100">
+                                      <span className="font-bold text-slate-900">
+                                        ${Number(alt.price).toFixed(2)} USD
+                                      </span>
+                                      <button
+                                        type="button"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleSelectProduct(alt);
+                                        }}
+                                        className={`text-[10px] font-bold px-2 py-1 rounded-lg transition-colors cursor-pointer ${
+                                          isSpotlighted
+                                            ? 'bg-[#0070BA] text-white'
+                                            : 'bg-slate-100 hover:bg-[#0070BA] hover:text-white text-slate-700'
+                                        }`}
+                                      >
+                                        {isSpotlighted ? '✓ In Spotlight' : 'Swap to Spotlight'}
+                                      </button>
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
