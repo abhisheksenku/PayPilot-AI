@@ -86,10 +86,10 @@ const SEED_TURN_1: ChatTurn = {
   turnNumber: 1,
   userQuery: 'Find a gaming laptop under ₹70,000',
   timestamp: '2:14 PM',
-  assistantSummary: `Here is a professional comparison of the top options tailored for your budget under ₹70,000 ($824 USD):
+  assistantSummary: `Here is a professional comparison of the top options tailored for your budget under ₹70,000:
 
-* **#1. Lenovo LOQ 15 ($749):** Features an unrestricted **115W TGP RTX 4060 GPU** and **16GB DDR5 RAM**, delivering the highest tensor compute in this price range with $75 left under budget.
-* **#2. HP Victus 15 ($699) & #3. Dell G15 ($779):** Reliable entry options, but with lower TGP or higher thermal throttling compared to the Lenovo LOQ.
+* **#1. Lenovo LOQ 15 (₹62,990):** Features an unrestricted **115W TGP RTX 4060 GPU** and **16GB DDR5 RAM**, delivering the highest tensor compute in this price range with ₹7,010 left under budget.
+* **#2. HP Victus 15 (₹58,990) & #3. Dell G15 (₹65,490):** Reliable entry options, but with lower TGP or higher thermal throttling compared to the Lenovo LOQ.
 
 **Why the Lenovo LOQ 15 is the best recommendation:** It provides the optimal balance of maximum graphics wattage (115W) and dual-channel upgradeable DDR5 memory for developer workflows and local machine learning tasks.
 
@@ -125,12 +125,12 @@ Would you like me to prepare the order and PayPal checkout for the Lenovo LOQ 15
     externalId: 'CH3-LENOVO-LOQ-15',
     name: 'Lenovo LOQ 15 Gaming & ML Laptop',
     description: 'Intel Core i5-13450HX, 16GB DDR5 RAM, 512GB SSD, NVIDIA RTX 4060 (115W TGP), 15.6" 144Hz FHD Display, Military Grade Durability.',
-    price: 749.0,
-    currency: 'USD',
+    price: 62990.0,
+    currency: 'INR',
     imageUrl: 'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed',
     score: 98,
     strengths: [
-      'Within budget with $75 to spare ($749 vs $824 budget cap)',
+      'Within budget with ₹7,010 to spare (₹62,990 vs ₹70,000 budget cap)',
       '115W TGP RTX 4060 GPU with 8GB VRAM for CUDA/PyTorch tensors',
       '16GB DDR5 5200MHz high-bandwidth RAM with dual-channel upgrade path',
       '15.6" FHD 144Hz IPS display with 100% sRGB color calibration',
@@ -155,11 +155,11 @@ Would you like me to prepare the order and PayPal checkout for the Lenovo LOQ 15
       externalId: 'CH3-HP-VICTUS-15',
       name: 'HP Victus 15',
       description: 'Intel Core i5-13420H, 16GB DDR5, 512GB SSD, RTX 3050 (95W TGP), 144Hz FHD.',
-      price: 699.0,
-      currency: 'USD',
+      price: 58990.0,
+      currency: 'INR',
       imageUrl: 'https://images.unsplash.com/photo-1544652478-6653e09f18a2',
       score: 87,
-      strengths: ['Affordable $699 budget price', '16GB DDR5 4800MHz', '144Hz FHD display'],
+      strengths: ['Affordable ₹58,990 budget price', '16GB DDR5 4800MHz', '144Hz FHD display'],
       tradeoffs: ['95W TGP RTX 3050 has lower VRAM than RTX 4060'],
       specifications: {
         processor: 'Intel Core i5-13420H',
@@ -174,8 +174,8 @@ Would you like me to prepare the order and PayPal checkout for the Lenovo LOQ 15
       externalId: 'CH3-DELL-G15',
       name: 'Dell G15 Gaming',
       description: 'Intel Core i5-13450HX, 16GB DDR5, 512GB SSD, RTX 4050 (140W TGP), 165Hz FHD.',
-      price: 779.0,
-      currency: 'USD',
+      price: 65490.0,
+      currency: 'INR',
       imageUrl: 'https://images.unsplash.com/photo-1593642632823-8f785ba67e45',
       score: 89,
       strengths: ['140W high TGP RTX 4050', '165Hz smooth display', 'Dual-channel DDR5'],
@@ -201,8 +201,8 @@ const SEED_TURN_2: ChatTurn = {
   timestamp: '2:24 PM',
   assistantSummary: `Here is a professional comparison of the top options tailored for your machine learning needs:
 
-* **#1. ASUS ROG Zephyrus G16 ($1,499):** Features **32GB of RAM**, which is ideal for handling heavy machine learning workflows, large datasets, and local model inference without bottlenecking. It also boasts a high-resolution display to reduce eye strain during long coding sessions.
-* **#2. Lenovo Legion Pro 5 ($1,299) & #3. Apple MacBook Pro 14 M3 Pro ($1,849):** Both are fantastic 32GB+ alternatives with dedicated GPUs or unified memory architecture for tensor operations.
+* **#1. ASUS ROG Zephyrus G16 (₹1,25,990):** Features **32GB of RAM**, which is ideal for handling heavy machine learning workflows, large datasets, and local model inference without bottlenecking. It also boasts a high-resolution display to reduce eye strain during long coding sessions.
+* **#2. Lenovo Legion Pro 5 (₹1,09,990) & #3. Apple MacBook Pro 14 M3 Pro (₹1,69,900):** Both are fantastic 32GB+ alternatives with dedicated GPUs or unified memory architecture for tensor operations.
 
 **Why the ASUS ROG Zephyrus G16 is the best recommendation:** While it comes at a higher price point, the 32GB RAM upgrade is crucial for serious machine learning tasks, ensuring future-proofing and smoother performance when training models or multitasking with heavy development environments.
 
@@ -238,8 +238,8 @@ Would you like me to prepare the order and PayPal checkout for the ASUS ROG Zeph
     externalId: 'CH3-ASUS-ZEPH-G16',
     name: 'ASUS ROG Zephyrus G16',
     description: 'Intel Core Ultra 9 185H, 32GB LPDDR5X RAM, 1TB NVMe SSD, NVIDIA RTX 4070 8GB GDDR6 (140W TGP), 16" 2.5K 240Hz OLED Display.',
-    price: 1499.0,
-    currency: 'USD',
+    price: 125990.0,
+    currency: 'INR',
     imageUrl: 'https://images.unsplash.com/photo-1603302576837-37561b2e2302',
     score: 95,
     strengths: [
@@ -267,8 +267,8 @@ Would you like me to prepare the order and PayPal checkout for the ASUS ROG Zeph
       externalId: 'CH3-LENOVO-LEGION-PRO5',
       name: 'Lenovo Legion Pro 5',
       description: 'AMD Ryzen 7 7745HX, 32GB DDR5 RAM, 1TB SSD, NVIDIA RTX 4060 140W TGP, 16" WQXGA 240Hz.',
-      price: 1299.0,
-      currency: 'USD',
+      price: 109990.0,
+      currency: 'INR',
       imageUrl: 'https://images.unsplash.com/photo-1593642632823-8f785ba67e45',
       score: 97,
       strengths: ['32GB DDR5 5600MHz RAM', '140W TGP RTX 4060', '16" 240Hz WQXGA 100% sRGB'],
@@ -287,8 +287,8 @@ Would you like me to prepare the order and PayPal checkout for the ASUS ROG Zeph
       externalId: 'CH3-APPLE-MBP-14-M3',
       name: 'Apple MacBook Pro 14 M3 Pro',
       description: 'Apple M3 Pro 12-core CPU, 18-core GPU, 36GB Unified Memory, 512GB SSD, 14.2" Liquid Retina XDR.',
-      price: 1849.0,
-      currency: 'USD',
+      price: 169900.0,
+      currency: 'INR',
       imageUrl: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8',
       score: 94,
       strengths: ['36GB Unified Memory with 150GB/s bandwidth', '14.2" Liquid Retina XDR', 'Extreme battery life'],
@@ -472,8 +472,8 @@ export default function StudioPage() {
           externalId: 'CH3-APPLE-MBA-M3',
           name: 'Apple MacBook Air M3 15-inch',
           description: 'Apple M3 chip, 16GB Unified Memory, 512GB SSD, Liquid Retina Display, 18h battery.',
-          price: 1299.0,
-          currency: 'USD',
+          price: 114900.0,
+          currency: 'INR',
           imageUrl: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8',
           score: 96,
           strengths: ['18-hour real-world battery life', 'Fanless whisper-quiet operation', '100GB/s unified memory'],
@@ -499,7 +499,7 @@ export default function StudioPage() {
           role: 'supervisor',
           name: 'Supervisor Agent',
           summary: res.requirements?.category
-            ? `Parsed intent for ${res.requirements.category} within $${res.requirements.budgetUSD || 824} cap.`
+            ? `Parsed intent for ${res.requirements.category} within ₹${Number(res.requirements.budgetINR || res.requirements.budgetUSD || 70000).toLocaleString('en-IN')} cap.`
             : 'Understanding and prioritizing your hardware constraints.',
           completedTime: timeString,
         },
@@ -518,7 +518,7 @@ export default function StudioPage() {
         {
           role: 'purchase',
           name: 'Purchase Guardrail Agent',
-          summary: `Verified locked price $${Number(winningProduct.price).toFixed(2)} USD under budget cap.`,
+          summary: `Verified locked price ₹${Number(winningProduct.price).toLocaleString('en-IN')} INR under budget cap.`,
           completedTime: timeString,
         },
       ];
@@ -810,7 +810,7 @@ export default function StudioPage() {
                               </p>
                               <div className="flex items-center gap-2.5 pt-0.5">
                                 <span className="font-bold text-sm text-gray-900">
-                                  ${Number(turn.product.price).toFixed(2)} USD
+                                  ₹{Number(turn.product.price).toLocaleString('en-IN')} INR
                                 </span>
                                 <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A]">
                                   <span>🏆</span>
@@ -877,7 +877,7 @@ export default function StudioPage() {
                                     </div>
                                     <div className="flex items-center justify-between text-sm text-slate-500 pt-1.5 border-t border-slate-100">
                                       <span className="font-bold text-slate-900">
-                                        ${Number(alt.price).toFixed(2)} USD
+                                        ₹{Number(alt.price).toLocaleString('en-IN')} INR
                                       </span>
                                       <button
                                         type="button"
@@ -1011,8 +1011,8 @@ export default function StudioPage() {
 
                 <div className="flex items-center justify-between pt-2">
                   <div className="text-2xl sm:text-3xl font-bold text-gray-900 font-sans tracking-tight">
-                    ${numericPrice.toFixed(2)}{' '}
-                    <span className="text-sm font-semibold text-gray-500">USD</span>
+                    ₹{numericPrice.toLocaleString('en-IN')}{' '}
+                    <span className="text-sm font-semibold text-gray-500">INR</span>
                   </div>
 
                   <div className="bg-[#FEF3C7] border border-[#FDE68A] rounded-xl px-3 py-1 text-center shadow-xs">

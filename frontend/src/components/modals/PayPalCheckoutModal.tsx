@@ -20,7 +20,7 @@ export function PayPalCheckoutModal({
   productId,
   productName,
   amount,
-  currency = 'USD',
+  currency = 'INR',
   onSuccess,
 }: PayPalCheckoutModalProps) {
   const [selectedMethod, setSelectedMethod] = useState<'balance' | 'paylater' | 'card'>('balance');
@@ -89,7 +89,7 @@ export function PayPalCheckoutModal({
             </div>
             <div className="text-right">
               <div className="text-2xl font-bold text-gray-900 font-sans">
-                ${amount.toFixed(2)}
+                ₹{amount.toLocaleString('en-IN')}
               </div>
               <span className="text-sm font-semibold text-gray-500">{currency}</span>
             </div>
@@ -114,7 +114,7 @@ export function PayPalCheckoutModal({
                 </div>
                 <div>
                   <div className="text-sm font-bold text-gray-900">PayPal Balance / Instant Transfer</div>
-                  <div className="text-sm text-gray-500">Available Sandbox Balance: $5,000.00 USD</div>
+                  <div className="text-sm text-gray-500">Available Sandbox Balance: ₹5,00,000.00 INR</div>
                 </div>
               </div>
               <div
@@ -144,7 +144,7 @@ export function PayPalCheckoutModal({
                 <div>
                   <div className="text-sm font-bold text-gray-900">Pay in 4 Interest-Free Payments</div>
                   <div className="text-sm text-gray-500">
-                    4 installments of ${(amount / 4).toFixed(2)} due every 2 weeks
+                    4 installments of ₹{(amount / 4).toLocaleString('en-IN')} due every 2 weeks
                   </div>
                 </div>
               </div>
@@ -256,7 +256,7 @@ export function PayPalCheckoutModal({
               ) : (
                 <>
                   <CheckCircle2 className="w-4 h-4" />
-                  <span>Authorize & Capture (${amount.toFixed(2)})</span>
+                  <span>Authorize & Capture (₹{amount.toLocaleString('en-IN')})</span>
                 </>
               )}
             </button>

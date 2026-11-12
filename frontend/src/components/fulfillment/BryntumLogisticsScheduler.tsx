@@ -49,37 +49,37 @@ interface BryntumLogisticsSchedulerProps {
 const DEFAULT_RESOURCES: FulfillmentResource[] = [
   {
     id: 'res-hub-1',
-    name: 'Channel3 West Coast Depot',
+    name: 'Channel3 South Depot',
     role: 'Primary Hardware Hub',
-    hub: 'San Jose, CA',
+    hub: 'Bengaluru, KA',
     status: 'ACTIVE',
   },
   {
     id: 'res-hub-2',
-    name: 'Channel3 East Coast Hub',
+    name: 'Channel3 North Hub',
     role: 'Regional Warehouse',
-    hub: 'Newark, NJ',
+    hub: 'Gurugram, HR',
     status: 'ACTIVE',
   },
   {
     id: 'res-carrier-fedex',
-    name: 'FedEx Priority Air Fleet',
-    role: 'Express Courier',
+    name: 'Blue Dart / FedEx Express',
+    role: 'Express Air Courier',
     hub: 'Domestic Priority',
     status: 'ACTIVE',
   },
   {
     id: 'res-carrier-dhl',
-    name: 'DHL International Express',
-    role: 'Cross-Border Air',
-    hub: 'Worldwide Priority',
+    name: 'DHL Express India',
+    role: 'National Air Freight',
+    hub: 'Inter-State Priority',
     status: 'ACTIVE',
   },
   {
     id: 'res-agent-ai',
     name: 'PayPal Autonomous Dispatcher',
     role: 'Escrow Settlement',
-    hub: 'Fintech Rail',
+    hub: 'Fintech Rail (India)',
     status: 'ONLINE',
   },
 ];
@@ -88,7 +88,7 @@ const DEFAULT_EVENTS: FulfillmentEvent[] = [
   {
     id: 'evt-1',
     resourceId: 'res-hub-1',
-    name: 'ORD-8850: ASUS ROG Zephyrus G16 (QA & Prep)',
+    name: 'ORD-8850: ASUS ROG Zephyrus G16 (Bengaluru Depot QA)',
     orderId: 'ORD-8850',
     startDate: '2026-11-09 09:00',
     endDate: '2026-11-10 14:00',
@@ -99,7 +99,7 @@ const DEFAULT_EVENTS: FulfillmentEvent[] = [
   {
     id: 'evt-2',
     resourceId: 'res-carrier-fedex',
-    name: 'ORD-8850: FedEx Air Express Transit',
+    name: 'ORD-8850: Blue Dart Air Express (Bengaluru -> Mumbai)',
     orderId: 'ORD-8850',
     startDate: '2026-11-10 14:30',
     endDate: '2026-11-12 18:00',
@@ -110,7 +110,7 @@ const DEFAULT_EVENTS: FulfillmentEvent[] = [
   {
     id: 'evt-3',
     resourceId: 'res-hub-2',
-    name: 'ORD-8842: Lenovo LOQ 15 (Inspection)',
+    name: 'ORD-8842: Lenovo LOQ 15 (Gurugram Hub Inspection)',
     orderId: 'ORD-8842',
     startDate: '2026-11-08 08:00',
     endDate: '2026-11-09 11:00',
@@ -121,7 +121,7 @@ const DEFAULT_EVENTS: FulfillmentEvent[] = [
   {
     id: 'evt-4',
     resourceId: 'res-carrier-fedex',
-    name: 'ORD-8842: Final Mile Delivery',
+    name: 'ORD-8842: Final Mile Delivery (Delhi NCR)',
     orderId: 'ORD-8842',
     startDate: '2026-11-09 11:30',
     endDate: '2026-11-11 16:00',
@@ -132,7 +132,7 @@ const DEFAULT_EVENTS: FulfillmentEvent[] = [
   {
     id: 'evt-5',
     resourceId: 'res-hub-1',
-    name: 'ORD-8837: MacBook Pro 14 (Benchmarking)',
+    name: 'ORD-8837: MacBook Pro 14 (Bengaluru Tech Testing)',
     orderId: 'ORD-8837',
     startDate: '2026-11-08 13:00',
     endDate: '2026-11-09 17:00',
@@ -143,7 +143,7 @@ const DEFAULT_EVENTS: FulfillmentEvent[] = [
   {
     id: 'evt-6',
     resourceId: 'res-carrier-dhl',
-    name: 'ORD-8837: DHL International Air',
+    name: 'ORD-8837: DHL Express Cargo (Bengaluru -> Hyderabad)',
     orderId: 'ORD-8837',
     startDate: '2026-11-09 18:00',
     endDate: '2026-11-12 12:00',
@@ -154,7 +154,7 @@ const DEFAULT_EVENTS: FulfillmentEvent[] = [
   {
     id: 'evt-7',
     resourceId: 'res-agent-ai',
-    name: 'PayPal Autonomous Escrow Lock',
+    name: 'PayPal Autonomous Escrow Lock (INR Settlement)',
     startDate: '2026-11-08 00:00',
     endDate: '2026-11-13 23:59',
     eventColor: 'cyan',

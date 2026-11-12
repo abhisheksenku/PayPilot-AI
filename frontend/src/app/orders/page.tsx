@@ -65,14 +65,14 @@ const INITIAL_ORDERS: OrderItem[] = [
     name: 'Lenovo LOQ 15',
     specs: 'RTX 4060 • 16GB DDR5 • 115W TGP',
     modelKey: 'lenovo-loq',
-    amount: '$749.00 USD',
-    amountNumeric: 749.0,
+    amount: '₹62,990 INR',
+    amountNumeric: 62990,
     paymentMethod: 'PayPal Balance',
     status: 'DELIVERED',
     date: 'Nov 10, 2026',
     time: '10:24 AM (IST)',
     shipping: 'Free',
-    tax: '$0.00',
+    tax: '₹0.00',
   },
   {
     id: 'ORD-8837',
@@ -82,14 +82,14 @@ const INITIAL_ORDERS: OrderItem[] = [
     name: 'MacBook Pro 14',
     specs: 'M3 Pro • 36GB Unified RAM • 14.2" Liquid Retina',
     modelKey: 'macbook-pro',
-    amount: '$1,849.00 USD',
-    amountNumeric: 1849.0,
+    amount: '₹1,69,900 INR',
+    amountNumeric: 169900,
     paymentMethod: 'PayPal Balance',
     status: 'IN_TRANSIT',
     date: 'Nov 09, 2026',
     time: '04:37 PM (IST)',
     shipping: 'Free',
-    tax: '$0.00',
+    tax: '₹0.00',
   },
   {
     id: 'ORD-8831',
@@ -99,14 +99,14 @@ const INITIAL_ORDERS: OrderItem[] = [
     name: 'HP Victus 15',
     specs: 'RTX 3050 • 16GB DDR5 • 144Hz FHD',
     modelKey: 'hp-victus',
-    amount: '$699.00 USD',
-    amountNumeric: 699.0,
+    amount: '₹58,990 INR',
+    amountNumeric: 58990,
     paymentMethod: 'PayPal Balance',
     status: 'DELIVERED',
     date: 'Nov 09, 2026',
     time: '11:15 AM (IST)',
     shipping: 'Free',
-    tax: '$0.00',
+    tax: '₹0.00',
   },
   {
     id: 'ORD-8825',
@@ -116,14 +116,14 @@ const INITIAL_ORDERS: OrderItem[] = [
     name: 'Dell G15 Gaming',
     specs: 'RTX 4050 • 16GB DDR5 • 120Hz Display',
     modelKey: 'dell-g15',
-    amount: '$779.00 USD',
-    amountNumeric: 779.0,
+    amount: '₹65,490 INR',
+    amountNumeric: 65490,
     paymentMethod: 'PayPal Balance',
     status: 'DELIVERED',
     date: 'Nov 08, 2026',
     time: '11:06 AM (IST)',
     shipping: 'Free',
-    tax: '$0.00',
+    tax: '₹0.00',
   },
   {
     id: 'ORD-8819',
@@ -133,14 +133,14 @@ const INITIAL_ORDERS: OrderItem[] = [
     name: 'Lenovo Legion Pro 5',
     specs: 'RTX 4060 • 32GB DDR5 • 16" WQXGA 240Hz',
     modelKey: 'lenovo-legion',
-    amount: '$1,299.00 USD',
-    amountNumeric: 1299.0,
+    amount: '₹1,09,990 INR',
+    amountNumeric: 109990,
     paymentMethod: 'PayPal Balance',
     status: 'IN_TRANSIT',
     date: 'Nov 07, 2026',
     time: '06:21 PM (IST)',
     shipping: 'Free',
-    tax: '$0.00',
+    tax: '₹0.00',
   },
   {
     id: 'ORD-8812',
@@ -150,14 +150,14 @@ const INITIAL_ORDERS: OrderItem[] = [
     name: 'ASUS ROG Zephyrus G16',
     specs: 'RTX 4070 • 32GB DDR5 • 240Hz (Escrow)',
     modelKey: 'asus-rog',
-    amount: '$1,499.00 USD',
-    amountNumeric: 1499.0,
+    amount: '₹1,25,990 INR',
+    amountNumeric: 125990,
     paymentMethod: 'PayPal Escrow Rails',
     status: 'ON_HOLD',
     date: 'Nov 07, 2026',
     time: '02:14 PM (IST)',
     shipping: 'Free',
-    tax: '$0.00',
+    tax: '₹0.00',
   },
 ];
 
@@ -251,8 +251,8 @@ function OrdersViewContent() {
           ? Object.values((order.Product as any).specifications).slice(0, 3).join(' • ')
           : 'RTX 4060 • 16GB DDR5 • 115W TGP',
         modelKey,
-        amount: `$${Number(order.totalAmount || 749).toFixed(2)} USD`,
-        amountNumeric: Number(order.totalAmount || 749),
+        amount: `₹${Number(order.totalAmount || 62990).toLocaleString('en-IN')} INR`,
+        amountNumeric: Number(order.totalAmount || 62990),
         paymentMethod: 'PayPal Balance',
         status,
         date: new Date(order.createdAt || Date.now()).toLocaleDateString('en-US', {
@@ -266,7 +266,7 @@ function OrdersViewContent() {
             minute: '2-digit',
           }) + ' (IST)',
         shipping: 'Free',
-        tax: '$0.00',
+        tax: '₹0.00',
       };
     });
   }, [liveOrders, user?.name, user?.email]);
@@ -311,7 +311,7 @@ function OrdersViewContent() {
 
   const netInvoicedVolume = useMemo(() => {
     const sum = allOrders.reduce((acc, o) => acc + o.amountNumeric, 0);
-    return `$${sum.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    return `₹${sum.toLocaleString('en-IN')}`;
   }, [allOrders]);
 
   const selectedOrder = useMemo(() => {
@@ -335,37 +335,37 @@ function OrdersViewContent() {
     () => [
       {
         id: 'res-hub-1',
-        name: 'Channel3 West Coast Depot',
+        name: 'Channel3 South Depot',
         role: 'Primary Hardware Hub',
-        hub: 'San Jose, CA',
+        hub: 'Bengaluru, KA',
         status: 'ACTIVE',
       },
       {
         id: 'res-hub-2',
-        name: 'Channel3 East Coast Hub',
+        name: 'Channel3 North Hub',
         role: 'Regional Warehouse',
-        hub: 'Newark, NJ',
+        hub: 'Gurugram, HR',
         status: 'ACTIVE',
       },
       {
         id: 'res-carrier-fedex',
-        name: 'FedEx Priority Air Fleet',
-        role: 'Express Courier',
+        name: 'Blue Dart / FedEx Express',
+        role: 'Express Air Courier',
         hub: 'Domestic Priority',
         status: 'ACTIVE',
       },
       {
         id: 'res-carrier-dhl',
-        name: 'DHL International Express',
-        role: 'Cross-Border Air',
-        hub: 'Worldwide Priority',
+        name: 'DHL Express India',
+        role: 'National Air Freight',
+        hub: 'Inter-State Priority',
         status: 'ACTIVE',
       },
       {
         id: 'res-agent-ai',
         name: 'PayPal Autonomous Dispatcher',
         role: 'Escrow Settlement',
-        hub: 'Fintech Rail',
+        hub: 'Fintech Rail (India)',
         status: 'ONLINE',
       },
     ],
@@ -403,7 +403,7 @@ function OrdersViewContent() {
       events.push({
         id: `evt-carrier-${order.id}`,
         resourceId: carrierId,
-        name: `${order.id}: ${carrierId === 'res-carrier-dhl' ? 'DHL Express' : 'FedEx Priority Air'} (${order.name})`,
+        name: `${order.id}: ${carrierId === 'res-carrier-dhl' ? 'DHL Express India' : 'Blue Dart Air Express'} (${order.name})`,
         orderId: order.id,
         startDate: `2026-11-${midDayPad} 14:00`,
         endDate: `2026-11-${endDayPad} 18:00`,
@@ -604,7 +604,7 @@ function OrdersViewContent() {
                   <span className="text-2xl font-bold text-gray-900 tracking-tight font-sans">
                     {netInvoicedVolume}
                   </span>
-                  <span className="text-sm font-semibold text-gray-500">USD</span>
+                  <span className="text-sm font-semibold text-gray-500">INR</span>
                 </div>
                 <span className="text-sm text-gray-500 font-medium block mt-1">
                   Full PayPal Seller Protection
@@ -626,7 +626,7 @@ function OrdersViewContent() {
                     Shipping &amp; Delivery Logistics Schedule
                   </h2>
                   <p className="text-sm text-slate-400 mt-1 max-w-3xl">
-                    Real-time timeline tracking Channel3 hardware depot allocation, priority air freight routes (FedEx / DHL), and PayPal autonomous payment releases.
+                    Real-time timeline tracking Channel3 hardware depot allocation, priority domestic air routes (Blue Dart / DHL India), and PayPal autonomous payment releases.
                   </p>
                 </div>
 
@@ -652,13 +652,13 @@ function OrdersViewContent() {
                 <div className="bg-slate-800/60 rounded-xl p-4 border border-slate-700/50">
                   <span className="text-sm text-slate-400 block font-medium">Fulfillment Hubs</span>
                   <span className="text-lg font-bold text-emerald-400 mt-1 block">
-                    {allOrders.length > 0 ? 'San Jose & Newark' : 'Standby (San Jose / Newark)'}
+                    {allOrders.length > 0 ? 'Bengaluru & Gurugram' : 'Standby (Bengaluru / Gurugram)'}
                   </span>
                 </div>
                 <div className="bg-slate-800/60 rounded-xl p-4 border border-slate-700/50">
                   <span className="text-sm text-slate-400 block font-medium">Air Freight Corridors</span>
                   <span className="text-lg font-bold text-blue-400 mt-1 block">
-                    {allOrders.length > 0 ? 'FedEx Air & DHL Express' : 'Ready (FedEx / DHL)'}
+                    {allOrders.length > 0 ? 'Blue Dart & DHL India' : 'Ready (Blue Dart / DHL India)'}
                   </span>
                 </div>
                 <div className="bg-slate-800/60 rounded-xl p-4 border border-slate-700/50">
@@ -714,23 +714,23 @@ function OrdersViewContent() {
               <span className="font-semibold text-gray-800">Route Legend:</span>
               <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-50 text-purple-700 border border-purple-200 font-medium">
                 <span className="w-2.5 h-2.5 rounded-full bg-purple-600" />
-                Channel3 West Coast Depot (ASUS / Apple)
+                Channel3 South Depot (Bengaluru Electronics City)
               </span>
               <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-600" />
-                Channel3 East Coast Hub (Lenovo / HP)
+                Channel3 North Hub (Delhi NCR / Gurugram)
               </span>
               <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200 font-medium">
                 <span className="w-2.5 h-2.5 rounded-full bg-blue-600" />
-                FedEx Priority Air Express
+                Blue Dart / FedEx Priority Express
               </span>
               <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200 font-medium">
                 <span className="w-2.5 h-2.5 rounded-full bg-amber-600" />
-                DHL International Air Cargo
+                DHL Express India Air Cargo
               </span>
               <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-50 text-cyan-700 border border-cyan-200 font-medium">
                 <span className="w-2.5 h-2.5 rounded-full bg-cyan-600" />
-                PayPal Smart Escrow Lock
+                PayPal Smart Escrow Lock (INR Settlement)
               </span>
             </div>
           </div>
@@ -1099,7 +1099,7 @@ function OrdersViewContent() {
                       <div className="font-bold text-gray-900">{selectedOrder.customerName}</div>
                       <div className="text-gray-600 font-mono text-sm mt-0.5">{selectedOrder.customerEmail}</div>
                       <div className="text-gray-500 text-sm mt-1">
-                        Shipping Address: 742 Evergreen Terrace, San Jose, CA 95123 (Channel3 Priority Corridor)
+                        Shipping Address: Flat 402, Prestige Tech Vista, Kadubeesanahalli, Outer Ring Road, Bengaluru, Karnataka 560103
                       </div>
                     </div>
                   </div>
@@ -1136,12 +1136,12 @@ function OrdersViewContent() {
                       <span className="font-medium text-gray-900">{selectedOrder.amount}</span>
                     </div>
                     <div className="flex justify-between text-gray-600">
-                      <span>Express Shipping (FedEx / DHL)</span>
+                      <span>Express Shipping (Blue Dart / DHL Express)</span>
                       <span className="font-semibold text-emerald-600">FREE</span>
                     </div>
                     <div className="flex justify-between text-gray-600">
-                      <span>Estimated Sales Tax (0.0%)</span>
-                      <span className="font-medium text-gray-900">$0.00 USD</span>
+                      <span>Estimated GST / Tax (0.0%)</span>
+                      <span className="font-medium text-gray-900">₹0.00 INR</span>
                     </div>
                     <div className="flex justify-between items-baseline pt-2 border-t border-gray-200 text-base font-bold text-gray-900">
                       <span>Total Paid</span>
@@ -1233,12 +1233,12 @@ function OrdersViewContent() {
                     defaultValue="asus-rog"
                     className="w-full border border-gray-300 rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:border-[#0070BA]"
                   >
-                    <option value="asus-rog">ASUS ROG Zephyrus G16 ($1,499.00 USD)</option>
-                    <option value="lenovo-loq">Lenovo LOQ 15 ($749.00 USD)</option>
-                    <option value="macbook-pro">Apple MacBook Pro 14 M3 Pro ($1,849.00 USD)</option>
-                    <option value="hp-victus">HP Victus 15 ($699.00 USD)</option>
-                    <option value="dell-g15">Dell G15 Gaming ($779.00 USD)</option>
-                    <option value="lenovo-legion">Lenovo Legion Pro 5 ($1,299.00 USD)</option>
+                    <option value="asus-rog">ASUS ROG Zephyrus G16 (₹1,25,990 INR)</option>
+                    <option value="lenovo-loq">Lenovo LOQ 15 (₹62,990 INR)</option>
+                    <option value="macbook-pro">Apple MacBook Pro 14 M3 Pro (₹1,69,900 INR)</option>
+                    <option value="hp-victus">HP Victus 15 (₹58,990 INR)</option>
+                    <option value="dell-g15">Dell G15 Gaming (₹65,490 INR)</option>
+                    <option value="lenovo-legion">Lenovo Legion Pro 5 (₹1,09,990 INR)</option>
                   </select>
                 </div>
 

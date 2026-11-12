@@ -167,11 +167,11 @@ export function AppHeader({
                 <div className="border-t border-gray-100 pt-2 space-y-1.5 text-sm text-gray-700">
                   <div className="flex justify-between">
                     <span>Budget Limit:</span>
-                    <span className="font-semibold text-gray-900">$824.00 USD</span>
+                    <span className="font-semibold text-gray-900">₹70,000 INR</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Locked Amount:</span>
-                    <span className="font-semibold text-emerald-700">$749.00 USD</span>
+                    <span className="font-semibold text-emerald-700">₹62,990 INR</span>
                   </div>
                 </div>
               </div>

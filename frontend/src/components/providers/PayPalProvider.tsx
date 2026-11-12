@@ -12,7 +12,7 @@ export const PayPalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     <PayPalScriptProvider
       options={{
         clientId: PAYPAL_CLIENT_ID,
-        currency: 'USD',
+        currency: 'INR',
         intent: 'capture',
         components: 'buttons',
         enableFunding: 'card,paylater',

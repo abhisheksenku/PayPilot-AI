@@ -46,7 +46,7 @@ const CATALOG_ITEMS: CatalogItem[] = [
     subtitle: 'Gaming & ML Laptop',
     score: '98/100 AI Score',
     isTopPick: true,
-    price: 749.0,
+    price: 62990.0,
     specs: ['115W TGP RTX 4060', '16GB DDR5 5200MHz', '100% sRGB Display'],
     category: 'ml-laptops',
     brand: 'Lenovo',
@@ -58,7 +58,7 @@ const CATALOG_ITEMS: CatalogItem[] = [
     subtitle: 'Developer & AI Workflows',
     score: '94/100 Score',
     isTopPick: false,
-    price: 1849.0,
+    price: 169900.0,
     specs: ['M3 Pro (12-core)', '36GB Unified RAM', '14.2" Liquid Retina XDR'],
     category: 'macbooks',
     brand: 'Apple',
@@ -70,7 +70,7 @@ const CATALOG_ITEMS: CatalogItem[] = [
     subtitle: 'Gaming & AI Development',
     score: '87/100 Score',
     isTopPick: false,
-    price: 699.0,
+    price: 58990.0,
     specs: ['95W TGP RTX 3050', '16GB DDR5 4800MHz', '144Hz FHD (15.6")'],
     category: 'ml-laptops',
     brand: 'HP',
@@ -82,7 +82,7 @@ const CATALOG_ITEMS: CatalogItem[] = [
     subtitle: 'Creator & ML Workstation',
     score: '95/100 Score',
     isTopPick: false,
-    price: 1499.0,
+    price: 125990.0,
     specs: ['115W TGP RTX 4070', '32GB DDR5 5600MHz', '16" 240Hz 2.5K (100% DCI-P3)'],
     category: 'workstations',
     brand: 'ASUS',
@@ -94,7 +94,7 @@ const CATALOG_ITEMS: CatalogItem[] = [
     subtitle: 'ML Training & Gaming',
     score: '89/100 Score',
     isTopPick: false,
-    price: 779.0,
+    price: 65490.0,
     specs: ['140W TGP RTX 4050', '16GB DDR5 4800MHz', '15.6" FHD 165Hz'],
     category: 'ml-laptops',
     brand: 'Dell',
@@ -106,7 +106,7 @@ const CATALOG_ITEMS: CatalogItem[] = [
     subtitle: 'High-Performance Dev Laptop',
     score: '97/100 Score',
     isTopPick: false,
-    price: 1299.0,
+    price: 109990.0,
     specs: ['140W TGP RTX 4060', '32GB DDR5 5600MHz', '16" WQXGA 240Hz (100% sRGB)'],
     category: 'ml-laptops',
     brand: 'Lenovo',
@@ -163,7 +163,7 @@ export default function CatalogPage() {
           : p.name.includes('HP')
           ? 'HP'
           : 'Lenovo',
-        price: Number(p.price || 749),
+        price: Number(p.price || 62990),
         score: '96/100',
         badge: 'Verified Live',
         isTopPick: p.name.includes('LOQ') || p.name.includes('TUF'),
@@ -187,7 +187,7 @@ export default function CatalogPage() {
     if (selectedBrand !== 'all' && item.brand !== selectedBrand) {
       return false;
     }
-    if (isBudgetFilterActive && item.price > 824.0) {
+    if (isBudgetFilterActive && item.price > 70000) {
       return false;
     }
     return true;
@@ -324,7 +324,7 @@ export default function CatalogPage() {
             }`}
           >
             <Filter className="w-4 h-4 text-[#0070BA]" />
-            <span>Budget: Under ₹70,000 ($824 USD)</span>
+            <span>Budget: Under ₹70,000</span>
             <span
               className={`p-0.5 rounded-full ${
                 isBudgetFilterActive
@@ -437,8 +437,8 @@ export default function CatalogPage() {
               <div className="flex items-center justify-between pt-2 border-t border-gray-100">
                 <div>
                   <div className="text-xl sm:text-2xl font-bold text-gray-900 font-sans tracking-tight">
-                    ${item.price.toFixed(2)}{' '}
-                    <span className="text-sm font-semibold text-gray-500">USD</span>
+                    ₹{item.price.toLocaleString('en-IN')}{' '}
+                    <span className="text-sm font-semibold text-gray-500">INR</span>
                   </div>
                 </div>
 

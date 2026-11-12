@@ -60,9 +60,9 @@ const INITIAL_TRANSACTIONS: TransactionItem[] = [
     specs: 'RTX 4060 • 16GB • 100% sRGB',
     brand: 'Lenovo',
     modelKey: 'lenovo-loq',
-    amount: '$749.00 USD',
-    amountNumeric: 749.0,
-    currency: 'USD',
+    amount: '₹62,990 INR',
+    amountNumeric: 62990,
+    currency: 'INR',
     status: 'CAPTURED',
     date: 'Nov 10, 2026',
     time: '10:24 AM',
@@ -77,9 +77,9 @@ const INITIAL_TRANSACTIONS: TransactionItem[] = [
     specs: '36GB • 14.2" • Liquid Retina',
     brand: 'Apple',
     modelKey: 'macbook-pro',
-    amount: '$1,849.00 USD',
-    amountNumeric: 1849.0,
-    currency: 'USD',
+    amount: '₹1,69,900 INR',
+    amountNumeric: 169900,
+    currency: 'INR',
     status: 'CAPTURED',
     date: 'Nov 09, 2026',
     time: '04:37 PM',
@@ -94,9 +94,9 @@ const INITIAL_TRANSACTIONS: TransactionItem[] = [
     specs: 'RTX 3050 • 16GB • 144Hz',
     brand: 'HP',
     modelKey: 'hp-victus',
-    amount: '$699.00 USD',
-    amountNumeric: 699.0,
-    currency: 'USD',
+    amount: '₹58,990 INR',
+    amountNumeric: 58990,
+    currency: 'INR',
     status: 'CAPTURED',
     date: 'Nov 09, 2026',
     time: '01:15 PM',
@@ -111,9 +111,9 @@ const INITIAL_TRANSACTIONS: TransactionItem[] = [
     specs: 'RTX 4070 • 32GB • 240Hz',
     brand: 'ASUS',
     modelKey: 'asus-rog',
-    amount: '$1,499.00 USD',
-    amountNumeric: 1499.0,
-    currency: 'USD',
+    amount: '₹1,25,990 INR',
+    amountNumeric: 125990,
+    currency: 'INR',
     status: 'CAPTURED',
     date: 'Nov 08, 2026',
     time: '08:42 PM',
@@ -128,9 +128,9 @@ const INITIAL_TRANSACTIONS: TransactionItem[] = [
     specs: 'RTX 4050 • 16GB • 165Hz',
     brand: 'Dell',
     modelKey: 'dell-g15',
-    amount: '$779.00 USD',
-    amountNumeric: 779.0,
-    currency: 'USD',
+    amount: '₹65,490 INR',
+    amountNumeric: 65490,
+    currency: 'INR',
     status: 'CAPTURED',
     date: 'Nov 08, 2026',
     time: '11:06 AM',
@@ -145,9 +145,9 @@ const INITIAL_TRANSACTIONS: TransactionItem[] = [
     specs: 'RTX 4060 • 32GB • 16" WQXGA',
     brand: 'Lenovo',
     modelKey: 'lenovo-legion',
-    amount: '$1,299.00 USD',
-    amountNumeric: 1299.0,
-    currency: 'USD',
+    amount: '₹1,09,990 INR',
+    amountNumeric: 109990,
+    currency: 'INR',
     status: 'CAPTURED',
     date: 'Nov 07, 2026',
     time: '06:21 PM',
@@ -162,9 +162,9 @@ const INITIAL_TRANSACTIONS: TransactionItem[] = [
     specs: 'RTX 4070 • 32GB • 240Hz',
     brand: 'ASUS',
     modelKey: 'asus-rog',
-    amount: '$1,499.00 USD',
-    amountNumeric: 1499.0,
-    currency: 'USD',
+    amount: '₹1,25,990 INR',
+    amountNumeric: 125990,
+    currency: 'INR',
     status: 'ON_HOLD',
     date: 'Nov 07, 2026',
     time: '02:14 PM',
@@ -248,9 +248,9 @@ export default function TransactionsPage() {
           : 'RTX 4060 • 16GB • 100% sRGB',
         brand: order.Product?.name?.includes('Apple') ? 'Apple' : 'Lenovo',
         modelKey,
-        amount: `$${Number(order.totalAmount || 749).toFixed(2)} USD`,
-        amountNumeric: Number(order.totalAmount || 749),
-        currency: order.currency || 'USD',
+        amount: `₹${Number(order.totalAmount || 62990).toLocaleString('en-IN')} INR`,
+        amountNumeric: Number(order.totalAmount || 62990),
+        currency: 'INR',
         status,
         date: new Date(order.createdAt || Date.now()).toLocaleDateString('en-US', {
           month: 'short',
@@ -291,7 +291,7 @@ export default function TransactionsPage() {
   // Dynamic KPI Metrics
   const totalVolumeFormatted = useMemo(() => {
     const sum = allTransactions.reduce((acc, t) => acc + t.amountNumeric, 0);
-    return `$${sum.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    return `₹${sum.toLocaleString('en-IN')}`;
   }, [allTransactions]);
 
   const settledCapturesCount = useMemo(() => {
@@ -401,7 +401,7 @@ export default function TransactionsPage() {
         filter: 'agNumberColumnFilter',
         cellRenderer: (params: any) => (
           <span className="font-semibold text-sm text-gray-900 flex items-center h-full">
-            ${Number(params.value || 0).toFixed(2)} USD
+            ₹{Number(params.value || 0).toLocaleString('en-IN')} INR
           </span>
         ),
       },
@@ -594,7 +594,7 @@ export default function TransactionsPage() {
                   <span className="text-2xl font-bold text-gray-900 tracking-tight font-sans">
                     {totalVolumeFormatted}
                   </span>
-                  <span className="text-sm font-semibold text-gray-500 font-sans">USD</span>
+                  <span className="text-sm font-semibold text-gray-500 font-sans">INR</span>
                 </div>
                 <span className="text-sm text-gray-500 font-medium block mt-1">
                   Settled across verified transactions
@@ -1093,21 +1093,21 @@ export default function TransactionsPage() {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
                 <span className="text-sm text-gray-500 font-medium">Gross Captured Volume</span>
-                <p className="text-2xl font-bold font-sans text-gray-900 mt-1">$6,874.00 USD</p>
+                <p className="text-2xl font-bold font-sans text-gray-900 mt-1">₹5,93,350 INR</p>
                 <span className="text-sm text-emerald-700 font-semibold mt-1 block">
                   6 of 6 Orders Captured
                 </span>
               </div>
               <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
                 <span className="text-sm text-gray-500 font-medium">Estimated Merchant Fees</span>
-                <p className="text-2xl font-bold font-sans text-gray-900 mt-1">$201.34 USD</p>
+                <p className="text-2xl font-bold font-sans text-gray-900 mt-1">₹14,834 INR</p>
                 <span className="text-sm text-gray-500 mt-1 block">
-                  2.9% + $0.30 per transaction
+                  2.5% RBI domestic settlement fee
                 </span>
               </div>
               <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
                 <span className="text-sm text-gray-500 font-medium">Net Settlement Payout</span>
-                <p className="text-2xl font-bold font-sans text-[#0070BA] mt-1">$6,672.66 USD</p>
+                <p className="text-2xl font-bold font-sans text-[#0070BA] mt-1">₹5,78,516 INR</p>
                 <span className="text-sm text-emerald-700 font-semibold mt-1 block">
                   Immediate Sandbox Release
                 </span>
@@ -1137,21 +1137,21 @@ export default function TransactionsPage() {
                   <tr>
                     <td className="py-3.5 px-4 font-semibold text-gray-900">PayPal Balance / Instant</td>
                     <td className="py-3.5 px-4">3</td>
-                    <td className="py-3.5 px-4 font-bold text-gray-900">$3,547.00 USD</td>
+                    <td className="py-3.5 px-4 font-bold text-gray-900">₹2,98,970 INR</td>
                     <td className="py-3.5 px-4">Instantaneous</td>
                     <td className="py-3.5 px-4 text-emerald-700 font-semibold">Cleared</td>
                   </tr>
                   <tr>
                     <td className="py-3.5 px-4 font-semibold text-gray-900">PayPal Credit / Pay Later</td>
                     <td className="py-3.5 px-4">1</td>
-                    <td className="py-3.5 px-4 font-bold text-gray-900">$1,849.00 USD</td>
+                    <td className="py-3.5 px-4 font-bold text-gray-900">₹1,69,900 INR</td>
                     <td className="py-3.5 px-4">Upfront Merchant Credit</td>
                     <td className="py-3.5 px-4 text-emerald-700 font-semibold">Cleared</td>
                   </tr>
                   <tr>
                     <td className="py-3.5 px-4 font-semibold text-gray-900">Debit / Credit Card (Direct)</td>
                     <td className="py-3.5 px-4">2</td>
-                    <td className="py-3.5 px-4 font-bold text-gray-900">$1,478.00 USD</td>
+                    <td className="py-3.5 px-4 font-bold text-gray-900">₹1,24,480 INR</td>
                     <td className="py-3.5 px-4">T+0 Sandbox Settlement</td>
                     <td className="py-3.5 px-4 text-emerald-700 font-semibold">Cleared</td>
                   </tr>
