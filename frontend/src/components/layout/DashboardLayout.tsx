@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 import { AppSidebar } from './AppSidebar';
 import { AppHeader } from './AppHeader';
 import { TestCardsModal } from '../modals/TestCardsModal';
@@ -29,12 +29,14 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       {/* Main Workspace (Takes remaining viewport height down to bottom of screen) */}
       <div className="flex-1 flex min-h-0 overflow-hidden">
         {/* Left Sidebar (Full height from header down to bottom edge) */}
-        <AppSidebar
-          onOpenTestCards={() => setIsTestCardsOpen(true)}
-          onOpenCredentials={() => setIsCredentialsOpen(true)}
-          isMobileOpen={isMobileSidebarOpen}
-          onCloseMobile={() => setIsMobileSidebarOpen(false)}
-        />
+        <Suspense fallback={<div className="w-64 bg-white border-r border-gray-200 hidden md:block" />}>
+          <AppSidebar
+            onOpenTestCards={() => setIsTestCardsOpen(true)}
+            onOpenCredentials={() => setIsCredentialsOpen(true)}
+            isMobileOpen={isMobileSidebarOpen}
+            onCloseMobile={() => setIsMobileSidebarOpen(false)}
+          />
+        </Suspense>
 
         {/* Scrollable Content Viewport */}
         <main className="flex-1 overflow-y-auto min-h-0">

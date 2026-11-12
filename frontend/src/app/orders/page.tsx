@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, Suspense } from 'react';
 import Link from 'next/link';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { ENABLE_SEED_DATA } from '@/lib/config';
 import { useAuth } from '@/context/AuthContext';
@@ -11,7 +12,6 @@ import {
   ShoppingCart,
   ShieldCheck,
   Wallet,
-  Filter,
   Printer,
   Plus,
   Search,
@@ -31,6 +31,9 @@ import {
   Truck,
   Check,
   ArrowRight,
+  Eye,
+  Sparkles,
+  Info,
 } from 'lucide-react';
 import { BryntumSchedulerWrapper } from '@/components/fulfillment/BryntumSchedulerWrapper';
 import type { FulfillmentResource, FulfillmentEvent } from '@/components/fulfillment/BryntumLogisticsScheduler';
@@ -166,31 +169,59 @@ function MiniThumbnail({ model }: { model: OrderItem['modelKey'] }) {
   );
 }
 
-export default function OrdersPage() {
+function OrdersViewContent() {
   const { user } = useAuth();
-  const [selectedOrderId, setSelectedOrderId] = useState<string>('ORD-8842');
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  // Reactive viewMode connected directly to Next.js query parameters
+  const viewQuery = searchParams ? searchParams.get('view') : null;
+  const [viewMode, setViewMode] = useState<'table' | 'bryntum'>(() => {
+    if (typeof window !== 'undefined') {
+      const p = new URLSearchParams(window.location.search);
+      return p.get('view') === 'bryntum' ? 'bryntum' : 'table';
+    }
+    return 'table';
+  });
+
+  // Keep viewMode synchronized whenever the URL query parameter changes
+  useEffect(() => {
+    if (viewQuery === 'bryntum') {
+      setViewMode('bryntum');
+    } else if (viewQuery === 'table' || !viewQuery) {
+      if (viewQuery === 'table') {
+        setViewMode('table');
+      }
+    }
+  }, [viewQuery]);
+
+  const handleSwitchView = (mode: 'table' | 'bryntum') => {
+    setViewMode(mode);
+    if (mode === 'bryntum') {
+      router.push('/orders?view=bryntum');
+    } else {
+      router.push('/orders');
+    }
+  };
+
+  const [selectedOrderId, setSelectedOrderId] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState('');
   const [dateFilter, setDateFilter] = useState('7d');
   const [isSentNotice, setIsSentNotice] = useState(false);
   const [isManualModalOpen, setIsManualModalOpen] = useState(false);
   const [liveOrders, setLiveOrders] = useState<Order[]>([]);
-  const [viewMode, setViewMode] = useState<'table' | 'bryntum'>('table');
+  const [showDemoPreview, setShowDemoPreview] = useState(false);
 
+  // Fetch real orders from database for current authenticated user
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      if (params.get('view') === 'bryntum') {
-        setViewMode('bryntum');
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    api.getOrders().then((orders) => {
-      if (orders && Array.isArray(orders)) {
-        setLiveOrders(orders);
-      }
-    }).catch(() => {});
+    api
+      .getOrders()
+      .then((orders) => {
+        if (orders && Array.isArray(orders)) {
+          setLiveOrders(orders);
+        }
+      })
+      .catch(() => {});
   }, []);
 
   const mappedLiveOrders = useMemo<OrderItem[]>(() => {
@@ -229,28 +260,49 @@ export default function OrdersPage() {
           day: '2-digit',
           year: 'numeric',
         }),
-        time: new Date(order.createdAt || Date.now()).toLocaleTimeString('en-US', {
-          hour: '2-digit',
-          minute: '2-digit',
-        }) + ' (IST)',
+        time:
+          new Date(order.createdAt || Date.now()).toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit',
+          }) + ' (IST)',
         shipping: 'Free',
         tax: '$0.00',
       };
     });
   }, [liveOrders, user?.name, user?.email]);
 
-  // Combined dataset: Always display orders so page looks complete and authentic
+  const isDemoAccount = !user || user.email === 'demo@paypilot.ai';
+
+  // Strict user data scoping:
+  // - Real logged-in user: Strictly displays their own genuine orders (unless they choose to preview sample data)
+  // - Demo account (demo@paypilot.ai): Displays pre-seeded showcase data so presentations look complete
   const allOrders = useMemo<OrderItem[]>(() => {
-    if (mappedLiveOrders.length > 0) {
-      if (ENABLE_SEED_DATA) {
+    if (!isDemoAccount && !showDemoPreview) {
+      return mappedLiveOrders;
+    }
+
+    if (ENABLE_SEED_DATA || showDemoPreview) {
+      if (mappedLiveOrders.length > 0) {
         const liveIds = new Set(mappedLiveOrders.map((o) => o.id));
         const dedupedSeed = INITIAL_ORDERS.filter((o) => !liveIds.has(o.id));
         return [...mappedLiveOrders, ...dedupedSeed];
       }
-      return mappedLiveOrders;
+      return INITIAL_ORDERS;
     }
-    return INITIAL_ORDERS;
-  }, [mappedLiveOrders]);
+
+    return mappedLiveOrders;
+  }, [mappedLiveOrders, isDemoAccount, showDemoPreview]);
+
+  // Keep selectedOrderId synchronized with the available list
+  useEffect(() => {
+    if (allOrders.length > 0) {
+      if (!allOrders.some((o) => o.id === selectedOrderId)) {
+        setSelectedOrderId(allOrders[0].id);
+      }
+    } else {
+      setSelectedOrderId('');
+    }
+  }, [allOrders, selectedOrderId]);
 
   // Dynamic Metrics
   const totalOrdersCount = useMemo(() => {
@@ -264,10 +316,7 @@ export default function OrdersPage() {
 
   const selectedOrder = useMemo(() => {
     if (allOrders.length === 0) return null;
-    return (
-      allOrders.find((o) => o.id === selectedOrderId) ||
-      allOrders[0]
-    );
+    return allOrders.find((o) => o.id === selectedOrderId) || allOrders[0];
   }, [allOrders, selectedOrderId]);
 
   const filteredOrders = useMemo(() => {
@@ -282,43 +331,46 @@ export default function OrdersPage() {
     });
   }, [allOrders, searchQuery]);
 
-  const bryntumResources = useMemo<FulfillmentResource[]>(() => [
-    {
-      id: 'res-hub-1',
-      name: 'Channel3 West Coast Depot',
-      role: 'Primary Hardware Hub',
-      hub: 'San Jose, CA',
-      status: 'ACTIVE',
-    },
-    {
-      id: 'res-hub-2',
-      name: 'Channel3 East Coast Hub',
-      role: 'Regional Warehouse',
-      hub: 'Newark, NJ',
-      status: 'ACTIVE',
-    },
-    {
-      id: 'res-carrier-fedex',
-      name: 'FedEx Priority Air Fleet',
-      role: 'Express Courier',
-      hub: 'Domestic Priority',
-      status: 'ACTIVE',
-    },
-    {
-      id: 'res-carrier-dhl',
-      name: 'DHL International Express',
-      role: 'Cross-Border Air',
-      hub: 'Worldwide Priority',
-      status: 'ACTIVE',
-    },
-    {
-      id: 'res-agent-ai',
-      name: 'PayPal Autonomous Dispatcher',
-      role: 'Escrow Settlement',
-      hub: 'Fintech Rail',
-      status: 'ONLINE',
-    },
-  ], []);
+  const bryntumResources = useMemo<FulfillmentResource[]>(
+    () => [
+      {
+        id: 'res-hub-1',
+        name: 'Channel3 West Coast Depot',
+        role: 'Primary Hardware Hub',
+        hub: 'San Jose, CA',
+        status: 'ACTIVE',
+      },
+      {
+        id: 'res-hub-2',
+        name: 'Channel3 East Coast Hub',
+        role: 'Regional Warehouse',
+        hub: 'Newark, NJ',
+        status: 'ACTIVE',
+      },
+      {
+        id: 'res-carrier-fedex',
+        name: 'FedEx Priority Air Fleet',
+        role: 'Express Courier',
+        hub: 'Domestic Priority',
+        status: 'ACTIVE',
+      },
+      {
+        id: 'res-carrier-dhl',
+        name: 'DHL International Express',
+        role: 'Cross-Border Air',
+        hub: 'Worldwide Priority',
+        status: 'ACTIVE',
+      },
+      {
+        id: 'res-agent-ai',
+        name: 'PayPal Autonomous Dispatcher',
+        role: 'Escrow Settlement',
+        hub: 'Fintech Rail',
+        status: 'ONLINE',
+      },
+    ],
+    []
+  );
 
   const bryntumEvents = useMemo<FulfillmentEvent[]>(() => {
     const events: FulfillmentEvent[] = [];
@@ -376,6 +428,25 @@ export default function OrdersPage() {
     return events;
   }, [allOrders]);
 
+  // Compute dynamic timeline boundaries so events are always visible and centered
+  const calculatedStartDate = useMemo(() => {
+    if (bryntumEvents.length === 0) return new Date(2026, 10, 8);
+    const minTime = Math.min(...bryntumEvents.map((e) => new Date(e.startDate).getTime()));
+    const d = new Date(minTime);
+    d.setHours(0, 0, 0, 0);
+    d.setDate(d.getDate() - 1);
+    return d;
+  }, [bryntumEvents]);
+
+  const calculatedEndDate = useMemo(() => {
+    if (bryntumEvents.length === 0) return new Date(2026, 10, 16);
+    const maxTime = Math.max(...bryntumEvents.map((e) => new Date(e.endDate).getTime()));
+    const d = new Date(maxTime);
+    d.setHours(23, 59, 59, 999);
+    d.setDate(d.getDate() + 2);
+    return d;
+  }, [bryntumEvents]);
+
   const handleResend = () => {
     setIsSentNotice(true);
     setTimeout(() => {
@@ -390,6 +461,23 @@ export default function OrdersPage() {
   return (
     <DashboardLayout>
       <div className="px-6 py-6 max-w-[1600px] mx-auto space-y-6 font-sans">
+        {/* Sample Preview Banner if user toggled demo preview */}
+        {showDemoPreview && (
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-3.5 px-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-amber-900 text-sm">
+            <div className="flex items-center gap-2.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse" />
+              <span className="font-semibold">Simulated Sample Deliveries &amp; Timeline Active:</span>
+              <span>Displaying sample Channel3 shipments and FedEx flight corridors for demonstration.</span>
+            </div>
+            <button
+              onClick={() => setShowDemoPreview(false)}
+              className="text-xs font-bold px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white transition-colors cursor-pointer shrink-0"
+            >
+              Return to Live Account View
+            </button>
+          </div>
+        )}
+
         {/* Top Header & Navigation Actions */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-gray-200">
           <div>
@@ -406,7 +494,7 @@ export default function OrdersPage() {
             {/* View Mode Toggle: Clean Segmented Control */}
             <div className="flex items-center bg-gray-100 p-1 rounded-xl border border-gray-200 shadow-xs">
               <button
-                onClick={() => setViewMode('table')}
+                onClick={() => handleSwitchView('table')}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer ${
                   viewMode === 'table'
                     ? 'bg-white text-gray-900 shadow-sm'
@@ -417,7 +505,7 @@ export default function OrdersPage() {
                 <span>Orders Table</span>
               </button>
               <button
-                onClick={() => setViewMode('bryntum')}
+                onClick={() => handleSwitchView('bryntum')}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer ${
                   viewMode === 'bryntum'
                     ? 'bg-slate-900 text-white shadow-sm'
@@ -465,7 +553,7 @@ export default function OrdersPage() {
                   </span>
                 </div>
                 <span className="text-sm text-gray-500 font-medium block mt-1">
-                  All transactions verified &amp; settled
+                  {totalOrdersCount > 0 ? 'All transactions verified & settled' : 'No transactions recorded yet'}
                 </span>
               </div>
             </div>
@@ -483,7 +571,7 @@ export default function OrdersPage() {
                 </span>
                 <div className="flex items-baseline gap-2 mt-1">
                   <span className="text-2xl font-bold text-emerald-700 tracking-tight font-sans">
-                    100% Dispatched
+                    {totalOrdersCount > 0 ? '100% Dispatched' : 'Standby (Ready)'}
                   </span>
                 </div>
                 <div className="flex items-center gap-2 mt-1">
@@ -491,7 +579,7 @@ export default function OrdersPage() {
                     {totalOrdersCount} Delivered / In Transit
                   </span>
                   <button
-                    onClick={() => setViewMode('bryntum')}
+                    onClick={() => handleSwitchView('bryntum')}
                     className="text-sm text-[#0070BA] font-semibold hover:underline inline-flex items-center gap-1 cursor-pointer"
                   >
                     <span>View Schedule</span>
@@ -544,7 +632,7 @@ export default function OrdersPage() {
 
                 <div className="flex items-center gap-2 self-start md:self-auto">
                   <button
-                    onClick={() => setViewMode('table')}
+                    onClick={() => handleSwitchView('table')}
                     className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-sm font-semibold text-slate-200 transition-colors cursor-pointer"
                   >
                     <FileText className="w-4 h-4 text-slate-400" />
@@ -557,15 +645,21 @@ export default function OrdersPage() {
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-5 border-t border-slate-800">
                 <div className="bg-slate-800/60 rounded-xl p-4 border border-slate-700/50">
                   <span className="text-sm text-slate-400 block font-medium">Active Shipments</span>
-                  <span className="text-lg font-bold text-white mt-1 block">{allOrders.length} Hardware Units</span>
+                  <span className="text-lg font-bold text-white mt-1 block">
+                    {allOrders.length} Hardware Units
+                  </span>
                 </div>
                 <div className="bg-slate-800/60 rounded-xl p-4 border border-slate-700/50">
                   <span className="text-sm text-slate-400 block font-medium">Fulfillment Hubs</span>
-                  <span className="text-lg font-bold text-emerald-400 mt-1 block">San Jose &amp; Newark</span>
+                  <span className="text-lg font-bold text-emerald-400 mt-1 block">
+                    {allOrders.length > 0 ? 'San Jose & Newark' : 'Standby (San Jose / Newark)'}
+                  </span>
                 </div>
                 <div className="bg-slate-800/60 rounded-xl p-4 border border-slate-700/50">
                   <span className="text-sm text-slate-400 block font-medium">Air Freight Corridors</span>
-                  <span className="text-lg font-bold text-blue-400 mt-1 block">FedEx Air &amp; DHL Express</span>
+                  <span className="text-lg font-bold text-blue-400 mt-1 block">
+                    {allOrders.length > 0 ? 'FedEx Air & DHL Express' : 'Ready (FedEx / DHL)'}
+                  </span>
                 </div>
                 <div className="bg-slate-800/60 rounded-xl p-4 border border-slate-700/50">
                   <span className="text-sm text-slate-400 block font-medium">Escrow Protection</span>
@@ -574,10 +668,43 @@ export default function OrdersPage() {
               </div>
             </div>
 
+            {/* Standby Banner if genuine user has 0 orders */}
+            {allOrders.length === 0 && !showDemoPreview && (
+              <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center shrink-0">
+                    <Truck className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-white">Logistics Pipelines on Standby</h4>
+                    <p className="text-sm text-slate-400 mt-0.5">
+                      No active shipments scheduled for {user?.email || 'your account'}. Place an order in the Catalog or preview sample flight routes.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 shrink-0">
+                  <button
+                    onClick={() => setShowDemoPreview(true)}
+                    className="px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-sm font-semibold rounded-xl transition-colors cursor-pointer"
+                  >
+                    Preview Sample Logistics Schedule
+                  </button>
+                  <Link
+                    href="/catalog"
+                    className="px-4 py-2 bg-[#0070BA] hover:bg-[#005ea6] text-white text-sm font-semibold rounded-xl transition-colors"
+                  >
+                    Browse Catalog
+                  </Link>
+                </div>
+              </div>
+            )}
+
             {/* Interactive Timeline Component */}
             <BryntumSchedulerWrapper
               resources={bryntumResources}
               events={bryntumEvents}
+              startDate={calculatedStartDate}
+              endDate={calculatedEndDate}
               height={620}
               viewPreset="dayAndWeek"
             />
@@ -605,6 +732,42 @@ export default function OrdersPage() {
                 <span className="w-2.5 h-2.5 rounded-full bg-cyan-600" />
                 PayPal Smart Escrow Lock
               </span>
+            </div>
+          </div>
+        ) : allOrders.length === 0 ? (
+          /* Personalized Empty State for Real Users with 0 Orders */
+          <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center shadow-xs space-y-6">
+            <div className="w-16 h-16 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center mx-auto text-[#0070BA]">
+              <Package className="w-8 h-8" />
+            </div>
+            <div className="space-y-2 max-w-lg mx-auto">
+              <h2 className="text-2xl font-bold text-gray-900 tracking-tight">
+                Welcome{user?.name ? `, ${user.name}` : ''}! No orders placed yet
+              </h2>
+              <p className="text-sm text-gray-600 leading-relaxed">
+                Your authenticated account ({user?.email || 'your profile'}) does not have any active hardware orders. When you purchase items through our Catalog or autonomous AI shopping studio, your digital tax receipts and delivery schedule will appear here.
+              </p>
+            </div>
+
+            <div className="flex items-center justify-center gap-3 flex-wrap pt-2">
+              <Link
+                href="/catalog"
+                className="px-5 py-2.5 bg-[#0070BA] hover:bg-[#005ea6] text-white rounded-xl text-sm font-semibold shadow-xs transition-colors"
+              >
+                Browse Apps &amp; Hardware Catalog
+              </Link>
+              <Link
+                href="/studio"
+                className="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-xl text-sm font-semibold transition-colors"
+              >
+                Launch AI Shopping Studio
+              </Link>
+              <button
+                onClick={() => setShowDemoPreview(true)}
+                className="px-4 py-2.5 border border-dashed border-gray-300 hover:border-gray-400 text-gray-600 rounded-xl text-sm font-medium transition-colors cursor-pointer"
+              >
+                Preview Sample Orders
+              </button>
             </div>
           </div>
         ) : (
@@ -898,141 +1061,122 @@ export default function OrdersPage() {
 
                   {/* Metadata Reference Boxes */}
                   <div className="grid grid-cols-2 gap-3 text-sm">
-                    <div className="p-3 bg-gray-50 rounded-xl border border-gray-200">
-                      <span className="text-sm text-gray-500 block font-medium">Order Number</span>
-                      <span className="font-bold text-gray-900 block mt-1 text-sm font-mono">{selectedOrder.id}</span>
+                    <div className="bg-gray-50 p-3 rounded-xl border border-gray-200/80">
+                      <span className="text-gray-500 font-medium block">Invoice Number</span>
+                      <span className="font-mono font-bold text-gray-900 mt-0.5 block">
+                        INV-2026-{selectedOrder.id.replace('ORD-', '')}
+                      </span>
                     </div>
-
-                    <div className="p-3 bg-gray-50 rounded-xl border border-gray-200">
-                      <span className="text-sm text-gray-500 block font-medium">Transaction ID</span>
-                      <span className="font-bold text-gray-900 block mt-1 text-sm font-mono truncate">{selectedOrder.transactionId}</span>
+                    <div className="bg-gray-50 p-3 rounded-xl border border-gray-200/80">
+                      <span className="text-gray-500 font-medium block">Invoice Date</span>
+                      <span className="font-semibold text-gray-900 mt-0.5 block">
+                        {selectedOrder.date}
+                      </span>
+                    </div>
+                    <div className="bg-gray-50 p-3 rounded-xl border border-gray-200/80">
+                      <span className="text-gray-500 font-medium block">Order ID</span>
+                      <span className="font-mono font-bold text-[#0070BA] mt-0.5 block">
+                        {selectedOrder.id}
+                      </span>
+                    </div>
+                    <div className="bg-gray-50 p-3 rounded-xl border border-gray-200/80">
+                      <span className="text-gray-500 font-medium block">Capture ID</span>
+                      <span className="font-mono font-bold text-gray-900 mt-0.5 block truncate">
+                        {selectedOrder.transactionId}
+                      </span>
                     </div>
                   </div>
 
                   {/* Customer Information */}
-                  <div className="grid grid-cols-2 gap-4 text-sm border-y border-gray-100 py-4">
-                    <div className="space-y-1">
-                      <span className="text-sm text-gray-500 block font-medium">Customer</span>
-                      <span className="font-bold text-gray-900 block text-base leading-tight">
-                        {selectedOrder.customerName}
-                      </span>
-                      <span className="text-sm text-gray-600 block">
-                        {selectedOrder.customerEmail}
+                  <div className="border border-gray-200 rounded-xl p-4 bg-white space-y-2 text-sm">
+                    <div className="flex items-center justify-between border-b border-gray-100 pb-2">
+                      <span className="font-semibold text-gray-700">Billed To:</span>
+                      <span className="text-emerald-700 bg-emerald-50 text-xs px-2 py-0.5 rounded-full font-semibold border border-emerald-200">
+                        Verified PayPal Customer
                       </span>
                     </div>
-
-                    <div className="space-y-2">
-                      <div>
-                        <span className="text-sm text-gray-500 block font-medium">Order Timestamp</span>
-                        <span className="text-sm font-semibold text-gray-900 block mt-0.5">
-                          {selectedOrder.date}, {selectedOrder.time}
-                        </span>
-                      </div>
-                      <div>
-                        <span className="text-sm text-gray-500 block font-medium">Payment Channel</span>
-                        <span className="text-sm font-semibold text-gray-900 block mt-0.5">
-                          {selectedOrder.paymentMethod}
-                        </span>
+                    <div className="pt-1">
+                      <div className="font-bold text-gray-900">{selectedOrder.customerName}</div>
+                      <div className="text-gray-600 font-mono text-sm mt-0.5">{selectedOrder.customerEmail}</div>
+                      <div className="text-gray-500 text-sm mt-1">
+                        Shipping Address: 742 Evergreen Terrace, San Jose, CA 95123 (Channel3 Priority Corridor)
                       </div>
                     </div>
                   </div>
 
-                  {/* Itemized Cost Breakdown */}
-                  <div className="space-y-3">
-                    <table className="w-full text-sm">
-                      <thead>
-                        <tr className="text-gray-500 border-b border-gray-200 pb-2 font-semibold">
-                          <th className="text-left pb-2">Description</th>
-                          <th className="text-center pb-2 w-12">Qty</th>
-                          <th className="text-right pb-2">Total</th>
+                  {/* Line Items Table */}
+                  <div className="border border-gray-200 rounded-xl overflow-hidden">
+                    <table className="w-full text-left text-sm border-collapse">
+                      <thead className="bg-gray-50 border-b border-gray-200 text-gray-600">
+                        <tr>
+                          <th className="py-2.5 px-3">Item Description</th>
+                          <th className="py-2.5 px-3 text-center">Qty</th>
+                          <th className="py-2.5 px-3 text-right">Unit Price</th>
+                          <th className="py-2.5 px-3 text-right">Total</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-gray-100">
+                      <tbody className="divide-y divide-gray-100 text-gray-800">
                         <tr>
-                          <td className="py-3">
-                            <div className="flex items-center gap-3">
-                              <MiniThumbnail model={selectedOrder.modelKey} />
-                              <div>
-                                <span className="font-bold text-gray-900 block text-sm leading-tight">
-                                  {selectedOrder.name}
-                                </span>
-                                <span className="text-sm text-gray-500 block mt-0.5">
-                                  {selectedOrder.specs}
-                                </span>
-                              </div>
-                            </div>
+                          <td className="py-3 px-3">
+                            <span className="font-bold block text-gray-900">{selectedOrder.name}</span>
+                            <span className="text-xs text-gray-500 block mt-0.5">{selectedOrder.specs}</span>
                           </td>
-                          <td className="py-3 text-center font-bold text-gray-800 text-sm">1</td>
-                          <td className="py-3 text-right font-bold text-gray-900 text-base">
-                            ${selectedOrder.amountNumeric.toFixed(2)}
-                          </td>
+                          <td className="py-3 px-3 text-center font-semibold">1</td>
+                          <td className="py-3 px-3 text-right font-medium">{selectedOrder.amount}</td>
+                          <td className="py-3 px-3 text-right font-bold text-gray-900">{selectedOrder.amount}</td>
                         </tr>
                       </tbody>
                     </table>
+                  </div>
 
-                    {/* Subtotals */}
-                    <div className="pt-3 border-t border-gray-100 space-y-1.5 text-sm">
-                      <div className="flex justify-between text-gray-600">
-                        <span>Unit Subtotal</span>
-                        <span className="font-semibold text-gray-900">${selectedOrder.amountNumeric.toFixed(2)}</span>
-                      </div>
-                      <div className="flex justify-between text-gray-600">
-                        <span>Express Air Shipping</span>
-                        <span className="text-emerald-600 font-semibold">{selectedOrder.shipping}</span>
-                      </div>
-                      <div className="flex justify-between text-gray-600">
-                        <span>Sales Tax</span>
-                        <span className="font-semibold text-gray-900">{selectedOrder.tax}</span>
-                      </div>
+                  {/* Invoice Summary Totals */}
+                  <div className="space-y-2 pt-2 border-t border-gray-100 text-sm">
+                    <div className="flex justify-between text-gray-600">
+                      <span>Subtotal</span>
+                      <span className="font-medium text-gray-900">{selectedOrder.amount}</span>
                     </div>
-
-                    {/* Total Paid Strip */}
-                    <div className="bg-blue-50/70 border border-blue-200 rounded-xl p-4 flex items-center justify-between">
-                      <span className="font-bold text-gray-900 text-sm">Total Paid</span>
-                      <span className="font-bold text-[#0070BA] text-xl font-sans">
-                        ${selectedOrder.amountNumeric.toFixed(2)} USD
+                    <div className="flex justify-between text-gray-600">
+                      <span>Express Shipping (FedEx / DHL)</span>
+                      <span className="font-semibold text-emerald-600">FREE</span>
+                    </div>
+                    <div className="flex justify-between text-gray-600">
+                      <span>Estimated Sales Tax (0.0%)</span>
+                      <span className="font-medium text-gray-900">$0.00 USD</span>
+                    </div>
+                    <div className="flex justify-between items-baseline pt-2 border-t border-gray-200 text-base font-bold text-gray-900">
+                      <span>Total Paid</span>
+                      <span className="text-xl text-[#0070BA] font-extrabold font-sans">
+                        {selectedOrder.amount}
                       </span>
                     </div>
                   </div>
 
-                  {/* Seller Protection Confirmation */}
-                  <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3.5 flex items-start gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+                  {/* Seller Protection & Escrow Banner */}
+                  <div className="p-3 bg-emerald-50/80 border border-emerald-200 rounded-xl flex items-center gap-3 text-emerald-900 text-sm">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
                     <div>
-                      <span className="font-bold text-emerald-900 text-sm block leading-tight">
-                        PayPal Seller Protection Active
-                      </span>
-                      <span className="text-sm text-emerald-700 block mt-0.5 leading-normal">
-                        Funds secured via official PayPal sandbox merchant capture.
+                      <span className="font-bold block">PayPal Seller Protection Guaranteed</span>
+                      <span className="text-xs text-emerald-700 block mt-0.5">
+                        Eligible for unauthorized payment and item-not-received coverage under PayPal Sandbox rails.
                       </span>
                     </div>
                   </div>
 
-                  {/* Actions */}
-                  <div className="grid grid-cols-2 gap-3 pt-2">
+                  {/* Receipt Action Buttons */}
+                  <div className="flex items-center gap-3 pt-2">
                     <button
                       onClick={handlePrint}
-                      className="w-full bg-[#0070BA] hover:bg-[#005ea6] text-white py-2.5 px-4 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer"
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-xl text-sm font-semibold transition-colors cursor-pointer"
                     >
-                      <Download className="w-4 h-4" />
-                      <span>Download Receipt</span>
+                      <Download className="w-4 h-4 text-gray-600" />
+                      <span>Download PDF</span>
                     </button>
-
                     <button
                       onClick={handleResend}
-                      className="w-full bg-white hover:bg-gray-50 border border-gray-300 text-gray-800 py-2.5 px-4 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer"
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-[#0070BA] hover:bg-[#005ea6] text-white rounded-xl text-sm font-semibold transition-colors cursor-pointer shadow-xs"
                     >
-                      {isSentNotice ? (
-                        <>
-                          <Check className="w-4 h-4 text-emerald-600" />
-                          <span className="text-emerald-700 font-bold">Email Dispatched!</span>
-                        </>
-                      ) : (
-                        <>
-                          <Mail className="w-4 h-4 text-gray-500" />
-                          <span>Resend to Buyer</span>
-                        </>
-                      )}
+                      <Mail className="w-4 h-4" />
+                      <span>{isSentNotice ? 'Receipt Sent!' : 'Email Receipt'}</span>
                     </button>
                   </div>
                 </div>
@@ -1043,31 +1187,16 @@ export default function OrdersPage() {
 
         {/* Modal: Create Manual Invoice */}
         {isManualModalOpen && (
-          <div
-            className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 font-sans"
-            onClick={() => setIsManualModalOpen(false)}
-          >
-            <div
-              className="bg-white rounded-2xl border border-gray-200 shadow-2xl max-w-lg w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-gray-50">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-blue-100 text-[#0070BA] flex items-center justify-center font-bold">
-                    <Plus className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h3 className="text-base font-bold text-gray-900">
-                      Create Sandbox Merchant Invoice
-                    </h3>
-                    <p className="text-sm text-gray-500">
-                      Issue verified test merchant invoice for hardware settlement
-                    </p>
-                  </div>
+          <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl border border-gray-200 animate-in fade-in zoom-in-95 duration-150">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+                <div className="flex items-center gap-2.5">
+                  <Plus className="w-5 h-5 text-[#0070BA]" />
+                  <h3 className="text-lg font-bold text-gray-900">Issue Manual Tax Invoice</h3>
                 </div>
                 <button
                   onClick={() => setIsManualModalOpen(false)}
-                  className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 cursor-pointer"
+                  className="text-gray-400 hover:text-gray-600 p-1 rounded-lg"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -1076,27 +1205,29 @@ export default function OrdersPage() {
               <div className="p-6 space-y-4 text-sm">
                 <div>
                   <label className="font-semibold text-gray-700 block mb-1 text-sm">
-                    Buyer Name &amp; Email
+                    Customer Name
                   </label>
-                  <div className="grid grid-cols-2 gap-3">
-                    <input
-                      type="text"
-                      defaultValue="Devendra Rao"
-                      placeholder="Buyer Full Name"
-                      className="border border-gray-300 rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:border-[#0070BA]"
-                    />
-                    <input
-                      type="email"
-                      defaultValue="devendra.rao@example.com"
-                      placeholder="buyer@example.com"
-                      className="border border-gray-300 rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:border-[#0070BA]"
-                    />
-                  </div>
+                  <input
+                    type="text"
+                    defaultValue={user?.name || 'Rahul Verma'}
+                    className="w-full border border-gray-300 rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:border-[#0070BA]"
+                  />
                 </div>
 
                 <div>
                   <label className="font-semibold text-gray-700 block mb-1 text-sm">
-                    Hardware Item
+                    Customer Email Address
+                  </label>
+                  <input
+                    type="email"
+                    defaultValue={user?.email || 'rahul.verma@example.com'}
+                    className="w-full border border-gray-300 rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:border-[#0070BA]"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-semibold text-gray-700 block mb-1 text-sm">
+                    Catalog Hardware Item
                   </label>
                   <select
                     defaultValue="asus-rog"
@@ -1149,5 +1280,24 @@ export default function OrdersPage() {
         )}
       </div>
     </DashboardLayout>
+  );
+}
+
+export default function OrdersPage() {
+  return (
+    <Suspense
+      fallback={
+        <DashboardLayout>
+          <div className="flex items-center justify-center min-h-[500px]">
+            <div className="flex flex-col items-center gap-3">
+              <div className="w-10 h-10 border-4 border-[#0070BA] border-t-transparent rounded-full animate-spin" />
+              <p className="text-sm font-medium text-gray-500">Loading orders &amp; shipping schedules...</p>
+            </div>
+          </div>
+        </DashboardLayout>
+      }
+    >
+      <OrdersViewContent />
+    </Suspense>
   );
 }

@@ -1,9 +1,21 @@
 'use client';
 
-import React, { useRef } from 'react';
+import React, { useRef, useState, useMemo, Component, ErrorInfo } from 'react';
 import { BryntumScheduler } from '@bryntum/scheduler-react';
 import '@bryntum/scheduler/scheduler.css';
 import '@bryntum/scheduler/stockholm-dark.css';
+import {
+  Calendar,
+  Truck,
+  ShieldCheck,
+  Clock,
+  Warehouse,
+  Plane,
+  RefreshCw,
+  Maximize2,
+  CheckCircle2,
+  Info,
+} from 'lucide-react';
 
 export interface FulfillmentResource {
   id: string | number;
@@ -151,6 +163,145 @@ const DEFAULT_EVENTS: FulfillmentEvent[] = [
   },
 ];
 
+// Error boundary to gracefully capture any Canvas/Bryntum engine initialization failure
+class BryntumErrorBoundary extends Component<
+  { children: React.ReactNode; fallback: React.ReactNode },
+  { hasError: boolean }
+> {
+  constructor(props: { children: React.ReactNode; fallback: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.warn('Bryntum Scheduler render caught by boundary, using timeline fallback:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback;
+    }
+    return this.props.children;
+  }
+}
+
+// High-fidelity fallback timeline component
+function LogisticsTimelineFallback({
+  resources,
+  events,
+  startDate,
+  endDate,
+}: {
+  resources: FulfillmentResource[];
+  events: FulfillmentEvent[];
+  startDate: Date;
+  endDate: Date;
+}) {
+  const days: { date: Date; label: string; sub: string }[] = useMemo(() => {
+    const list = [];
+    const cur = new Date(startDate);
+    while (cur <= endDate) {
+      list.push({
+        date: new Date(cur),
+        label: cur.toLocaleDateString('en-US', { weekday: 'short', month: 'numeric', day: 'numeric' }),
+        sub: cur.toLocaleDateString('en-US', { weekday: 'short' }),
+      });
+      cur.setDate(cur.getDate() + 1);
+    }
+    return list;
+  }, [startDate, endDate]);
+
+  const totalTime = endDate.getTime() - startDate.getTime();
+
+  return (
+    <div className="bg-slate-950 text-slate-100 rounded-xl overflow-x-auto border border-slate-800 p-4">
+      <div className="min-w-[900px]">
+        {/* Header timeline */}
+        <div className="grid grid-cols-12 border-b border-slate-800 pb-3 text-sm font-semibold text-slate-400">
+          <div className="col-span-4 pl-3">Fulfillment Facility / Carrier</div>
+          <div className="col-span-8 grid grid-cols-7 text-center text-xs">
+            {days.slice(0, 7).map((d, i) => (
+              <div key={i} className="border-l border-slate-800 px-1 py-0.5">
+                <span className="text-white block font-medium">{d.label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Resources rows */}
+        <div className="divide-y divide-slate-800/70">
+          {resources.map((res) => {
+            const resEvents = events.filter((e) => String(e.resourceId) === String(res.id));
+            return (
+              <div key={res.id} className="grid grid-cols-12 py-3.5 items-center hover:bg-slate-900/40 transition-colors">
+                <div className="col-span-4 pl-3 pr-4">
+                  <div className="font-semibold text-white text-sm flex items-center gap-2">
+                    {res.name.includes('Depot') || res.name.includes('Hub') ? (
+                      <Warehouse className="w-4 h-4 text-emerald-400 shrink-0" />
+                    ) : res.name.includes('Air') || res.name.includes('DHL') || res.name.includes('FedEx') ? (
+                      <Plane className="w-4 h-4 text-blue-400 shrink-0" />
+                    ) : (
+                      <ShieldCheck className="w-4 h-4 text-cyan-400 shrink-0" />
+                    )}
+                    <span className="truncate">{res.name}</span>
+                  </div>
+                  <div className="text-xs text-slate-400 flex items-center gap-2 mt-0.5">
+                    <span>{res.role}</span>
+                    <span>•</span>
+                    <span className="text-slate-500">{res.hub}</span>
+                  </div>
+                </div>
+
+                <div className="col-span-8 relative h-12 flex items-center border-l border-slate-800/80 bg-slate-900/20 rounded px-2">
+                  {resEvents.length === 0 ? (
+                    <span className="text-xs text-slate-500 italic pl-2">Standby — ready for incoming order allocation</span>
+                  ) : (
+                    resEvents.map((evt) => {
+                      const s = new Date(evt.startDate).getTime();
+                      const e = new Date(evt.endDate).getTime();
+                      const leftPct = Math.max(0, Math.min(100, ((s - startDate.getTime()) / totalTime) * 100));
+                      const widthPct = Math.max(12, Math.min(100 - leftPct, ((e - s) / totalTime) * 100));
+
+                      const bg =
+                        evt.eventColor === 'purple'
+                          ? 'bg-purple-900/80 border-purple-500 text-purple-200'
+                          : evt.eventColor === 'blue'
+                          ? 'bg-blue-900/80 border-blue-500 text-blue-200'
+                          : evt.eventColor === 'green'
+                          ? 'bg-emerald-900/80 border-emerald-500 text-emerald-200'
+                          : evt.eventColor === 'orange'
+                          ? 'bg-amber-900/80 border-amber-500 text-amber-200'
+                          : 'bg-cyan-900/80 border-cyan-500 text-cyan-200';
+
+                      return (
+                        <div
+                          key={evt.id}
+                          className={`absolute top-1.5 bottom-1.5 rounded-lg border px-2.5 py-1 text-xs font-semibold flex items-center justify-between shadow-md truncate cursor-pointer transition-transform hover:scale-[1.01] ${bg}`}
+                          style={{ left: `${leftPct}%`, width: `${widthPct}%` }}
+                          title={`${evt.name} (${evt.startDate} to ${evt.endDate})`}
+                        >
+                          <span className="truncate">{evt.name}</span>
+                          <span className="ml-2 text-[10px] px-1.5 py-0.2 rounded bg-black/40 uppercase tracking-wider shrink-0">
+                            {evt.status || 'Active'}
+                          </span>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function BryntumLogisticsScheduler({
   resources = DEFAULT_RESOURCES,
   events = DEFAULT_EVENTS,
@@ -160,7 +311,27 @@ export function BryntumLogisticsScheduler({
   endDate = new Date(2026, 10, 16),
 }: BryntumLogisticsSchedulerProps) {
   const schedulerRef = useRef<BryntumScheduler>(null);
-  const [activePreset, setActivePreset] = React.useState<string>(viewPreset);
+  const [activePreset, setActivePreset] = useState<string>(viewPreset);
+  const [selectedFacilityFilter, setSelectedFacilityFilter] = useState<'ALL' | 'DEPOT' | 'AIR' | 'ESCROW'>('ALL');
+
+  const filteredResources = useMemo(() => {
+    if (selectedFacilityFilter === 'DEPOT') {
+      return resources.filter((r) => r.role.includes('Hub') || r.role.includes('Warehouse'));
+    }
+    if (selectedFacilityFilter === 'AIR') {
+      return resources.filter((r) => r.role.includes('Express') || r.role.includes('Courier') || r.role.includes('Air'));
+    }
+    if (selectedFacilityFilter === 'ESCROW') {
+      return resources.filter((r) => r.role.includes('Settlement') || r.role.includes('Escrow'));
+    }
+    return resources;
+  }, [resources, selectedFacilityFilter]);
+
+  const filteredResourceIds = useMemo(() => new Set(filteredResources.map((r) => String(r.id))), [filteredResources]);
+
+  const filteredEvents = useMemo(() => {
+    return events.filter((e) => filteredResourceIds.has(String(e.resourceId)));
+  }, [events, filteredResourceIds]);
 
   const columns = [
     {
@@ -191,23 +362,79 @@ export function BryntumLogisticsScheduler({
     }
   };
 
+  const fallback = (
+    <LogisticsTimelineFallback
+      resources={filteredResources}
+      events={filteredEvents}
+      startDate={startDate}
+      endDate={endDate}
+    />
+  );
+
   return (
     <div className="space-y-3 font-sans">
       {/* Clean Enterprise Toolbar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between bg-slate-900 border border-slate-800 rounded-xl px-5 py-3 gap-3 text-sm">
-        <div className="flex items-center gap-3">
-          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-          <span className="font-semibold text-white text-sm">Fulfillment Schedule Timeline</span>
-          <span className="text-slate-400 text-sm">| 5 Active Carrier Routes</span>
+        <div className="flex items-center gap-3 flex-wrap">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="font-semibold text-white text-sm">Fulfillment Schedule Timeline</span>
+          </div>
+          <span className="text-slate-500 text-sm hidden sm:inline">|</span>
+          
+          {/* Facility Filter Chips */}
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={() => setSelectedFacilityFilter('ALL')}
+              className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+                selectedFacilityFilter === 'ALL'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+              }`}
+            >
+              All Routes ({filteredEvents.length} events)
+            </button>
+            <button
+              onClick={() => setSelectedFacilityFilter('DEPOT')}
+              className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+                selectedFacilityFilter === 'DEPOT'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+              }`}
+            >
+              Depots
+            </button>
+            <button
+              onClick={() => setSelectedFacilityFilter('AIR')}
+              className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+                selectedFacilityFilter === 'AIR'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+              }`}
+            >
+              Air Express
+            </button>
+            <button
+              onClick={() => setSelectedFacilityFilter('ESCROW')}
+              className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+                selectedFacilityFilter === 'ESCROW'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+              }`}
+            >
+              Escrow
+            </button>
+          </div>
         </div>
 
+        {/* Time Preset Controls */}
         <div className="flex items-center gap-2">
-          <span className="text-slate-400 text-sm mr-1">Time View:</span>
+          <span className="text-slate-400 text-xs sm:text-sm mr-1">Time Scale:</span>
           {(['hourAndDay', 'dayAndWeek', 'weekAndMonth'] as const).map((preset) => (
             <button
               key={preset}
               onClick={() => handleZoom(preset)}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
+              className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors cursor-pointer ${
                 activePreset === preset
                   ? 'bg-blue-600 text-white shadow-sm'
                   : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
@@ -219,23 +446,26 @@ export function BryntumLogisticsScheduler({
         </div>
       </div>
 
-      <div
-        className="bryntum-scheduler-container rounded-xl overflow-hidden border border-slate-800 shadow-xl bg-slate-950"
-        style={{ height }}
-      >
-        <BryntumScheduler
-          ref={schedulerRef}
-          startDate={startDate}
-          endDate={endDate}
-          viewPreset={activePreset}
-          rowHeight={60}
-          barMargin={8}
-          resources={resources}
-          events={events}
-          columns={columns}
-          eventColor="indigo"
-        />
-      </div>
+      {/* Bryntum Scheduler Engine with Seamless Visual Fallback */}
+      <BryntumErrorBoundary fallback={fallback}>
+        <div
+          className="bryntum-scheduler-container rounded-xl overflow-hidden border border-slate-800 shadow-xl bg-slate-950"
+          style={{ height }}
+        >
+          <BryntumScheduler
+            ref={schedulerRef}
+            startDate={startDate}
+            endDate={endDate}
+            viewPreset={activePreset}
+            rowHeight={64}
+            barMargin={8}
+            resources={filteredResources}
+            events={filteredEvents}
+            columns={columns}
+            eventColor="indigo"
+          />
+        </div>
+      </BryntumErrorBoundary>
     </div>
   );
 }

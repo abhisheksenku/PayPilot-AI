@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import {
   Home,
   Box,
@@ -32,6 +32,8 @@ export function AppSidebar({
   setActiveTab,
 }: AppSidebarProps) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const viewQuery = searchParams ? searchParams.get('view') : null;
   const [environment, setEnvironment] = React.useState<'sandbox' | 'live'>('sandbox');
   const [showLiveNotice, setShowLiveNotice] = React.useState(false);
 
@@ -172,7 +174,9 @@ export function AppSidebar({
             const Icon = item.icon;
             const isActive =
               (item.id === 'studio' && (pathname === '/studio' || pathname === '/')) ||
-              (item.id !== 'studio' && pathname.startsWith(item.href));
+              (item.id === 'bryntum-schedule' && pathname === '/orders' && viewQuery === 'bryntum') ||
+              (item.id === 'orders' && pathname === '/orders' && viewQuery !== 'bryntum') ||
+              (item.id !== 'studio' && item.id !== 'bryntum-schedule' && item.id !== 'orders' && item.href !== '#' && pathname.startsWith(item.href));
 
             return (
               <Link

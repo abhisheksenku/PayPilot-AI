@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useEffect, useRef } from 'react';
+import Link from 'next/link';
 import { AgGridReact } from 'ag-grid-react';
 import type { ColDef } from 'ag-grid-community';
 import 'ag-grid-community/styles/ag-grid.css';
@@ -266,18 +267,26 @@ export default function TransactionsPage() {
     });
   }, [liveOrders]);
 
-  // Combined dataset: Always display transactions so ledger looks complete and authentic
+  const [showDemoPreview, setShowDemoPreview] = useState(false);
+  const isDemoAccount = !user || user.email === 'demo@paypilot.ai';
+
+  // Combined dataset: Real users see strictly their own genuine transactions, demo user sees sample data
   const allTransactions = useMemo<TransactionItem[]>(() => {
-    if (mappedLiveTransactions.length > 0) {
-      if (ENABLE_SEED_DATA) {
+    if (!isDemoAccount && !showDemoPreview) {
+      return mappedLiveTransactions;
+    }
+
+    if (ENABLE_SEED_DATA || showDemoPreview) {
+      if (mappedLiveTransactions.length > 0) {
         const liveIds = new Set(mappedLiveTransactions.map((t) => t.orderId));
         const dedupedSeed = INITIAL_TRANSACTIONS.filter((t) => !liveIds.has(t.orderId));
         return [...mappedLiveTransactions, ...dedupedSeed];
       }
-      return mappedLiveTransactions;
+      return INITIAL_TRANSACTIONS;
     }
-    return INITIAL_TRANSACTIONS;
-  }, [mappedLiveTransactions]);
+
+    return mappedLiveTransactions;
+  }, [mappedLiveTransactions, isDemoAccount, showDemoPreview]);
 
   // Dynamic KPI Metrics
   const totalVolumeFormatted = useMemo(() => {
@@ -552,6 +561,23 @@ export default function TransactionsPage() {
           </div>
         </div>
 
+        {/* Sample Preview Banner if user toggled demo preview */}
+        {showDemoPreview && (
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-3.5 px-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-amber-900 text-sm">
+            <div className="flex items-center gap-2.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse" />
+              <span className="font-semibold">Simulated Sample Ledger Active:</span>
+              <span>Displaying sample PayPal Sandbox settlements for demonstration.</span>
+            </div>
+            <button
+              onClick={() => setShowDemoPreview(false)}
+              className="text-xs font-bold px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white transition-colors cursor-pointer shrink-0"
+            >
+              Return to Live Account View
+            </button>
+          </div>
+        )}
+
         {/* Top 3 Metric Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {/* Metric 1: Total Volume */}
@@ -624,6 +650,41 @@ export default function TransactionsPage() {
 
         {/* Tab 1: Transaction Logs View */}
         {activeTab === 'logs' && (
+          allTransactions.length === 0 ? (
+            <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center shadow-xs space-y-6">
+              <div className="w-16 h-16 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center mx-auto text-[#0070BA]">
+                <FileText className="w-8 h-8" />
+              </div>
+              <div className="space-y-2 max-w-lg mx-auto">
+                <h2 className="text-2xl font-bold text-gray-900 tracking-tight">
+                  Welcome{user?.name ? `, ${user.name}` : ''}! No ledger events recorded yet
+                </h2>
+                <p className="text-sm text-gray-600 leading-relaxed">
+                  Your authenticated account ({user?.email || 'your profile'}) does not have any captured payment records. Complete an order through our Catalog or AI Studio to see real-time PayPal REST API logs here.
+                </p>
+              </div>
+              <div className="flex items-center justify-center gap-3 flex-wrap pt-2">
+                <Link
+                  href="/catalog"
+                  className="px-5 py-2.5 bg-[#0070BA] hover:bg-[#005ea6] text-white rounded-xl text-sm font-semibold shadow-xs transition-colors"
+                >
+                  Browse Apps &amp; Catalog
+                </Link>
+                <Link
+                  href="/studio"
+                  className="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-xl text-sm font-semibold transition-colors"
+                >
+                  Launch AI Studio
+                </Link>
+                <button
+                  onClick={() => setShowDemoPreview(true)}
+                  className="px-4 py-2.5 border border-dashed border-gray-300 hover:border-gray-400 text-gray-600 rounded-xl text-sm font-medium transition-colors cursor-pointer"
+                >
+                  Preview Sample Ledger
+                </button>
+              </div>
+            </div>
+          ) : (
           <div className="space-y-4">
             {/* Filter and Action Bar */}
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
@@ -1014,6 +1075,7 @@ export default function TransactionsPage() {
             </div>
             )}
           </div>
+          )
         )}
 
         {/* Tab 2: Ledger Summary View */}
