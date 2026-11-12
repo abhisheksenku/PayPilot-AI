@@ -97,8 +97,9 @@ export function AppSidebar({
   };
 
   const sidebarContent = (
-    <div className="relative z-10 flex flex-col justify-between h-full p-4 space-y-4">
-      <div className="space-y-4">
+    <div className="relative z-10 flex flex-col h-full max-h-full p-4 overflow-hidden">
+      {/* Top Header & Environment Switcher */}
+      <div className="shrink-0 space-y-3 pb-3">
         {/* Brand Header */}
         <div className="flex items-center justify-between px-1 pt-1">
           <div className="flex items-center gap-2.5">
@@ -167,9 +168,11 @@ export function AppSidebar({
             </div>
           )}
         </div>
+      </div>
 
-        {/* Navigation Items */}
-        <nav className="space-y-1.5 pt-1">
+      {/* Scrollable Navigation Area */}
+      <div className="flex-1 min-h-0 overflow-y-auto py-1 pr-1 space-y-1.5 -mr-1">
+        <nav className="space-y-1.5">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive =
@@ -220,8 +223,8 @@ export function AppSidebar({
         </nav>
       </div>
 
-      {/* Bottom PayPal JS SDK v6 Status Widget */}
-      <div className="pt-2">
+      {/* Pinned Bottom PayPal JS SDK v6 Status Widget */}
+      <div className="shrink-0 pt-3 border-t border-gray-100">
         <div
           onClick={() => {
             onOpenCredentials?.();

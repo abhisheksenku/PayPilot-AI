@@ -16,7 +16,6 @@ import {
   Shield,
   CreditCard,
   Plus,
-  History,
   Bot,
   Cpu,
   Zap,
@@ -329,7 +328,6 @@ export default function StudioPage() {
   const [promptInput, setPromptInput] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
-  const [showHistoryDropdown, setShowHistoryDropdown] = useState(false);
   const [inspectingProduct, setInspectingProduct] = useState<RankedProduct | null>(null);
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
 
@@ -577,19 +575,6 @@ export default function StudioPage() {
     );
   };
 
-  // Start fresh chat
-  const handleStartNewChat = () => {
-    setTurns([]);
-    setSelectedProduct(fallbackProduct);
-    setPaymentSuccess(null);
-    if (typeof window !== 'undefined') {
-      try {
-        sessionStorage.removeItem('paypilot_studio_turns');
-      } catch {}
-    }
-    inputRef.current?.focus();
-  };
-
   // Select a product from any turn into the right spotlight
   const handleSelectProduct = (product: RankedProduct) => {
     setSelectedProduct(product);
@@ -618,7 +603,7 @@ export default function StudioPage() {
   return (
     <DashboardLayout>
       <div className="px-4 sm:px-6 py-4 max-w-[1600px] mx-auto space-y-4 font-sans">
-        {/* Header: Title + New Chat + History */}
+        {/* Header: Title */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-gray-100">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight flex items-center gap-2">
@@ -629,73 +614,18 @@ export default function StudioPage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-2 relative">
-            <button
-              onClick={handleStartNewChat}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-gray-50 border border-gray-200 text-gray-700 text-sm font-semibold rounded-xl shadow-xs hover:shadow-sm transition-all cursor-pointer"
-            >
-              <Plus className="w-4 h-4 text-[#0070BA]" />
-              <span>New Chat</span>
-            </button>
-
-            <button
-              onClick={() => setShowHistoryDropdown(!showHistoryDropdown)}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-gray-50 border border-gray-200 text-gray-700 text-sm font-semibold rounded-xl shadow-xs hover:shadow-sm transition-all cursor-pointer"
-            >
-              <History className="w-4 h-4 text-gray-500" />
-              <span>Conversation History</span>
-              {turns.length > 0 && (
-                <span className="w-5 h-5 rounded-full bg-blue-100 text-[#0070BA] text-xs flex items-center justify-center font-bold">
-                  {turns.length}
-                </span>
-              )}
-            </button>
-
-            {/* Conversation History Dropdown */}
-            {showHistoryDropdown && (
-              <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-2xl shadow-xl border border-gray-200 p-4 z-30 space-y-2 animate-fade-in font-sans">
-                <div className="flex items-center justify-between pb-2 border-b border-gray-100">
-                  <span className="text-sm font-bold text-gray-900">Recent Sessions</span>
-                  <button
-                    onClick={() => setShowHistoryDropdown(false)}
-                    className="text-gray-400 hover:text-gray-600 p-1"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-                {turns.length === 0 ? (
-                  <p className="text-sm text-gray-400 py-3 text-center">No questions in history yet.</p>
-                ) : (
-                  <div className="space-y-1.5 max-h-56 overflow-y-auto">
-                    {turns.map((t, idx) => (
-                      <button
-                        key={t.id}
-                        onClick={() => {
-                          setSelectedProduct(t.product);
-                          setShowHistoryDropdown(false);
-                        }}
-                        className="w-full text-left p-2.5 rounded-xl hover:bg-blue-50/70 border border-transparent hover:border-blue-100 transition-colors text-sm"
-                      >
-                        <div className="font-semibold text-gray-800 truncate">
-                          Q{idx + 1}: {t.userQuery}
-                        </div>
-                        <div className="text-xs text-gray-500 flex items-center justify-between mt-1">
-                          <span className="text-[#0070BA] font-medium truncate">{t.product.name}</span>
-                          <span className="shrink-0">{t.timestamp}</span>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-sm font-semibold bg-blue-50 text-[#0070BA] border border-blue-200 shadow-xs">
+              <Sparkles className="w-4 h-4 text-[#0070BA]" />
+              <span>Multi-Agent Swarm Active</span>
+            </span>
           </div>
         </div>
 
-        {/* 2-Column Split-Screen Copilot: Chat Feed (Left ~60%) + Spotlight Terminal (Right ~40%) */}
+        {/* 2-Column Split-Screen Copilot: Chat Feed (Left ~67%) + Spotlight Terminal (Right ~33%) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-          {/* LEFT COLUMN: Unified Scrollable Chat Console with Docked Bottom Input (Col 7 / 12) */}
-          <div className="lg:col-span-7 flex flex-col bg-white border border-gray-200/90 rounded-2xl shadow-xs h-[calc(100vh-140px)] min-h-[620px] max-h-[860px] overflow-hidden">
+          {/* LEFT COLUMN: Unified Scrollable Chat Console with Docked Bottom Input (Col 8 / 12) */}
+          <div className="lg:col-span-8 flex flex-col bg-white border border-gray-200/90 rounded-2xl shadow-xs h-[calc(100vh-125px)] min-h-[640px] overflow-hidden">
             {/* 1. Chat Header Bar */}
             <div className="px-5 py-3.5 bg-white border-b border-gray-100 flex items-center justify-between shrink-0">
               <div className="flex items-center gap-3">
@@ -719,19 +649,10 @@ export default function StudioPage() {
               </div>
 
               <div className="flex items-center gap-2">
-                {turns.length > 0 && (
-                  <span className="text-xs sm:text-sm font-medium text-gray-600 bg-gray-50 border border-gray-200 px-2.5 py-1 rounded-lg">
-                    {turns.length} {turns.length === 1 ? 'Turn' : 'Turns'}
-                  </span>
-                )}
-                <button
-                  type="button"
-                  onClick={handleStartNewChat}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold text-gray-700 hover:text-[#0070BA] bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-200 rounded-lg transition-colors cursor-pointer"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span className="hidden sm:inline">New Chat</span>
-                </button>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs sm:text-sm font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  Live Hardware Reasoning
+                </span>
               </div>
             </div>
 
@@ -1057,8 +978,8 @@ export default function StudioPage() {
             </div>
           </div>
 
-          {/* RIGHT COLUMN: Persistent Spotlight Recommendation & PayPal Terminal (Col 5 / 12) */}
-          <div className="lg:col-span-5 sticky top-4 space-y-4 font-sans">
+          {/* RIGHT COLUMN: Persistent Spotlight Recommendation & PayPal Terminal (Col 4 / 12) */}
+          <div className="lg:col-span-4 sticky top-4 space-y-4 font-sans">
             <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-xs space-y-4">
               {/* Card Header */}
               <div className="flex items-center justify-between pb-3 border-b border-gray-100">
