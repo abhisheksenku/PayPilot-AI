@@ -979,8 +979,9 @@ export default function StudioPage() {
           </div>
 
           {/* RIGHT COLUMN: Persistent Spotlight Recommendation & PayPal Terminal (Col 4 / 12) */}
-          <div className="lg:col-span-4 sticky top-4 space-y-4 font-sans">
-            <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-xs space-y-4">
+          <div className="lg:col-span-4 flex flex-col bg-white border border-gray-200/90 rounded-2xl shadow-xs h-[calc(100vh-125px)] min-h-[640px] overflow-hidden font-sans">
+            {/* Scrollable Upper Area: Visual, Description & Specifications */}
+            <div className="flex-1 overflow-y-auto p-5 space-y-4">
               {/* Card Header */}
               <div className="flex items-center justify-between pb-3 border-b border-gray-100">
                 <div className="flex items-center gap-2 text-sm font-bold text-[#0070BA]">
@@ -1064,9 +1065,12 @@ export default function StudioPage() {
                   </div>
                 </div>
               )}
+            </div>
 
+            {/* Pinned Bottom: PayPal Checkout Buttons & Security Footer */}
+            <div className="p-5 pt-3 border-t border-gray-100 bg-gray-50/40 shrink-0 space-y-3">
               {/* 3 PayPal Action Buttons */}
-              <div className="space-y-2.5 pt-1">
+              <div className="space-y-2.5">
                 {/* Button 1: Gold PayPal Checkout */}
                 <button
                   onClick={() => setIsCheckoutModalOpen(true)}
@@ -1110,7 +1114,7 @@ export default function StudioPage() {
               </div>
 
               {/* Trust Footer */}
-              <div className="flex items-center justify-center gap-5 pt-2 text-sm text-gray-500 border-t border-gray-100">
+              <div className="flex items-center justify-center gap-5 pt-1 text-sm text-gray-500 border-t border-gray-200/60">
                 <div className="flex items-center gap-1.5 font-medium">
                   <Lock className="w-3.5 h-3.5 text-gray-400" />
                   <span>Secure checkout by PayPal</span>
