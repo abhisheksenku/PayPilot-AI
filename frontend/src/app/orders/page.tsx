@@ -31,7 +31,14 @@ import {
   Truck,
   Check,
   ArrowRight,
+  Clock,
+  Sparkles,
+  Layers,
+  Plane,
+  Warehouse,
 } from 'lucide-react';
+import { BryntumSchedulerWrapper } from '@/components/fulfillment/BryntumSchedulerWrapper';
+import type { FulfillmentResource, FulfillmentEvent } from '@/components/fulfillment/BryntumLogisticsScheduler';
 
 interface OrderItem {
   id: string;
@@ -369,6 +376,136 @@ export default function OrdersPage() {
     window.print();
   };
 
+  const [viewMode, setViewMode] = useState<'table' | 'bryntum'>('table');
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('view') === 'bryntum') {
+        setViewMode('bryntum');
+      }
+    }
+  }, []);
+
+  const bryntumResources = useMemo<FulfillmentResource[]>(() => [
+    {
+      id: 'res-hub-1',
+      name: 'Channel3 West Coast Depot',
+      role: 'Primary Hardware Hub',
+      hub: 'San Jose, CA',
+      status: 'ACTIVE',
+    },
+    {
+      id: 'res-hub-2',
+      name: 'Channel3 East Coast Hub',
+      role: 'Regional Warehouse',
+      hub: 'Newark, NJ',
+      status: 'ACTIVE',
+    },
+    {
+      id: 'res-carrier-fedex',
+      name: 'FedEx Priority Air Fleet',
+      role: 'Express Courier',
+      hub: 'Global Logistics',
+      status: 'ACTIVE',
+    },
+    {
+      id: 'res-carrier-dhl',
+      name: 'DHL International Express',
+      role: 'Cross-Border Air',
+      hub: 'Worldwide Express',
+      status: 'ACTIVE',
+    },
+    {
+      id: 'res-agent-ai',
+      name: 'PayPal Autonomous Dispatcher',
+      role: 'AI Escrow & Release',
+      hub: 'Cloud Autonomous Agent',
+      status: 'ONLINE',
+    },
+  ], []);
+
+  const bryntumEvents = useMemo<FulfillmentEvent[]>(() => {
+    if (allOrders.length === 0) {
+      return [
+        {
+          id: 'evt-standby-1',
+          resourceId: 'res-agent-ai',
+          name: 'PayPilot Autonomous Dispatcher Standby',
+          startDate: '2026-11-10 08:00',
+          endDate: '2026-11-15 20:00',
+          eventColor: 'cyan',
+          iconCls: 'b-fa b-fa-shield-halved',
+          status: 'Online',
+        },
+        {
+          id: 'evt-hub-standby',
+          resourceId: 'res-hub-1',
+          name: 'Channel3 Hardware Hub Ready for Inbound Orders',
+          startDate: '2026-11-10 09:00',
+          endDate: '2026-11-14 18:00',
+          eventColor: 'teal',
+          iconCls: 'b-fa b-fa-warehouse',
+          status: 'Active',
+        },
+      ];
+    }
+
+    const events: FulfillmentEvent[] = [];
+    allOrders.forEach((order, index) => {
+      const isRog = order.modelKey === 'asus-rog';
+      const isMac = order.modelKey === 'macbook-pro';
+      const hubId = isRog || isMac ? 'res-hub-1' : 'res-hub-2';
+      const carrierId = isMac ? 'res-carrier-dhl' : 'res-carrier-fedex';
+      const color = isRog ? 'purple' : isMac ? 'indigo' : 'green';
+
+      const baseDay = 8 + (index % 4);
+      const startHour = 8 + ((index * 2) % 6);
+      const startHourPad = String(startHour).padStart(2, '0');
+      const startDayPad = String(baseDay).padStart(2, '0');
+      const midDayPad = String(baseDay + 1).padStart(2, '0');
+      const endDayPad = String(baseDay + 2).padStart(2, '0');
+
+      events.push({
+        id: `evt-hub-${order.id}`,
+        resourceId: hubId,
+        name: `${order.id}: ${order.name} (Allocation & QA)`,
+        orderId: order.id,
+        startDate: `2026-11-${startDayPad} ${startHourPad}:00`,
+        endDate: `2026-11-${midDayPad} 13:00`,
+        eventColor: color,
+        iconCls: 'b-fa b-fa-box-check',
+        status: order.status === 'DELIVERED' ? 'Completed' : 'Processing',
+      });
+
+      events.push({
+        id: `evt-carrier-${order.id}`,
+        resourceId: carrierId,
+        name: `${order.id}: ${carrierId === 'res-carrier-dhl' ? 'DHL Express' : 'FedEx Priority Air'} (${order.name})`,
+        orderId: order.id,
+        startDate: `2026-11-${midDayPad} 14:00`,
+        endDate: `2026-11-${endDayPad} 18:00`,
+        eventColor: carrierId === 'res-carrier-dhl' ? 'orange' : 'blue',
+        iconCls: 'b-fa b-fa-plane',
+        status: order.status === 'DELIVERED' ? 'Delivered' : 'In Transit',
+      });
+
+      events.push({
+        id: `evt-escrow-${order.id}`,
+        resourceId: 'res-agent-ai',
+        name: `${order.id}: PayPal Smart Lock (${order.amount})`,
+        orderId: order.id,
+        startDate: `2026-11-${startDayPad} ${startHourPad}:00`,
+        endDate: `2026-11-${endDayPad} 18:00`,
+        eventColor: 'cyan',
+        iconCls: 'b-fa b-fa-lock',
+        status: 'Escrow Protected',
+      });
+    });
+
+    return events;
+  }, [allOrders]);
+
   return (
     <DashboardLayout>
       <div className="px-6 py-5 max-w-[1600px] mx-auto space-y-4">
@@ -383,8 +520,34 @@ export default function OrdersPage() {
             </p>
           </div>
 
-          {/* Action Buttons */}
+          {/* Action Buttons & View Switcher */}
           <div className="flex items-center gap-2 self-start sm:self-auto flex-wrap">
+            {/* View Mode Toggle: Table vs Bryntum */}
+            <div className="flex items-center bg-gray-100 p-0.5 rounded-lg border border-gray-200">
+              <button
+                onClick={() => setViewMode('table')}
+                className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${
+                  viewMode === 'table'
+                    ? 'bg-white text-gray-900 shadow-2xs'
+                    : 'text-gray-500 hover:text-gray-900'
+                }`}
+              >
+                📋 Orders Table
+              </button>
+              <button
+                onClick={() => setViewMode('bryntum')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${
+                  viewMode === 'bryntum'
+                    ? 'bg-[#0F172A] text-white shadow-2xs border border-indigo-500/50'
+                    : 'text-gray-500 hover:text-indigo-600'
+                }`}
+              >
+                <Calendar className="w-3.5 h-3.5 text-indigo-400" />
+                <span>⚡ Bryntum Scheduler</span>
+                <span className="text-[10px] bg-indigo-500/20 text-indigo-300 px-1.5 py-0.2 rounded-full font-mono">v7.3</span>
+              </button>
+            </div>
+
             <button
               onClick={() => {}}
               className="flex items-center gap-1.5 px-3.5 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-semibold text-gray-700 hover:bg-gray-50 shadow-2xs transition-all cursor-pointer"
@@ -456,6 +619,13 @@ export default function OrdersPage() {
                 <span className="text-[11px] text-gray-400 font-medium block mt-0.5">
                   {totalOrdersCount} Delivered / In Transit
                 </span>
+                <button
+                  onClick={() => setViewMode('bryntum')}
+                  className="text-[11px] text-[#0070BA] font-semibold hover:underline mt-1 flex items-center gap-1 cursor-pointer"
+                >
+                  <span>⚡ Open Bryntum Timeline</span>
+                  <ArrowRight className="w-3 h-3" />
+                </button>
               </div>
             </div>
           </div>
@@ -484,8 +654,107 @@ export default function OrdersPage() {
           </div>
         </div>
 
-        {/* Main Two-Pane Workstation */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+        {/* Main Workstation: Conditional Table View vs Bryntum Scheduler Pro */}
+        {viewMode === 'bryntum' ? (
+          <div className="space-y-4">
+            {/* Bryntum Header Banner */}
+            <div className="bg-[#0F172A] border border-[#1E293B] rounded-2xl p-5 shadow-xl text-white">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="flex h-2 w-2 relative">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                    <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 uppercase tracking-wider font-mono">
+                      Bryntum Scheduler Pro Engine • v7.3.8
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
+                      Live Logistics Feed
+                    </span>
+                  </div>
+                  <h2 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+                    <Truck className="w-5 h-5 text-indigo-400" />
+                    Autonomous Order Fulfillment &amp; Logistics Timeline
+                  </h2>
+                  <p className="text-xs text-gray-400 mt-1 max-w-2xl">
+                    High-performance timeline scheduling tracking Channel3 supplier depot allocations, priority express air corridors (FedEx / DHL), and PayPal autonomous escrow release milestones.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2 self-start md:self-auto">
+                  <button
+                    onClick={() => setViewMode('table')}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#1E293B] hover:bg-[#334155] border border-gray-700 text-xs font-semibold text-gray-200 transition-colors cursor-pointer"
+                  >
+                    <FileText className="w-3.5 h-3.5 text-gray-400" />
+                    <span>Switch to Table View</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* 4 Logistics KPI Badges */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4 pt-4 border-t border-[#1E293B]">
+                <div className="bg-[#1E293B]/60 rounded-xl p-3 border border-[#334155]/50">
+                  <span className="text-[11px] text-gray-400 block">Total Active Deliveries</span>
+                  <span className="text-lg font-bold text-white font-mono">{allOrders.length} Hardware Units</span>
+                </div>
+                <div className="bg-[#1E293B]/60 rounded-xl p-3 border border-[#334155]/50">
+                  <span className="text-[11px] text-gray-400 block">Fulfillment Depots</span>
+                  <span className="text-lg font-bold text-emerald-400 font-mono">Channel3 SJ &amp; NWK</span>
+                </div>
+                <div className="bg-[#1E293B]/60 rounded-xl p-3 border border-[#334155]/50">
+                  <span className="text-[11px] text-gray-400 block">Air Express Fleets</span>
+                  <span className="text-lg font-bold text-blue-400 font-mono">FedEx Priority &amp; DHL</span>
+                </div>
+                <div className="bg-[#1E293B]/60 rounded-xl p-3 border border-[#334155]/50">
+                  <span className="text-[11px] text-gray-400 block">PayPal Smart Escrow</span>
+                  <span className="text-lg font-bold text-cyan-400 font-mono">100% Guaranteed</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Interactive Bryntum Scheduler Pro Component */}
+            <BryntumSchedulerWrapper
+              resources={bryntumResources}
+              events={bryntumEvents}
+              height={620}
+              viewPreset="dayAndWeek"
+            />
+
+            {/* Bryntum Timeline Legend & Feature Highlights */}
+            <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-2xs flex flex-col md:flex-row items-center justify-between gap-4 text-xs">
+              <div className="flex items-center gap-3 flex-wrap">
+                <span className="font-semibold text-gray-700">Timeline Milestone Legend:</span>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-purple-50 text-purple-700 border border-purple-200 font-medium">
+                  <span className="w-2 h-2 rounded-full bg-purple-600" />
+                  Channel3 West Coast Depot (ASUS / Apple)
+                </span>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium">
+                  <span className="w-2 h-2 rounded-full bg-emerald-600" />
+                  Channel3 East Coast Hub (Lenovo / HP)
+                </span>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200 font-medium">
+                  <span className="w-2 h-2 rounded-full bg-blue-600" />
+                  FedEx Air Express Flight
+                </span>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200 font-medium">
+                  <span className="w-2 h-2 rounded-full bg-amber-600" />
+                  DHL Worldwide Express
+                </span>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-cyan-50 text-cyan-700 border border-cyan-200 font-medium">
+                  <span className="w-2 h-2 rounded-full bg-cyan-600" />
+                  PayPal Escrow Protection Rail
+                </span>
+              </div>
+
+              <div className="text-[11px] text-gray-500 text-right">
+                Powered by <strong>Bryntum Scheduler Pro</strong> with drag-and-drop event reallocations, sub-millisecond timeline rendering, and zero layout shift.
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
           {/* Left Column: Order History Table (60% width = col-span-7) */}
           <div className="lg:col-span-7 space-y-3">
             <div className="bg-white rounded-xl border border-gray-200 shadow-2xs overflow-hidden flex flex-col justify-between">
@@ -990,6 +1259,7 @@ export default function OrdersPage() {
             )}
           </div>
         </div>
+        )}
 
         {/* Modal: Create Manual Invoice */}
         {isManualModalOpen && (

@@ -13,6 +13,7 @@ import {
   Code2,
   CheckCircle2,
   X,
+  Calendar,
 } from 'lucide-react';
 
 interface AppSidebarProps {
@@ -74,6 +75,14 @@ export function AppSidebar({
       href: '/orders',
       icon: Receipt,
       hasChevron: true,
+    },
+    {
+      id: 'bryntum-schedule',
+      label: 'Bryntum Logistics',
+      href: '/orders?view=bryntum',
+      icon: Calendar,
+      hasChevron: true,
+      badge: 'PRO',
     },
   ];
 
@@ -192,9 +201,16 @@ export function AppSidebar({
                   />
                   <span>{item.label}</span>
                 </div>
-                {item.hasChevron && (
-                  <ChevronRight className="w-3.5 h-3.5 text-gray-400" />
-                )}
+                <div className="flex items-center gap-1.5">
+                  {(item as any).badge && (
+                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-700 border border-indigo-200">
+                      {(item as any).badge}
+                    </span>
+                  )}
+                  {item.hasChevron && (
+                    <ChevronRight className="w-3.5 h-3.5 text-gray-400" />
+                  )}
+                </div>
               </Link>
             );
           })}

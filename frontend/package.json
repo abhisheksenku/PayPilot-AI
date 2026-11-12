@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@bryntum/scheduler": "npm:@bryntum/scheduler-trial@^7.3.8",
+    "@bryntum/scheduler-react": "^7.3.8",
     "@paypal/react-paypal-js": "^8.7.0",
     "ag-grid-community": "^31.3.2",
     "ag-grid-react": "^31.3.2",
