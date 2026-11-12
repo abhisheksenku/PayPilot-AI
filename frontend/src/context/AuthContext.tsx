@@ -70,7 +70,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsLoading(true);
     await api.logout();
     setUser(null);
+    if (typeof window !== 'undefined') {
+      try {
+        sessionStorage.removeItem('paypilot_studio_turns');
+      } catch {}
+    }
     setIsLoading(false);
+    if (typeof window !== 'undefined') {
+      window.location.href = '/login';
+    }
   };
 
   const demoLogin = async () => {

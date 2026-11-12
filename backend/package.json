@@ -4,7 +4,8 @@
   "description": "Backend API & AI Agent Engine for PayPilot AI",
   "main": "dist/server.js",
   "scripts": {
-    "dev": "node dist/server.js",
+    "dev": "tsx watch src/server.ts",
+    "dev:dist": "node dist/server.js",
     "dev:watch": "node --watch dist/server.js",
     "build": "tsc",
     "start": "node dist/server.js",
