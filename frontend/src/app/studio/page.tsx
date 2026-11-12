@@ -32,6 +32,7 @@ import {
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { LaptopVisual, LaptopModelType } from '@/components/catalog/LaptopVisual';
 import { PayPalCheckoutModal } from '@/components/modals/PayPalCheckoutModal';
+import { FormattedAgentMessage } from '@/components/studio/FormattedAgentMessage';
 import { api, fallbackProduct } from '@/lib/api';
 import { ENABLE_SEED_DATA } from '@/lib/config';
 import { useAuth } from '@/context/AuthContext';
@@ -86,7 +87,14 @@ const SEED_TURN_1: ChatTurn = {
   turnNumber: 1,
   userQuery: 'Find a gaming laptop under ₹70,000',
   timestamp: '2:14 PM',
-  assistantSummary: "I've found the best options for you! Here's my top recommendation:",
+  assistantSummary: `Here is a professional comparison of the top options tailored for your budget under ₹70,000 ($824 USD):
+
+* **#1. Lenovo LOQ 15 ($749):** Features an unrestricted **115W TGP RTX 4060 GPU** and **16GB DDR5 RAM**, delivering the highest tensor compute in this price range with $75 left under budget.
+* **#2. HP Victus 15 ($699) & #3. Dell G15 ($779):** Reliable entry options, but with lower TGP or higher thermal throttling compared to the Lenovo LOQ.
+
+**Why the Lenovo LOQ 15 is the best recommendation:** It provides the optimal balance of maximum graphics wattage (115W) and dual-channel upgradeable DDR5 memory for developer workflows and local machine learning tasks.
+
+Would you like me to prepare the order and PayPal checkout for the Lenovo LOQ 15?`,
   agentSteps: [
     {
       role: 'supervisor',
@@ -192,7 +200,14 @@ const SEED_TURN_2: ChatTurn = {
   turnNumber: 2,
   userQuery: 'Can you find a better option with 32GB RAM?',
   timestamp: '2:24 PM',
-  assistantSummary: "Sure! I've found a better option with 32GB RAM within a similar budget range.",
+  assistantSummary: `Here is a professional comparison of the top options tailored for your machine learning needs:
+
+* **#1. ASUS ROG Zephyrus G16 ($1,499):** Features **32GB of RAM**, which is ideal for handling heavy machine learning workflows, large datasets, and local model inference without bottlenecking. It also boasts a high-resolution display to reduce eye strain during long coding sessions.
+* **#2. Lenovo Legion Pro 5 ($1,299) & #3. Apple MacBook Pro 14 M3 Pro ($1,849):** Both are fantastic 32GB+ alternatives with dedicated GPUs or unified memory architecture for tensor operations.
+
+**Why the ASUS ROG Zephyrus G16 is the best recommendation:** While it comes at a higher price point, the 32GB RAM upgrade is crucial for serious machine learning tasks, ensuring future-proofing and smoother performance when training models or multitasking with heavy development environments.
+
+Would you like me to prepare the order and PayPal checkout for the ASUS ROG Zephyrus G16?`,
   agentSteps: [
     {
       role: 'supervisor',
@@ -440,14 +455,6 @@ export default function StudioPage() {
     const now = new Date();
     const timeString = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
 
-    // Collapse previous turns when asking a new question (as shown in Image 2)
-    setTurns((prev) =>
-      prev.map((t) => ({
-        ...t,
-        isTurnCollapsed: true,
-      }))
-    );
-
     try {
       // Run LangGraph Multi-Agent Swarm against Express backend & MySQL
       const res = await api.runAgentChat(text, activeConversationId || undefined);
@@ -523,11 +530,12 @@ export default function StudioPage() {
         turnNumber: turns.length + 1,
         userQuery: text,
         timestamp: timeString,
-        assistantSummary: `I've found the best options for you! Here's my top recommendation:`,
+        assistantSummary:
+          res.agentResponse || `I've found the best options for you! Here's my top recommendation:`,
         agentSteps,
         product: winningProduct,
         alternativeProducts: altProducts,
-        isLogsExpanded: true,
+        isLogsExpanded: false,
         isTurnCollapsed: false,
       };
 
@@ -545,7 +553,7 @@ export default function StudioPage() {
         agentSteps: SEED_TURN_1.agentSteps,
         product: fallbackProduct,
         alternativeProducts: SEED_TURN_1.alternativeProducts,
-        isLogsExpanded: true,
+        isLogsExpanded: false,
         isTurnCollapsed: false,
       };
       setTurns((prev) => [...prev, fallbackTurn]);
@@ -686,15 +694,54 @@ export default function StudioPage() {
 
         {/* 2-Column Split-Screen Copilot: Chat Feed (Left ~60%) + Spotlight Terminal (Right ~40%) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-          {/* LEFT COLUMN: Multi-Turn Conversation Stream (Col 7 / 12) */}
-          <div className="lg:col-span-7 flex flex-col space-y-4">
-            {/* Scrollable Conversation Container */}
-            <div className="space-y-4 min-h-[460px]">
+          {/* LEFT COLUMN: Unified Scrollable Chat Console with Docked Bottom Input (Col 7 / 12) */}
+          <div className="lg:col-span-7 flex flex-col bg-white border border-gray-200/90 rounded-2xl shadow-2xs h-[calc(100vh-140px)] min-h-[620px] max-h-[860px] overflow-hidden">
+            {/* 1. Chat Header Bar */}
+            <div className="px-4 py-3 bg-white border-b border-gray-100 flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-blue-50 border border-blue-200/70 flex items-center justify-center text-[#0070BA] font-black text-xs shadow-2xs">
+                  P
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-xs sm:text-sm font-bold text-gray-900">
+                      PayPilot AI Hardware Copilot
+                    </h2>
+                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      4 Agents Active
+                    </span>
+                  </div>
+                  <p className="text-[10px] sm:text-[11px] text-gray-400">
+                    Live hardware reasoning • Specs comparison • Instant PayPal order locks
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-1.5">
+                {turns.length > 0 && (
+                  <span className="text-[11px] font-medium text-gray-500 bg-gray-50 border border-gray-200 px-2 py-1 rounded-lg">
+                    {turns.length} {turns.length === 1 ? 'Turn' : 'Turns'}
+                  </span>
+                )}
+                <button
+                  type="button"
+                  onClick={handleStartNewChat}
+                  className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-gray-700 hover:text-[#0070BA] bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-200 rounded-lg transition-colors cursor-pointer"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">New Chat</span>
+                </button>
+              </div>
+            </div>
+
+            {/* 2. Scrollable Message Feed (Previous and current conversations scrollable above) */}
+            <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-5 bg-[#FAFBFD]">
               {/* Clean Empty State when turns.length === 0 */}
               {turns.length === 0 && (
-                <div className="bg-white rounded-2xl border border-gray-200 p-8 text-center space-y-4 shadow-2xs">
-                  <div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center mx-auto text-[#0070BA]">
-                    <Bot className="w-6 h-6" />
+                <div className="h-full min-h-[380px] flex flex-col items-center justify-center text-center p-6 space-y-4">
+                  <div className="w-14 h-14 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center mx-auto text-[#0070BA] shadow-2xs">
+                    <Bot className="w-7 h-7" />
                   </div>
                   <div className="space-y-1 max-w-md mx-auto">
                     <h3 className="text-base font-bold text-gray-900">
@@ -704,12 +751,13 @@ export default function StudioPage() {
                       Ask any hardware or developer laptop question. Our 4-agent swarm will query live market specs, benchmark tensors, lock the best price, and stage your verified PayPal order.
                     </p>
                   </div>
-                  <div className="pt-2 flex flex-wrap gap-2 justify-center">
+                  <div className="pt-2 flex flex-wrap gap-2 justify-center max-w-lg">
                     {SUGGESTED_PROMPTS.map((prompt) => (
                       <button
                         key={prompt}
+                        type="button"
                         onClick={() => handleSendMessage(prompt)}
-                        className="px-3 py-1.5 bg-gray-50 hover:bg-blue-50/80 border border-gray-200 hover:border-blue-200 text-gray-700 hover:text-[#0070BA] rounded-xl text-xs font-semibold transition-all cursor-pointer shadow-2xs"
+                        className="px-3 py-1.5 bg-white hover:bg-blue-50/80 border border-gray-200 hover:border-blue-200 text-gray-700 hover:text-[#0070BA] rounded-xl text-xs font-semibold transition-all cursor-pointer shadow-2xs text-left"
                       >
                         {prompt} →
                       </button>
@@ -718,68 +766,45 @@ export default function StudioPage() {
                 </div>
               )}
 
-              {/* Render Multi-Turn Chat History */}
+              {/* Render Multi-Turn Continuous Chat History */}
               {turns.map((turn, index) => {
                 const turnVisualModel = getLaptopModelType(turn.product);
 
-                // COLLAPSED PRIOR QUESTION VIEW (Image 2 pattern)
-                if (turn.isTurnCollapsed) {
-                  return (
-                    <div
-                      key={turn.id}
-                      onClick={() => toggleTurnCollapsed(turn.id)}
-                      className="bg-blue-50/60 hover:bg-blue-50 border border-blue-200/80 rounded-2xl p-3 flex items-center justify-between cursor-pointer transition-all shadow-2xs group"
-                    >
-                      <div className="flex items-center gap-2.5 overflow-hidden">
-                        <span className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
-                          <Check className="w-3.5 h-3.5 stroke-[2.5]" />
-                        </span>
-                        <div className="truncate">
-                          <span className="font-bold text-xs text-gray-900">
-                            Q{index + 1}: {turn.userQuery}
-                          </span>
-                          <span className="text-[11px] text-gray-500 ml-2 font-medium hidden sm:inline">
-                            Recommendation: <strong>{turn.product.name}</strong> • Completed (4/4)
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-1.5 shrink-0 pl-2 text-xs font-semibold text-[#0070BA] group-hover:underline">
-                        <span>Expand</span>
-                        <ChevronDown className="w-4 h-4" />
-                      </div>
-                    </div>
-                  );
-                }
-
-                // EXPANDED ACTIVE QUESTION VIEW (Image 1 pattern)
                 return (
-                  <div key={turn.id} className="space-y-3 animate-fade-in">
+                  <div key={turn.id} className="space-y-3.5 animate-fade-in">
                     {/* User Message Bubble (Right-Aligned) */}
-                    <div className="flex items-center justify-end gap-2.5">
-                      <div className="bg-[#F1F5F9] border border-gray-200/80 text-gray-900 px-4 py-2.5 rounded-2xl rounded-tr-xs shadow-2xs max-w-[85%] space-y-0.5">
-                        <p className="text-xs sm:text-sm font-semibold">{turn.userQuery}</p>
-                        <p className="text-[10px] text-gray-400 text-right">{turn.timestamp}</p>
+                    <div className="flex items-start justify-end gap-2.5">
+                      <div className="bg-[#0070BA] text-white px-4 py-2.5 rounded-2xl rounded-tr-xs shadow-2xs max-w-[85%] space-y-0.5">
+                        <p className="text-xs sm:text-sm font-medium leading-relaxed">{turn.userQuery}</p>
+                        <p className="text-[10px] text-blue-100/70 text-right">{turn.timestamp}</p>
                       </div>
-                      <div className="w-8 h-8 rounded-full bg-[#0070BA] text-white font-bold text-xs flex items-center justify-center shadow-2xs shrink-0">
+                      <div className="w-8 h-8 rounded-full bg-blue-900 text-white font-bold text-xs flex items-center justify-center shadow-2xs shrink-0 mt-0.5">
                         {userInitials}
                       </div>
                     </div>
 
                     {/* Assistant Response Box (Left-Aligned) */}
                     <div className="flex items-start gap-2.5">
-                      <div className="w-7 h-7 rounded-full bg-blue-50 border border-blue-200 text-[#0070BA] font-black text-xs flex items-center justify-center shadow-2xs shrink-0 mt-0.5">
+                      <div className="w-8 h-8 rounded-full bg-blue-50 border border-blue-200 text-[#0070BA] font-black text-xs flex items-center justify-center shadow-2xs shrink-0 mt-0.5">
                         P
                       </div>
 
                       <div className="space-y-3 flex-1 min-w-0">
-                        {/* Assistant Intro */}
-                        <p className="text-xs sm:text-sm text-gray-800 font-medium leading-relaxed">
-                          {turn.assistantSummary}
-                        </p>
+                        {/* Formatted Assistant Comparison & Explanation */}
+                        <div className="bg-white border border-gray-200/90 rounded-2xl p-4 shadow-2xs">
+                          <FormattedAgentMessage
+                            content={turn.assistantSummary}
+                            onOpenCheckout={() => {
+                              handleSelectProduct(turn.product);
+                              setIsCheckoutModalOpen(true);
+                            }}
+                          />
+                        </div>
 
                         {/* Collapsible Multi-Agent Analysis Accordion */}
                         <div className="bg-white border border-gray-200 rounded-2xl shadow-2xs overflow-hidden transition-all">
                           <button
+                            type="button"
                             onClick={() => toggleLogsExpanded(turn.id)}
                             className="w-full px-3.5 py-2.5 bg-gray-50/70 hover:bg-gray-100/70 flex items-center justify-between border-b border-gray-100 transition-colors text-left cursor-pointer"
                           >
@@ -788,7 +813,7 @@ export default function StudioPage() {
                                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                               </span>
                               <span className="text-xs font-bold text-gray-900">
-                                Multi-Agent Analysis — Completed (4/4)
+                                Multi-Agent Analysis Audit — Completed (4/4)
                               </span>
                             </div>
                             <div className="text-gray-400 hover:text-gray-600">
@@ -842,16 +867,21 @@ export default function StudioPage() {
                         >
                           {/* Left: Thumbnail & Details */}
                           <div className="flex items-center gap-3 min-w-0">
-                            {/* Visual Thumbnail */}
                             <div className="w-18 h-13 shrink-0 rounded-lg overflow-hidden bg-gray-50 border border-gray-200 flex items-center justify-center p-0.5">
                               <LaptopVisual model={turnVisualModel} />
                             </div>
 
-                            {/* Title & Specs */}
                             <div className="min-w-0 space-y-1">
-                              <h4 className="text-xs sm:text-sm font-bold text-gray-900 truncate">
-                                {turn.product.name}
-                              </h4>
+                              <div className="flex items-center gap-2">
+                                <h4 className="text-xs sm:text-sm font-bold text-gray-900 truncate">
+                                  {turn.product.name}
+                                </h4>
+                                {selectedProduct.id === turn.product.id && (
+                                  <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-[#0070BA] shrink-0">
+                                    Active in Dock
+                                  </span>
+                                )}
+                              </div>
                               <p className="text-[11px] text-gray-500 truncate">
                                 {turn.product.specifications.graphics || 'RTX 4060'} •{' '}
                                 {turn.product.specifications.ram || '16GB DDR5'} •{' '}
@@ -869,9 +899,10 @@ export default function StudioPage() {
                             </div>
                           </div>
 
-                          {/* Right: View Details Button */}
+                          {/* Right: View Specs Button */}
                           <div className="sm:shrink-0 flex items-center gap-2 justify-end">
                             <button
+                              type="button"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleSelectProduct(turn.product);
@@ -879,7 +910,7 @@ export default function StudioPage() {
                               }}
                               className="px-3 py-1.5 bg-white hover:bg-gray-50 border border-gray-300 text-gray-800 text-xs font-bold rounded-xl transition-all shadow-2xs hover:border-[#0070BA] hover:text-[#0070BA] flex items-center gap-1 cursor-pointer"
                             >
-                              <span>View Details</span>
+                              <span>View Specs</span>
                               <ArrowRight className="w-3 h-3" />
                             </button>
                           </div>
@@ -957,7 +988,7 @@ export default function StudioPage() {
               {/* Processing Loader State */}
               {isProcessing && (
                 <div className="flex items-start gap-2.5 animate-fade-in">
-                  <div className="w-7 h-7 rounded-full bg-blue-50 border border-blue-200 text-[#0070BA] font-black text-xs flex items-center justify-center shadow-2xs shrink-0 animate-pulse">
+                  <div className="w-8 h-8 rounded-full bg-blue-50 border border-blue-200 text-[#0070BA] font-black text-xs flex items-center justify-center shadow-2xs shrink-0 animate-pulse">
                     P
                   </div>
                   <div className="bg-white border border-gray-200 rounded-2xl p-4 shadow-2xs space-y-2 flex-1">
@@ -968,6 +999,7 @@ export default function StudioPage() {
                     <div className="space-y-1 text-xs text-gray-500">
                       <p>• Supervisor Agent decomposing constraints...</p>
                       <p>• Querying Channel3 live catalog & FP16 thermals...</p>
+                      <p>• Product Analyst comparing specifications & benchmarks...</p>
                     </div>
                   </div>
                 </div>
@@ -976,14 +1008,15 @@ export default function StudioPage() {
               <div ref={chatBottomRef} />
             </div>
 
-            {/* Bottom Input Area & Prompt Chips */}
-            <div className="bg-white border border-gray-200 rounded-2xl p-3 shadow-2xs space-y-2.5">
+            {/* 3. Docked Bottom Input Area & Dynamic Prompt Chips */}
+            <div className="bg-white border-t border-gray-100 p-3 sm:p-3.5 shrink-0 space-y-2.5 shadow-2xs">
               {/* Dynamic Suggested Prompt Chips */}
-              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs no-scrollbar">
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 text-xs no-scrollbar">
                 <span className="text-[11px] font-semibold text-gray-400 shrink-0">Try asking:</span>
                 {SUGGESTED_PROMPTS.map((prompt) => (
                   <button
                     key={prompt}
+                    type="button"
                     onClick={() => handleSendMessage(prompt)}
                     className="px-2.5 py-1 bg-gray-50 hover:bg-blue-50/80 border border-gray-200/80 hover:border-blue-200 text-gray-600 hover:text-[#0070BA] rounded-full text-[11px] font-medium whitespace-nowrap transition-colors cursor-pointer"
                   >
@@ -1010,13 +1043,13 @@ export default function StudioPage() {
                   value={promptInput}
                   onChange={(e) => setPromptInput(e.target.value)}
                   placeholder="Ask another question... (e.g., 'Compare with ASUS ROG', 'Find 32GB RAM option')"
-                  className="w-full text-xs sm:text-sm text-gray-900 placeholder:text-gray-400 bg-gray-50/60 focus:bg-white border border-gray-200 focus:border-[#0070BA] focus:ring-2 focus:ring-blue-100 rounded-xl px-3 py-2.5 transition-all outline-none"
+                  className="w-full text-xs sm:text-sm text-gray-900 placeholder:text-gray-400 bg-gray-50/60 focus:bg-white border border-gray-200 focus:border-[#0070BA] focus:ring-2 focus:ring-blue-100 rounded-xl px-3.5 py-2.5 transition-all outline-none"
                 />
 
                 <button
                   type="submit"
                   disabled={!promptInput.trim() || isProcessing}
-                  className="w-9 h-9 rounded-xl bg-[#0070BA] hover:bg-[#003087] disabled:opacity-40 text-white flex items-center justify-center shadow-2xs transition-all shrink-0 cursor-pointer"
+                  className="w-10 h-10 rounded-xl bg-[#0070BA] hover:bg-[#003087] disabled:opacity-40 text-white flex items-center justify-center shadow-2xs transition-all shrink-0 cursor-pointer"
                 >
                   <Send className="w-4 h-4" />
                 </button>
