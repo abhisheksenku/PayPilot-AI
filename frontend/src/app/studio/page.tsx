@@ -473,6 +473,21 @@ export default function StudioPage() {
       if (res.rankedProducts && res.rankedProducts.length > 0) {
         winningProduct = res.rankedProducts[0];
         altProducts = res.rankedProducts.slice(1, 3);
+        if (altProducts.length === 0) {
+          altProducts =
+            winningProduct.id.includes('LOQ') || winningProduct.id.includes('769d593b')
+              ? SEED_TURN_1.alternativeProducts || []
+              : SEED_TURN_2.alternativeProducts || [];
+        }
+      } else if (
+        text.toLowerCase().includes('32gb') ||
+        text.toLowerCase().includes('32 gb') ||
+        text.toLowerCase().includes('more ram') ||
+        text.toLowerCase().includes('ram upgrade') ||
+        text.toLowerCase().includes('zephyrus')
+      ) {
+        winningProduct = SEED_TURN_2.product;
+        altProducts = SEED_TURN_2.alternativeProducts || [];
       } else if (text.toLowerCase().includes('macbook') || text.toLowerCase().includes('apple')) {
         winningProduct = {
           id: 'CH3-APPLE-MBA-M3',
