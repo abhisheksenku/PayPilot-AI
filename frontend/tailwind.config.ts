@@ -54,6 +54,17 @@ const config: Config = {
           guardrail: '#059669',  // Emerald Mint
         },
       },
+      fontSize: {
+        '2xs': ['0.8125rem', { lineHeight: '1.125rem' }], // 13px
+        'xs': ['0.875rem', { lineHeight: '1.25rem' }],    // 14px (lifted from 12px)
+        'sm': ['1rem', { lineHeight: '1.5rem' }],         // 16px (lifted from 14px)
+        'base': ['1.125rem', { lineHeight: '1.75rem' }],  // 18px (lifted from 16px)
+        'lg': ['1.25rem', { lineHeight: '1.75rem' }],     // 20px (lifted from 18px)
+        'xl': ['1.5rem', { lineHeight: '2rem' }],         // 24px (lifted from 20px)
+        '2xl': ['1.875rem', { lineHeight: '2.25rem' }],   // 30px (lifted from 24px)
+        '3xl': ['2.25rem', { lineHeight: '2.5rem' }],     // 36px (lifted from 30px)
+        '4xl': ['2.75rem', { lineHeight: '1.1' }],        // 44px (lifted from 36px)
+      },
       fontFamily: {
         sans: ['"Plus Jakarta Sans"', 'Inter', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'sans-serif'],
         mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],

@@ -50,14 +50,14 @@ export function CredentialsModal({ isOpen, onClose }: CredentialsModalProps) {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/40 backdrop-blur-sm animate-fade-in">
       <div className="w-full max-w-xl bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 bg-[#F5F7FA] border-b border-gray-200">
+        <div className="flex items-center justify-between px-6 py-4 bg-[#F5F7FA] border-b border-gray-200 font-sans">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-[#0070BA]/10 text-[#0070BA] flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-[#0070BA]/10 text-[#0070BA] flex items-center justify-center">
               <Key className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-gray-900">API Credentials & PayPal Sandbox Config</h3>
-              <p className="text-xs text-gray-500">Official PayPal Developer portal test environment keys</p>
+              <h3 className="text-lg font-bold text-gray-900">API Credentials &amp; PayPal Sandbox Config</h3>
+              <p className="text-sm text-gray-500">Official PayPal Developer portal test environment keys</p>
             </div>
           </div>
           <button
@@ -69,63 +69,63 @@ export function CredentialsModal({ isOpen, onClose }: CredentialsModalProps) {
         </div>
 
         {/* Content */}
-        <div className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
-          <div className="flex items-center gap-2 p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-800">
-            <Shield className="w-4 h-4 text-emerald-600 shrink-0" />
+        <div className="p-6 space-y-4 max-h-[70vh] overflow-y-auto font-sans">
+          <div className="flex items-center gap-2.5 p-3.5 bg-emerald-50 border border-emerald-200 rounded-xl text-sm text-emerald-800">
+            <Shield className="w-5 h-5 text-emerald-600 shrink-0" />
             <span>
               Connected to PayPal Sandbox REST API v2. Active merchant account:{' '}
               <strong className="font-semibold">Abhishek UthukotaSriram</strong>.
             </span>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-3.5">
             {credentials.map((cred) => (
-              <div key={cred.label} className="p-3.5 bg-gray-50 rounded-xl border border-gray-200 space-y-1.5">
+              <div key={cred.label} className="p-4 bg-gray-50 rounded-xl border border-gray-200 space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold text-gray-700">{cred.label}</span>
+                  <span className="text-sm font-semibold text-gray-800">{cred.label}</span>
                   <button
                     onClick={() => handleCopy(cred.label, cred.value)}
-                    className="flex items-center gap-1 text-[11px] font-medium text-[#0070BA] hover:text-[#005ea6] transition-colors"
+                    className="flex items-center gap-1.5 text-sm font-medium text-[#0070BA] hover:text-[#005ea6] transition-colors"
                   >
                     {copiedKey === cred.label ? (
                       <>
-                        <Check className="w-3.5 h-3.5 text-emerald-600" />
+                        <Check className="w-4 h-4 text-emerald-600" />
                         <span className="text-emerald-600">Copied</span>
                       </>
                     ) : (
                       <>
-                        <Copy className="w-3.5 h-3.5" />
+                        <Copy className="w-4 h-4" />
                         <span>Copy</span>
                       </>
                     )}
                   </button>
                 </div>
-                <div className="font-mono text-xs text-gray-900 bg-white px-3 py-1.5 rounded-lg border border-gray-200 truncate select-all">
+                <div className="font-mono text-sm text-gray-900 bg-white px-3.5 py-2 rounded-lg border border-gray-200 truncate select-all">
                   {cred.value}
                 </div>
-                <p className="text-[11px] text-gray-500">{cred.description}</p>
+                <p className="text-sm text-gray-500">{cred.description}</p>
               </div>
             ))}
           </div>
 
-          <div className="p-3 bg-blue-50/70 border border-blue-200 rounded-xl text-xs text-[#0070BA] flex items-center justify-between">
-            <span>Learn more about PayPal JS SDK v6 features & capabilities</span>
+          <div className="p-3.5 bg-blue-50/70 border border-blue-200 rounded-xl text-sm text-[#0070BA] flex items-center justify-between">
+            <span>Learn more about PayPal JS SDK v6 features &amp; capabilities</span>
             <a
               href="https://developer.paypal.com/docs/multiparty/checkout/standard/integrate/"
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-1 font-semibold hover:underline"
+              className="inline-flex items-center gap-1.5 font-semibold hover:underline"
             >
-              Docs <ExternalLink className="w-3.5 h-3.5" />
+              Docs <ExternalLink className="w-4 h-4" />
             </a>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end px-6 py-3.5 bg-[#F5F7FA] border-t border-gray-200">
+        <div className="flex items-center justify-end px-6 py-4 bg-[#F5F7FA] border-t border-gray-200 font-sans">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-xs font-semibold text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors shadow-sm"
+            className="px-5 py-2.5 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors shadow-xs"
           >
             Close
           </button>

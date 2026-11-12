@@ -114,10 +114,10 @@ export function AppSidebar({
               </svg>
             </div>
             <div>
-              <span className="font-extrabold text-xl tracking-tight text-[#003087] leading-none block">
+              <span className="font-extrabold text-2xl tracking-tight text-[#003087] leading-none block">
                 Pay<span className="text-[#0070BA]">Pal</span>
               </span>
-              <span className="text-[11px] font-medium text-gray-500 tracking-tight leading-none mt-0.5 block">
+              <span className="text-sm font-medium text-gray-500 tracking-tight leading-none mt-1 block">
                 Developer <span className="text-gray-400">•</span> PayPilot AI
               </span>
             </div>
@@ -134,40 +134,40 @@ export function AppSidebar({
 
         {/* Sandbox / Live Switcher */}
         <div className="relative pt-1">
-          <div className="flex items-center bg-[#F3F4F6] p-1 rounded-xl border border-gray-200">
+          <div className="flex items-center bg-[#F3F4F6] p-1.5 rounded-xl border border-gray-200">
             <button
               onClick={() => handleEnvToggle('sandbox')}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+              className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-semibold transition-all cursor-pointer ${
                 environment === 'sandbox'
-                  ? 'bg-[#0070BA] text-white shadow-2xs'
+                  ? 'bg-[#0070BA] text-white shadow-xs'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              <span className={`w-1.5 h-1.5 rounded-full ${environment === 'sandbox' ? 'bg-white' : 'bg-gray-400'}`} />
+              <span className={`w-2 h-2 rounded-full ${environment === 'sandbox' ? 'bg-white' : 'bg-gray-400'}`} />
               Sandbox
             </button>
             <button
               onClick={() => handleEnvToggle('live')}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+              className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-semibold transition-all cursor-pointer ${
                 environment === 'live'
-                  ? 'bg-[#0070BA] text-white shadow-2xs'
+                  ? 'bg-[#0070BA] text-white shadow-xs'
                   : 'text-gray-500 hover:text-gray-800'
               }`}
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-gray-400" />
+              <span className="w-2 h-2 rounded-full bg-gray-400" />
               Live
             </button>
           </div>
 
           {showLiveNotice && (
-            <div className="absolute top-full left-0 right-0 mt-1.5 p-2 bg-amber-50 border border-amber-200 rounded-lg text-[11px] text-amber-800 shadow-lg z-30 animate-fade-in">
+            <div className="absolute top-full left-0 right-0 mt-1.5 p-2.5 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-800 shadow-lg z-30 animate-fade-in">
               Production live credentials locked. Using verified PayPal Sandbox.
             </div>
           )}
         </div>
 
         {/* Navigation Items */}
-        <nav className="space-y-1 pt-1">
+        <nav className="space-y-1.5 pt-1">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive =
@@ -186,15 +186,15 @@ export function AppSidebar({
                     onCloseMobile?.();
                   }
                 }}
-                className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+                className={`flex items-center justify-between px-4 py-3 rounded-xl text-base font-semibold transition-colors ${
                   isActive
-                    ? 'bg-[#EBF5FF] text-[#0070BA] font-semibold border border-[#D0E5FF]/70 shadow-xs'
+                    ? 'bg-[#EBF5FF] text-[#0070BA] border border-[#D0E5FF]/70 shadow-xs'
                     : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
                 }`}
               >
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3.5">
                   <Icon
-                    className={`w-4 h-4 ${
+                    className={`w-5 h-5 ${
                       isActive ? 'text-[#0070BA]' : 'text-gray-500'
                     }`}
                   />
@@ -202,7 +202,7 @@ export function AppSidebar({
                 </div>
                 <div className="flex items-center gap-1.5">
                   {(item as any).badge && (
-                    <span className="text-xs font-semibold px-2 py-0.5 rounded bg-blue-100 text-blue-700 border border-blue-200">
+                    <span className="text-sm font-semibold px-2 py-0.5 rounded bg-blue-100 text-blue-700 border border-blue-200">
                       {(item as any).badge}
                     </span>
                   )}
@@ -223,22 +223,22 @@ export function AppSidebar({
             onOpenCredentials?.();
             onCloseMobile?.();
           }}
-          className="p-3 bg-gradient-to-r from-blue-50/90 to-indigo-50/60 border border-blue-200/90 rounded-2xl cursor-pointer hover:border-[#0070BA]/60 transition-all shadow-2xs group backdrop-blur-2xs"
+          className="p-3.5 bg-gradient-to-r from-blue-50/90 to-indigo-50/60 border border-blue-200/90 rounded-2xl cursor-pointer hover:border-[#0070BA]/60 transition-all shadow-xs group backdrop-blur-xs"
         >
-          <div className="flex items-center gap-2 mb-1.5">
-            <div className="w-5 h-5 rounded-md bg-[#0070BA]/10 text-[#0070BA] flex items-center justify-center">
-              <Code2 className="w-3 h-3" />
+          <div className="flex items-center gap-2.5 mb-2">
+            <div className="w-6 h-6 rounded-md bg-[#0070BA]/10 text-[#0070BA] flex items-center justify-center">
+              <Code2 className="w-4 h-4" />
             </div>
-            <div className="text-xs font-bold text-gray-900 group-hover:text-[#0070BA] transition-colors">
+            <div className="text-sm font-bold text-gray-900 group-hover:text-[#0070BA] transition-colors">
               PayPal JS SDK v6
             </div>
           </div>
           <div className="flex items-center justify-between">
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-100/80 text-emerald-800 rounded-full text-[10px] font-semibold">
-              <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-emerald-100/80 text-emerald-800 rounded-full text-sm font-semibold">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
               Active
             </span>
-            <span className="text-[10px] text-gray-500 font-mono">v6.1.4</span>
+            <span className="text-sm text-gray-500 font-mono">v6.1.4</span>
           </div>
         </div>
       </div>
@@ -248,7 +248,7 @@ export function AppSidebar({
   return (
     <>
       {/* Desktop Sticky Sidebar (100% height down to viewport bottom) */}
-      <aside className="hidden lg:flex w-60 xl:w-64 bg-white border-r border-gray-200 flex-col h-full min-h-full select-none shrink-0 relative overflow-hidden">
+      <aside className="hidden lg:flex w-64 xl:w-72 bg-white border-r border-gray-200 flex-col h-full min-h-full select-none shrink-0 relative overflow-hidden font-sans">
         {/* Subtle ambient light blue wave at bottom matching blueprint image */}
         <div className="absolute bottom-0 left-0 right-0 h-36 bg-gradient-to-t from-blue-100/50 via-blue-50/20 to-transparent pointer-events-none" />
         {sidebarContent}

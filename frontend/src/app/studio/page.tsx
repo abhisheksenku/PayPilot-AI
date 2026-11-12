@@ -617,35 +617,35 @@ export default function StudioPage() {
 
   return (
     <DashboardLayout>
-      <div className="px-4 sm:px-6 py-4 max-w-[1600px] mx-auto space-y-4">
+      <div className="px-4 sm:px-6 py-4 max-w-[1600px] mx-auto space-y-4 font-sans">
         {/* Header: Title + New Chat + History */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-gray-100">
           <div>
-            <h1 className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight flex items-center gap-2">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight flex items-center gap-2">
               <span>PayPilot AI — Studio</span>
             </h1>
-            <p className="text-xs sm:text-sm text-gray-500 font-medium">
-              Your AI-powered shopping assistant for developer & ML hardware
+            <p className="text-sm sm:text-base text-gray-600 font-medium mt-1">
+              Your AI-powered shopping assistant for developer &amp; ML hardware
             </p>
           </div>
 
           <div className="flex items-center gap-2 relative">
             <button
               onClick={handleStartNewChat}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-gray-50 border border-gray-200 text-gray-700 text-xs font-bold rounded-xl shadow-2xs hover:shadow-xs transition-all cursor-pointer"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-gray-50 border border-gray-200 text-gray-700 text-sm font-semibold rounded-xl shadow-xs hover:shadow-sm transition-all cursor-pointer"
             >
-              <Plus className="w-3.5 h-3.5 text-[#0070BA]" />
+              <Plus className="w-4 h-4 text-[#0070BA]" />
               <span>New Chat</span>
             </button>
 
             <button
               onClick={() => setShowHistoryDropdown(!showHistoryDropdown)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-gray-50 border border-gray-200 text-gray-700 text-xs font-bold rounded-xl shadow-2xs hover:shadow-xs transition-all cursor-pointer"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-gray-50 border border-gray-200 text-gray-700 text-sm font-semibold rounded-xl shadow-xs hover:shadow-sm transition-all cursor-pointer"
             >
-              <History className="w-3.5 h-3.5 text-gray-500" />
+              <History className="w-4 h-4 text-gray-500" />
               <span>Conversation History</span>
               {turns.length > 0 && (
-                <span className="w-4 h-4 rounded-full bg-blue-100 text-[#0070BA] text-[10px] flex items-center justify-center font-bold">
+                <span className="w-5 h-5 rounded-full bg-blue-100 text-[#0070BA] text-xs flex items-center justify-center font-bold">
                   {turns.length}
                 </span>
               )}
@@ -653,18 +653,18 @@ export default function StudioPage() {
 
             {/* Conversation History Dropdown */}
             {showHistoryDropdown && (
-              <div className="absolute right-0 top-full mt-2 w-72 bg-white rounded-2xl shadow-xl border border-gray-200 p-3 z-30 space-y-2 animate-fade-in">
+              <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-2xl shadow-xl border border-gray-200 p-4 z-30 space-y-2 animate-fade-in font-sans">
                 <div className="flex items-center justify-between pb-2 border-b border-gray-100">
-                  <span className="text-xs font-bold text-gray-900">Recent Sessions</span>
+                  <span className="text-sm font-bold text-gray-900">Recent Sessions</span>
                   <button
                     onClick={() => setShowHistoryDropdown(false)}
-                    className="text-gray-400 hover:text-gray-600 p-0.5"
+                    className="text-gray-400 hover:text-gray-600 p-1"
                   >
-                    <X className="w-3.5 h-3.5" />
+                    <X className="w-4 h-4" />
                   </button>
                 </div>
                 {turns.length === 0 ? (
-                  <p className="text-xs text-gray-400 py-3 text-center">No questions in history yet.</p>
+                  <p className="text-sm text-gray-400 py-3 text-center">No questions in history yet.</p>
                 ) : (
                   <div className="space-y-1.5 max-h-56 overflow-y-auto">
                     {turns.map((t, idx) => (
@@ -674,12 +674,12 @@ export default function StudioPage() {
                           setSelectedProduct(t.product);
                           setShowHistoryDropdown(false);
                         }}
-                        className="w-full text-left p-2 rounded-xl hover:bg-blue-50/70 border border-transparent hover:border-blue-100 transition-colors text-xs"
+                        className="w-full text-left p-2.5 rounded-xl hover:bg-blue-50/70 border border-transparent hover:border-blue-100 transition-colors text-sm"
                       >
                         <div className="font-semibold text-gray-800 truncate">
                           Q{idx + 1}: {t.userQuery}
                         </div>
-                        <div className="text-[10px] text-gray-500 flex items-center justify-between mt-0.5">
+                        <div className="text-xs text-gray-500 flex items-center justify-between mt-1">
                           <span className="text-[#0070BA] font-medium truncate">{t.product.name}</span>
                           <span className="shrink-0">{t.timestamp}</span>
                         </div>
@@ -695,69 +695,69 @@ export default function StudioPage() {
         {/* 2-Column Split-Screen Copilot: Chat Feed (Left ~60%) + Spotlight Terminal (Right ~40%) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
           {/* LEFT COLUMN: Unified Scrollable Chat Console with Docked Bottom Input (Col 7 / 12) */}
-          <div className="lg:col-span-7 flex flex-col bg-white border border-gray-200/90 rounded-2xl shadow-2xs h-[calc(100vh-140px)] min-h-[620px] max-h-[860px] overflow-hidden">
+          <div className="lg:col-span-7 flex flex-col bg-white border border-gray-200/90 rounded-2xl shadow-xs h-[calc(100vh-140px)] min-h-[620px] max-h-[860px] overflow-hidden">
             {/* 1. Chat Header Bar */}
-            <div className="px-4 py-3 bg-white border-b border-gray-100 flex items-center justify-between shrink-0">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-blue-50 border border-blue-200/70 flex items-center justify-center text-[#0070BA] font-black text-xs shadow-2xs">
+            <div className="px-5 py-3.5 bg-white border-b border-gray-100 flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-blue-50 border border-blue-200/70 flex items-center justify-center text-[#0070BA] font-black text-sm shadow-xs">
                   P
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h2 className="text-xs sm:text-sm font-bold text-gray-900">
+                    <h2 className="text-sm sm:text-base font-bold text-gray-900">
                       PayPilot AI Hardware Copilot
                     </h2>
-                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500" />
                       4 Agents Active
                     </span>
                   </div>
-                  <p className="text-[10px] sm:text-[11px] text-gray-400">
+                  <p className="text-xs sm:text-sm text-gray-500 mt-0.5">
                     Live hardware reasoning • Specs comparison • Instant PayPal order locks
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-2">
                 {turns.length > 0 && (
-                  <span className="text-[11px] font-medium text-gray-500 bg-gray-50 border border-gray-200 px-2 py-1 rounded-lg">
+                  <span className="text-xs sm:text-sm font-medium text-gray-600 bg-gray-50 border border-gray-200 px-2.5 py-1 rounded-lg">
                     {turns.length} {turns.length === 1 ? 'Turn' : 'Turns'}
                   </span>
                 )}
                 <button
                   type="button"
                   onClick={handleStartNewChat}
-                  className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-gray-700 hover:text-[#0070BA] bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-200 rounded-lg transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold text-gray-700 hover:text-[#0070BA] bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-200 rounded-lg transition-colors cursor-pointer"
                 >
-                  <Plus className="w-3.5 h-3.5" />
+                  <Plus className="w-4 h-4" />
                   <span className="hidden sm:inline">New Chat</span>
                 </button>
               </div>
             </div>
 
-            {/* 2. Scrollable Message Feed (Previous and current conversations scrollable above) */}
+            {/* 2. Scrollable Message Feed */}
             <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-5 bg-[#FAFBFD]">
               {/* Clean Empty State when turns.length === 0 */}
               {turns.length === 0 && (
-                <div className="h-full min-h-[380px] flex flex-col items-center justify-center text-center p-6 space-y-4">
-                  <div className="w-14 h-14 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center mx-auto text-[#0070BA] shadow-2xs">
-                    <Bot className="w-7 h-7" />
+                <div className="h-full min-h-[380px] flex flex-col items-center justify-center text-center p-6 space-y-4 font-sans">
+                  <div className="w-16 h-16 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center mx-auto text-[#0070BA] shadow-xs">
+                    <Bot className="w-8 h-8" />
                   </div>
-                  <div className="space-y-1 max-w-md mx-auto">
-                    <h3 className="text-base font-bold text-gray-900">
+                  <div className="space-y-1.5 max-w-md mx-auto">
+                    <h3 className="text-lg sm:text-xl font-bold text-gray-900">
                       Welcome to PayPilot AI Hardware Studio{user?.name ? `, ${user.name}` : ''}
                     </h3>
-                    <p className="text-xs text-gray-500 leading-relaxed">
+                    <p className="text-sm text-gray-600 leading-relaxed">
                       Ask any hardware or developer laptop question. Our 4-agent swarm will query live market specs, benchmark tensors, lock the best price, and stage your verified PayPal order.
                     </p>
                   </div>
-                  <div className="pt-2 flex flex-wrap gap-2 justify-center max-w-lg">
+                  <div className="pt-2 flex flex-wrap gap-2.5 justify-center max-w-lg">
                     {SUGGESTED_PROMPTS.map((prompt) => (
                       <button
                         key={prompt}
                         type="button"
                         onClick={() => handleSendMessage(prompt)}
-                        className="px-3 py-1.5 bg-white hover:bg-blue-50/80 border border-gray-200 hover:border-blue-200 text-gray-700 hover:text-[#0070BA] rounded-xl text-xs font-semibold transition-all cursor-pointer shadow-2xs text-left"
+                        className="px-3.5 py-2 bg-white hover:bg-blue-50/80 border border-gray-200 hover:border-blue-200 text-gray-700 hover:text-[#0070BA] rounded-xl text-sm font-semibold transition-all cursor-pointer shadow-xs text-left"
                       >
                         {prompt} →
                       </button>
@@ -771,27 +771,27 @@ export default function StudioPage() {
                 const turnVisualModel = getLaptopModelType(turn.product);
 
                 return (
-                  <div key={turn.id} className="space-y-3.5 animate-fade-in">
+                  <div key={turn.id} className="space-y-3.5 animate-fade-in font-sans">
                     {/* User Message Bubble (Right-Aligned) */}
                     <div className="flex items-start justify-end gap-2.5">
-                      <div className="bg-[#0070BA] text-white px-4 py-2.5 rounded-2xl rounded-tr-xs shadow-2xs max-w-[85%] space-y-0.5">
-                        <p className="text-xs sm:text-sm font-medium leading-relaxed">{turn.userQuery}</p>
-                        <p className="text-[10px] text-blue-100/70 text-right">{turn.timestamp}</p>
+                      <div className="bg-[#0070BA] text-white px-4 py-3 rounded-2xl rounded-tr-xs shadow-xs max-w-[85%] space-y-1">
+                        <p className="text-sm sm:text-base font-medium leading-relaxed">{turn.userQuery}</p>
+                        <p className="text-xs text-blue-100/80 text-right">{turn.timestamp}</p>
                       </div>
-                      <div className="w-8 h-8 rounded-full bg-blue-900 text-white font-bold text-xs flex items-center justify-center shadow-2xs shrink-0 mt-0.5">
+                      <div className="w-9 h-9 rounded-full bg-blue-900 text-white font-bold text-sm flex items-center justify-center shadow-xs shrink-0 mt-0.5">
                         {userInitials}
                       </div>
                     </div>
 
                     {/* Assistant Response Box (Left-Aligned) */}
                     <div className="flex items-start gap-2.5">
-                      <div className="w-8 h-8 rounded-full bg-blue-50 border border-blue-200 text-[#0070BA] font-black text-xs flex items-center justify-center shadow-2xs shrink-0 mt-0.5">
+                      <div className="w-9 h-9 rounded-full bg-blue-50 border border-blue-200 text-[#0070BA] font-black text-sm flex items-center justify-center shadow-xs shrink-0 mt-0.5">
                         P
                       </div>
 
                       <div className="space-y-3 flex-1 min-w-0">
                         {/* Formatted Assistant Comparison & Explanation */}
-                        <div className="bg-white border border-gray-200/90 rounded-2xl p-4 shadow-2xs">
+                        <div className="bg-white border border-gray-200/90 rounded-2xl p-4 sm:p-5 shadow-xs text-sm sm:text-base leading-relaxed">
                           <FormattedAgentMessage
                             content={turn.assistantSummary}
                             onOpenCheckout={() => {
@@ -802,17 +802,17 @@ export default function StudioPage() {
                         </div>
 
                         {/* Collapsible Multi-Agent Analysis Accordion */}
-                        <div className="bg-white border border-gray-200 rounded-2xl shadow-2xs overflow-hidden transition-all">
+                        <div className="bg-white border border-gray-200 rounded-2xl shadow-xs overflow-hidden transition-all">
                           <button
                             type="button"
                             onClick={() => toggleLogsExpanded(turn.id)}
-                            className="w-full px-3.5 py-2.5 bg-gray-50/70 hover:bg-gray-100/70 flex items-center justify-between border-b border-gray-100 transition-colors text-left cursor-pointer"
+                            className="w-full px-4 py-3 bg-gray-50/70 hover:bg-gray-100/70 flex items-center justify-between border-b border-gray-100 transition-colors text-left cursor-pointer"
                           >
-                            <div className="flex items-center gap-2">
-                              <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center">
-                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                            <div className="flex items-center gap-2.5">
+                              <span className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                               </span>
-                              <span className="text-xs font-bold text-gray-900">
+                              <span className="text-sm font-bold text-gray-900">
                                 Multi-Agent Analysis Audit — Completed (4/4)
                               </span>
                             </div>
@@ -826,15 +826,15 @@ export default function StudioPage() {
                           </button>
 
                           {turn.isLogsExpanded && (
-                            <div className="p-3 space-y-2 text-xs bg-white">
+                            <div className="p-4 space-y-2.5 text-sm bg-white">
                               {turn.agentSteps.map((step, idx) => (
                                 <div
                                   key={idx}
-                                  className="flex items-center justify-between py-1 px-2 rounded-lg hover:bg-gray-50 transition-colors"
+                                  className="flex items-center justify-between py-1.5 px-3 rounded-lg hover:bg-gray-50 transition-colors"
                                 >
-                                  <div className="flex items-center gap-2 min-w-0">
+                                  <div className="flex items-center gap-2.5 min-w-0">
                                     <span
-                                      className={`w-2 h-2 rounded-full shrink-0 ${
+                                      className={`w-2.5 h-2.5 rounded-full shrink-0 ${
                                         step.role === 'supervisor'
                                           ? 'bg-violet-600'
                                           : step.role === 'research'
@@ -849,7 +849,7 @@ export default function StudioPage() {
                                     </span>
                                     <span className="text-gray-600 truncate">{step.summary}</span>
                                   </div>
-                                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 ml-2" />
+                                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 ml-2" />
                                 </div>
                               ))}
                             </div>
@@ -859,39 +859,39 @@ export default function StudioPage() {
                         {/* Inline Hardware Recommendation Card */}
                         <div
                           onClick={() => handleSelectProduct(turn.product)}
-                          className={`bg-white rounded-2xl border p-3.5 shadow-2xs hover:shadow-xs transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 cursor-pointer ${
+                          className={`bg-white rounded-2xl border p-4 shadow-xs hover:shadow-md transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer ${
                             selectedProduct.id === turn.product.id
                               ? 'border-[#0070BA] ring-2 ring-[#0070BA]/20'
                               : 'border-gray-200 hover:border-gray-300'
                           }`}
                         >
                           {/* Left: Thumbnail & Details */}
-                          <div className="flex items-center gap-3 min-w-0">
-                            <div className="w-18 h-13 shrink-0 rounded-lg overflow-hidden bg-gray-50 border border-gray-200 flex items-center justify-center p-0.5">
+                          <div className="flex items-center gap-3.5 min-w-0">
+                            <div className="w-20 h-16 shrink-0 rounded-xl overflow-hidden bg-gray-50 border border-gray-200 flex items-center justify-center p-1">
                               <LaptopVisual model={turnVisualModel} />
                             </div>
 
                             <div className="min-w-0 space-y-1">
                               <div className="flex items-center gap-2">
-                                <h4 className="text-xs sm:text-sm font-bold text-gray-900 truncate">
+                                <h4 className="text-sm sm:text-base font-bold text-gray-900 truncate">
                                   {turn.product.name}
                                 </h4>
                                 {selectedProduct.id === turn.product.id && (
-                                  <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-[#0070BA] shrink-0">
+                                  <span className="px-2 py-0.5 rounded text-xs font-bold bg-blue-100 text-[#0070BA] shrink-0">
                                     Active in Dock
                                   </span>
                                 )}
                               </div>
-                              <p className="text-[11px] text-gray-500 truncate">
+                              <p className="text-sm text-gray-500 truncate">
                                 {turn.product.specifications.graphics || 'RTX 4060'} •{' '}
                                 {turn.product.specifications.ram || '16GB DDR5'} •{' '}
                                 {turn.product.specifications.tgp || '115W TGP'}
                               </p>
-                              <div className="flex items-center gap-2 pt-0.5">
-                                <span className="font-mono font-black text-xs text-gray-900">
+                              <div className="flex items-center gap-2.5 pt-0.5">
+                                <span className="font-bold text-sm text-gray-900">
                                   ${Number(turn.product.price).toFixed(2)} USD
                                 </span>
-                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A]">
+                                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A]">
                                   <span>🏆</span>
                                   <span>{turn.product.score}/100 AI Score</span>
                                 </span>
@@ -908,53 +908,53 @@ export default function StudioPage() {
                                 handleSelectProduct(turn.product);
                                 setInspectingProduct(turn.product);
                               }}
-                              className="px-3 py-1.5 bg-white hover:bg-gray-50 border border-gray-300 text-gray-800 text-xs font-bold rounded-xl transition-all shadow-2xs hover:border-[#0070BA] hover:text-[#0070BA] flex items-center gap-1 cursor-pointer"
+                              className="px-4 py-2 bg-white hover:bg-gray-50 border border-gray-300 text-gray-800 text-sm font-semibold rounded-xl transition-all shadow-xs hover:border-[#0070BA] hover:text-[#0070BA] flex items-center gap-1.5 cursor-pointer"
                             >
                               <span>View Specs</span>
-                              <ArrowRight className="w-3 h-3" />
+                              <ArrowRight className="w-3.5 h-3.5" />
                             </button>
                           </div>
                         </div>
 
                         {/* Other Options Evaluated (Runners-Up) */}
                         {turn.alternativeProducts && turn.alternativeProducts.length > 0 && (
-                          <div className="bg-slate-50/90 border border-slate-200 rounded-2xl p-3.5 space-y-2.5 shadow-2xs">
+                          <div className="bg-slate-50/90 border border-slate-200 rounded-2xl p-4 space-y-3 shadow-xs">
                             <div className="flex items-center justify-between">
-                              <span className="text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                                <Layers className="w-3.5 h-3.5 text-[#0070BA]" />
+                              <span className="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                                <Layers className="w-4 h-4 text-[#0070BA]" />
                                 <span>Other Options Evaluated ({turn.alternativeProducts.length} Runners-Up)</span>
                               </span>
                               <Link
                                 href="/catalog"
-                                className="text-[11px] font-bold text-[#0070BA] hover:underline inline-flex items-center gap-1"
+                                className="text-sm font-bold text-[#0070BA] hover:underline inline-flex items-center gap-1"
                               >
                                 <span>View all in Catalog</span>
-                                <ArrowRight className="w-3 h-3" />
+                                <ArrowRight className="w-3.5 h-3.5" />
                               </Link>
                             </div>
 
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                               {turn.alternativeProducts.map((alt) => {
                                 const isSpotlighted = selectedProduct.id === alt.id;
                                 return (
                                   <div
                                     key={alt.id}
                                     onClick={() => handleSelectProduct(alt)}
-                                    className={`p-3 rounded-xl border transition-all cursor-pointer flex flex-col justify-between gap-2 ${
+                                    className={`p-3.5 rounded-xl border transition-all cursor-pointer flex flex-col justify-between gap-2.5 ${
                                       isSpotlighted
                                         ? 'bg-blue-50/90 border-[#0070BA] ring-2 ring-[#0070BA]/20 shadow-xs'
                                         : 'bg-white hover:bg-blue-50/40 border-slate-200 hover:border-blue-200'
                                     }`}
                                   >
-                                    <div className="flex items-start justify-between gap-1">
-                                      <div className="font-bold text-xs text-slate-900 truncate">
+                                    <div className="flex items-start justify-between gap-1.5">
+                                      <div className="font-bold text-sm text-slate-900 truncate">
                                         {alt.name}
                                       </div>
-                                      <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded shrink-0">
+                                      <span className="text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded shrink-0">
                                         {alt.score}/100
                                       </span>
                                     </div>
-                                    <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1 border-t border-slate-100">
+                                    <div className="flex items-center justify-between text-sm text-slate-500 pt-1.5 border-t border-slate-100">
                                       <span className="font-bold text-slate-900">
                                         ${Number(alt.price).toFixed(2)} USD
                                       </span>
@@ -964,7 +964,7 @@ export default function StudioPage() {
                                           e.stopPropagation();
                                           handleSelectProduct(alt);
                                         }}
-                                        className={`text-[10px] font-bold px-2 py-1 rounded-lg transition-colors cursor-pointer ${
+                                        className={`text-xs font-semibold px-2.5 py-1 rounded-lg transition-colors cursor-pointer ${
                                           isSpotlighted
                                             ? 'bg-[#0070BA] text-white'
                                             : 'bg-slate-100 hover:bg-[#0070BA] hover:text-white text-slate-700'
@@ -987,19 +987,19 @@ export default function StudioPage() {
 
               {/* Processing Loader State */}
               {isProcessing && (
-                <div className="flex items-start gap-2.5 animate-fade-in">
-                  <div className="w-8 h-8 rounded-full bg-blue-50 border border-blue-200 text-[#0070BA] font-black text-xs flex items-center justify-center shadow-2xs shrink-0 animate-pulse">
+                <div className="flex items-start gap-2.5 animate-fade-in font-sans">
+                  <div className="w-9 h-9 rounded-full bg-blue-50 border border-blue-200 text-[#0070BA] font-black text-sm flex items-center justify-center shadow-xs shrink-0 animate-pulse">
                     P
                   </div>
-                  <div className="bg-white border border-gray-200 rounded-2xl p-4 shadow-2xs space-y-2 flex-1">
-                    <div className="flex items-center gap-2 text-xs font-bold text-[#0070BA]">
-                      <span className="w-2 h-2 rounded-full bg-[#0070BA] animate-ping" />
+                  <div className="bg-white border border-gray-200 rounded-2xl p-4 shadow-xs space-y-2 flex-1">
+                    <div className="flex items-center gap-2 text-sm font-bold text-[#0070BA]">
+                      <span className="w-2.5 h-2.5 rounded-full bg-[#0070BA] animate-ping" />
                       <span>Multi-Agent Swarm Reasoning in Progress...</span>
                     </div>
-                    <div className="space-y-1 text-xs text-gray-500">
+                    <div className="space-y-1 text-sm text-gray-500">
                       <p>• Supervisor Agent decomposing constraints...</p>
-                      <p>• Querying Channel3 live catalog & FP16 thermals...</p>
-                      <p>• Product Analyst comparing specifications & benchmarks...</p>
+                      <p>• Querying Channel3 live catalog &amp; FP16 thermals...</p>
+                      <p>• Product Analyst comparing specifications &amp; benchmarks...</p>
                     </div>
                   </div>
                 </div>
@@ -1009,16 +1009,16 @@ export default function StudioPage() {
             </div>
 
             {/* 3. Docked Bottom Input Area & Dynamic Prompt Chips */}
-            <div className="bg-white border-t border-gray-100 p-3 sm:p-3.5 shrink-0 space-y-2.5 shadow-2xs">
+            <div className="bg-white border-t border-gray-100 p-4 shrink-0 space-y-3 shadow-xs font-sans">
               {/* Dynamic Suggested Prompt Chips */}
-              <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 text-xs no-scrollbar">
-                <span className="text-[11px] font-semibold text-gray-400 shrink-0">Try asking:</span>
+              <div className="flex items-center gap-2 overflow-x-auto pb-0.5 text-sm no-scrollbar">
+                <span className="text-sm font-medium text-gray-500 shrink-0">Try asking:</span>
                 {SUGGESTED_PROMPTS.map((prompt) => (
                   <button
                     key={prompt}
                     type="button"
                     onClick={() => handleSendMessage(prompt)}
-                    className="px-2.5 py-1 bg-gray-50 hover:bg-blue-50/80 border border-gray-200/80 hover:border-blue-200 text-gray-600 hover:text-[#0070BA] rounded-full text-[11px] font-medium whitespace-nowrap transition-colors cursor-pointer"
+                    className="px-3 py-1.5 bg-gray-50 hover:bg-blue-50/80 border border-gray-200 hover:border-blue-200 text-gray-700 hover:text-[#0070BA] rounded-full text-sm font-medium whitespace-nowrap transition-colors cursor-pointer"
                   >
                     {prompt}
                   </button>
@@ -1031,10 +1031,10 @@ export default function StudioPage() {
                   e.preventDefault();
                   handleSendMessage();
                 }}
-                className="flex items-center gap-2 relative"
+                className="flex items-center gap-2.5 relative"
               >
                 <div className="p-2 text-gray-400 hover:text-gray-600 rounded-lg cursor-pointer">
-                  <Paperclip className="w-4 h-4" />
+                  <Paperclip className="w-5 h-5" />
                 </div>
 
                 <input
@@ -1043,58 +1043,58 @@ export default function StudioPage() {
                   value={promptInput}
                   onChange={(e) => setPromptInput(e.target.value)}
                   placeholder="Ask another question... (e.g., 'Compare with ASUS ROG', 'Find 32GB RAM option')"
-                  className="w-full text-xs sm:text-sm text-gray-900 placeholder:text-gray-400 bg-gray-50/60 focus:bg-white border border-gray-200 focus:border-[#0070BA] focus:ring-2 focus:ring-blue-100 rounded-xl px-3.5 py-2.5 transition-all outline-none"
+                  className="w-full text-sm sm:text-base text-gray-900 placeholder:text-gray-400 bg-gray-50/60 focus:bg-white border border-gray-200 focus:border-[#0070BA] focus:ring-2 focus:ring-blue-100 rounded-xl px-4 py-3 transition-all outline-none"
                 />
 
                 <button
                   type="submit"
                   disabled={!promptInput.trim() || isProcessing}
-                  className="w-10 h-10 rounded-xl bg-[#0070BA] hover:bg-[#003087] disabled:opacity-40 text-white flex items-center justify-center shadow-2xs transition-all shrink-0 cursor-pointer"
+                  className="w-11 h-11 rounded-xl bg-[#0070BA] hover:bg-[#003087] disabled:opacity-40 text-white flex items-center justify-center shadow-xs transition-all shrink-0 cursor-pointer"
                 >
-                  <Send className="w-4 h-4" />
+                  <Send className="w-5 h-5" />
                 </button>
               </form>
             </div>
           </div>
 
           {/* RIGHT COLUMN: Persistent Spotlight Recommendation & PayPal Terminal (Col 5 / 12) */}
-          <div className="lg:col-span-5 sticky top-4 space-y-4">
-            <div className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-5 shadow-2xs space-y-4">
-              {/* Card Header: Star Pill & FX Oracle */}
+          <div className="lg:col-span-5 sticky top-4 space-y-4 font-sans">
+            <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-xs space-y-4">
+              {/* Card Header */}
               <div className="flex items-center justify-between pb-3 border-b border-gray-100">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-[#0070BA]">
+                <div className="flex items-center gap-2 text-sm font-bold text-[#0070BA]">
                   <Star className="w-4 h-4 fill-[#0070BA]" />
                   <span>{turns.length === 0 ? 'Featured Hardware Match' : 'Current Recommendation'}</span>
                 </div>
-                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+                <span className="text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
                   Price Locked
                 </span>
               </div>
 
               {/* Hardware Render Visual */}
-              <div className="bg-gray-50/70 rounded-2xl border border-gray-100 p-3 flex items-center justify-center min-h-[160px]">
-                <div className="w-full max-w-[280px]">
+              <div className="bg-gray-50/70 rounded-2xl border border-gray-100 p-4 flex items-center justify-center min-h-[170px]">
+                <div className="w-full max-w-[300px]">
                   <LaptopVisual model={visualModel} />
                 </div>
               </div>
 
               {/* Name, Big Price Tag & Score */}
-              <div className="space-y-1">
-                <h3 className="text-base sm:text-lg font-black text-gray-900 tracking-tight">
+              <div className="space-y-1.5">
+                <h3 className="text-lg sm:text-xl font-bold text-gray-900 tracking-tight">
                   {selectedProduct.name}
                 </h3>
-                <p className="text-xs text-gray-500 line-clamp-2">
+                <p className="text-sm text-gray-600 line-clamp-2">
                   {selectedProduct.description}
                 </p>
 
                 <div className="flex items-center justify-between pt-2">
-                  <div className="text-2xl sm:text-3xl font-black text-gray-900 font-mono tracking-tight">
+                  <div className="text-2xl sm:text-3xl font-bold text-gray-900 font-sans tracking-tight">
                     ${numericPrice.toFixed(2)}{' '}
-                    <span className="text-xs font-bold text-gray-500">USD</span>
+                    <span className="text-sm font-semibold text-gray-500">USD</span>
                   </div>
 
-                  <div className="bg-[#FEF3C7] border border-[#FDE68A] rounded-xl px-2.5 py-1 text-center shadow-2xs">
-                    <div className="inline-flex items-center gap-1 text-xs font-bold text-[#92400E]">
+                  <div className="bg-[#FEF3C7] border border-[#FDE68A] rounded-xl px-3 py-1 text-center shadow-xs">
+                    <div className="inline-flex items-center gap-1.5 text-sm font-bold text-[#92400E]">
                       <span>🏆</span>
                       <span>{selectedProduct.score}/100 AI Score</span>
                     </div>
@@ -1103,22 +1103,22 @@ export default function StudioPage() {
               </div>
 
               {/* 3 Quick Spec Badges */}
-              <div className="grid grid-cols-3 gap-2 pt-1 border-t border-gray-100">
-                <div className="p-2 bg-gray-50 rounded-xl border border-gray-200/80 text-center space-y-0.5">
-                  <Cpu className="w-3.5 h-3.5 text-[#0070BA] mx-auto" />
-                  <div className="text-[10px] font-bold text-gray-900 truncate">
+              <div className="grid grid-cols-3 gap-2.5 pt-2 border-t border-gray-100">
+                <div className="p-2.5 bg-gray-50 rounded-xl border border-gray-200 text-center space-y-1">
+                  <Cpu className="w-4 h-4 text-[#0070BA] mx-auto" />
+                  <div className="text-xs font-bold text-gray-900 truncate">
                     {selectedProduct.specifications.graphics || 'RTX 4060'}
                   </div>
                 </div>
-                <div className="p-2 bg-gray-50 rounded-xl border border-gray-200/80 text-center space-y-0.5">
-                  <Zap className="w-3.5 h-3.5 text-emerald-700 mx-auto" />
-                  <div className="text-[10px] font-bold text-gray-900 truncate">
+                <div className="p-2.5 bg-gray-50 rounded-xl border border-gray-200 text-center space-y-1">
+                  <Zap className="w-4 h-4 text-emerald-700 mx-auto" />
+                  <div className="text-xs font-bold text-gray-900 truncate">
                     {selectedProduct.specifications.ram || '16GB DDR5'}
                   </div>
                 </div>
-                <div className="p-2 bg-gray-50 rounded-xl border border-gray-200/80 text-center space-y-0.5">
-                  <Monitor className="w-3.5 h-3.5 text-purple-700 mx-auto" />
-                  <div className="text-[10px] font-bold text-gray-900 truncate">
+                <div className="p-2.5 bg-gray-50 rounded-xl border border-gray-200 text-center space-y-1">
+                  <Monitor className="w-4 h-4 text-purple-700 mx-auto" />
+                  <div className="text-xs font-bold text-gray-900 truncate">
                     {selectedProduct.specifications.display || '144Hz FHD'}
                   </div>
                 </div>
@@ -1126,17 +1126,17 @@ export default function StudioPage() {
 
               {/* Payment Success Confirmation Banner */}
               {paymentSuccess && (
-                <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-900 space-y-1 animate-fade-in">
+                <div className="p-3.5 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-900 space-y-1.5 animate-fade-in text-sm">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1.5 font-bold text-xs">
+                    <div className="flex items-center gap-2 font-bold text-sm">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                      <span>Payment Captured & Authorized!</span>
+                      <span>Payment Captured &amp; Authorized!</span>
                     </div>
-                    <span className="text-[10px] font-mono bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded">
+                    <span className="text-xs font-mono bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-bold">
                       SETTLED
                     </span>
                   </div>
-                  <div className="text-[11px] font-mono text-emerald-800 bg-white/70 p-2 rounded-lg border border-emerald-100 space-y-0.5">
+                  <div className="text-sm font-mono text-emerald-800 bg-white/70 p-2.5 rounded-lg border border-emerald-100 space-y-1">
                     <div>Order ID: <strong>{paymentSuccess.orderId}</strong></div>
                     <div>Capture Seal: <strong>{paymentSuccess.captureId}</strong></div>
                     <div>Item: <strong>{paymentSuccess.productName}</strong></div>
@@ -1145,13 +1145,13 @@ export default function StudioPage() {
               )}
 
               {/* 3 PayPal Action Buttons */}
-              <div className="space-y-2 pt-1">
+              <div className="space-y-2.5 pt-1">
                 {/* Button 1: Gold PayPal Checkout */}
                 <button
                   onClick={() => setIsCheckoutModalOpen(true)}
-                  className="w-full py-2.5 px-4 bg-[#FFC439] hover:bg-[#F4B400] text-[#003087] font-extrabold text-xs sm:text-sm rounded-xl shadow-2xs hover:shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer border border-[#E0A800]/50"
+                  className="w-full py-3 px-4 bg-[#FFC439] hover:bg-[#F4B400] text-[#003087] font-bold text-sm sm:text-base rounded-xl shadow-xs hover:shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer border border-[#E0A800]/50"
                 >
-                  <svg viewBox="0 0 24 24" className="w-4 h-4 shrink-0" fill="none">
+                  <svg viewBox="0 0 24 24" className="w-5 h-5 shrink-0" fill="none">
                     <path
                       d="M7 2h6.5c3.5 0 6 2.3 5.3 5.8-.7 3.5-3.4 5.4-6.8 5.4H9.2L7.6 22H3.7L7 2z"
                       fill="#003087"
@@ -1161,19 +1161,19 @@ export default function StudioPage() {
                       fill="#0070BA"
                     />
                   </svg>
-                  <span>PayPal <span className="font-bold text-gray-900">Checkout</span></span>
+                  <span>PayPal <span className="font-extrabold text-gray-900">Checkout</span></span>
                 </button>
 
                 {/* Button 2: Pay Later */}
                 <button
                   onClick={() => setIsCheckoutModalOpen(true)}
-                  className="w-full py-2 px-3.5 bg-white hover:bg-gray-50 border border-gray-300 rounded-xl shadow-2xs transition-all flex items-center justify-between cursor-pointer text-left"
+                  className="w-full py-2.5 px-4 bg-white hover:bg-gray-50 border border-gray-300 rounded-xl shadow-xs transition-all flex items-center justify-between cursor-pointer text-left text-sm"
                 >
-                  <div className="flex items-center gap-1.5 shrink-0">
-                    <span className="font-extrabold text-xs text-[#0070BA]">P</span>
-                    <span className="font-bold text-xs text-[#003087]">Pay Later</span>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className="font-extrabold text-sm text-[#0070BA]">P</span>
+                    <span className="font-bold text-sm text-[#003087]">Pay Later</span>
                   </div>
-                  <div className="text-[11px] text-gray-500 font-medium truncate ml-2">
+                  <div className="text-sm text-gray-600 font-medium truncate ml-2">
                     Buy now, pay in 4 payments <span className="text-gray-400">ⓘ</span>
                   </div>
                 </button>
@@ -1181,7 +1181,7 @@ export default function StudioPage() {
                 {/* Button 3: Debit or Credit Card */}
                 <button
                   onClick={() => setIsCheckoutModalOpen(true)}
-                  className="w-full py-2 px-4 bg-white hover:bg-gray-50 border border-gray-300 text-gray-800 font-bold text-xs rounded-xl shadow-2xs transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full py-2.5 px-4 bg-white hover:bg-gray-50 border border-gray-300 text-gray-800 font-bold text-sm rounded-xl shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <CreditCard className="w-4 h-4 text-gray-600" />
                   <span>Debit or Credit Card</span>
@@ -1189,13 +1189,13 @@ export default function StudioPage() {
               </div>
 
               {/* Trust Footer */}
-              <div className="flex items-center justify-center gap-5 pt-2 text-[11px] text-gray-500 border-t border-gray-100">
+              <div className="flex items-center justify-center gap-5 pt-2 text-sm text-gray-500 border-t border-gray-100">
                 <div className="flex items-center gap-1.5 font-medium">
-                  <Lock className="w-3 h-3 text-gray-400" />
+                  <Lock className="w-3.5 h-3.5 text-gray-400" />
                   <span>Secure checkout by PayPal</span>
                 </div>
                 <div className="flex items-center gap-1.5 font-medium">
-                  <Shield className="w-3 h-3 text-gray-400" />
+                  <Shield className="w-3.5 h-3.5 text-gray-400" />
                   <span>Buyer Protection ⓘ</span>
                 </div>
               </div>

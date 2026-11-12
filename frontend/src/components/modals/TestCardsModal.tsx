@@ -85,18 +85,18 @@ export const TestCardsModal: React.FC<TestCardsModalProps> = ({ isOpen, onClose 
             >
               <div className="flex items-center justify-between">
                 <span className="text-sm font-bold text-gray-900">{card.brand}</span>
-                <span className="text-xs font-mono px-2 py-0.5 rounded-full bg-white border border-gray-200 text-gray-600 font-medium">
+                <span className="text-sm font-mono px-2.5 py-0.5 rounded-full bg-white border border-gray-200 text-gray-700 font-medium">
                   {card.type}
                 </span>
               </div>
 
-              <div className="mt-2.5 flex items-center justify-between bg-white px-3.5 py-2 rounded-lg border border-gray-200">
-                <span className="font-mono text-sm font-bold tracking-wider text-gray-900">
+              <div className="mt-2.5 flex items-center justify-between bg-white px-3.5 py-2.5 rounded-lg border border-gray-200">
+                <span className="font-mono text-base font-bold tracking-wider text-gray-900">
                   {card.number}
                 </span>
                 <button
                   onClick={() => handleCopy(card.raw, `num-${idx}`)}
-                  className="flex items-center gap-1.5 text-xs font-mono font-bold text-[#0070BA] hover:underline"
+                  className="flex items-center gap-1.5 text-sm font-mono font-bold text-[#0070BA] hover:underline"
                 >
                   {copiedKey === `num-${idx}` ? (
                     <>
@@ -112,7 +112,7 @@ export const TestCardsModal: React.FC<TestCardsModalProps> = ({ isOpen, onClose 
                 </button>
               </div>
 
-              <div className="mt-2.5 flex items-center gap-5 text-xs font-mono text-gray-600">
+              <div className="mt-2.5 flex items-center gap-5 text-sm font-mono text-gray-700">
                 <span>
                   EXP: <strong className="text-gray-900">{card.exp}</strong>
                 </span>

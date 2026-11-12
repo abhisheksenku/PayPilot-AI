@@ -11,11 +11,16 @@
   --foreground: #111827;
 }
 
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
   color: var(--foreground);
   background: var(--background);
   font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
-  font-size: 15px;
+  font-size: 16px;
   line-height: 1.6;
   overflow-x: hidden;
   letter-spacing: -0.01em;
@@ -60,9 +65,9 @@ body {
   --ag-foreground-color: #0F172A !important;
   --ag-row-hover-color: #F8FAFC !important;
   --ag-selected-row-background-color: #EFF6FF !important;
-  --ag-font-size: 14px !important;
-  --ag-header-height: 48px !important;
-  --ag-row-height: 54px !important;
+  --ag-font-size: 15px !important;
+  --ag-header-height: 52px !important;
+  --ag-row-height: 56px !important;
   border-radius: 12px !important;
   overflow: hidden !important;
   border: 1px solid #E2E8F0 !important;
@@ -70,7 +75,7 @@ body {
 
 .ag-theme-quartz .ag-header-cell {
   font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif !important;
-  font-size: 14px !important;
+  font-size: 15px !important;
   font-weight: 600 !important;
   color: #334155 !important;
 }
@@ -79,6 +84,15 @@ body {
   display: flex !important;
   align-items: center !important;
   font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif !important;
-  font-size: 14px !important;
+  font-size: 15px !important;
   color: #0F172A !important;
+}
+
+/* Bryntum Timeline Text */
+.b-scheduler, .b-grid-cell, .b-sch-event {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif !important;
+  font-size: 14.5px !important;
+}
+.b-grid-header {
+  font-size: 15px !important;
 }

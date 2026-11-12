@@ -197,45 +197,45 @@ export default function CatalogPage() {
     <DashboardLayout>
       <div className="px-4 sm:px-6 pt-3 pb-6 max-w-[1600px] mx-auto space-y-4">
         {/* Page Header Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-gray-200">
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight leading-tight">
-              Apps & Product Catalog
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight leading-tight">
+              Apps &amp; Product Catalog
             </h1>
-            <p className="text-[11px] sm:text-xs text-gray-500 -mt-0.5">
-              Channel3 Verified Developer Hardware Index & AI Benchmarks
+            <p className="text-sm sm:text-base text-gray-600 mt-1">
+              Channel3 Verified Developer Hardware Index &amp; AI Benchmarks
             </p>
           </div>
 
           {/* Quick Actions */}
-          <div className="flex items-center gap-1.5 bg-white p-1 rounded-xl border border-gray-200 shadow-2xs self-start sm:self-auto">
+          <div className="flex items-center gap-2 bg-white p-1.5 rounded-xl border border-gray-200 shadow-xs self-start sm:self-auto">
             <Link
               href="/studio"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#EBF5FF] text-[#0070BA] shadow-2xs border border-[#D0E5FF]/60 hover:bg-[#D9EDFF] transition-all"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-[#EBF5FF] text-[#0070BA] shadow-xs border border-[#D0E5FF]/60 hover:bg-[#D9EDFF] transition-all"
             >
-              <ShoppingBag className="w-3.5 h-3.5" />
+              <ShoppingBag className="w-4 h-4" />
               <span>Shopping Studio</span>
             </Link>
 
             <Link
               href="/orders"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-gray-700 hover:text-gray-900 hover:bg-gray-50 transition-all"
             >
-              <FileText className="w-3.5 h-3.5" />
+              <FileText className="w-4 h-4" />
               <span>My Orders</span>
             </Link>
           </div>
         </div>
 
-        {/* Horizontal Filter Bar (Exact Match to Blueprint) */}
-        <div className="flex flex-wrap items-center gap-2 pt-1 pb-1">
+        {/* Horizontal Filter Bar */}
+        <div className="flex flex-wrap items-center gap-3 pt-1 pb-1">
           {/* Category Pills */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
             <button
               onClick={() => setSelectedCategory('all')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+              className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
                 selectedCategory === 'all'
-                  ? 'bg-[#0070BA] text-white shadow-2xs'
+                  ? 'bg-[#0070BA] text-white shadow-xs'
                   : 'bg-white hover:bg-gray-50 text-gray-700 border border-gray-200'
               }`}
             >
@@ -244,9 +244,9 @@ export default function CatalogPage() {
 
             <button
               onClick={() => setSelectedCategory('ml-laptops')}
-              className={`flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
                 selectedCategory === 'ml-laptops'
-                  ? 'bg-[#0070BA] text-white shadow-2xs'
+                  ? 'bg-[#0070BA] text-white shadow-xs'
                   : 'bg-white hover:bg-gray-50 text-gray-700 border border-gray-200'
               }`}
             >
@@ -256,9 +256,9 @@ export default function CatalogPage() {
 
             <button
               onClick={() => setSelectedCategory('macbooks')}
-              className={`flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
                 selectedCategory === 'macbooks'
-                  ? 'bg-[#0070BA] text-white shadow-2xs'
+                  ? 'bg-[#0070BA] text-white shadow-xs'
                   : 'bg-white hover:bg-gray-50 text-gray-700 border border-gray-200'
               }`}
             >
@@ -268,9 +268,9 @@ export default function CatalogPage() {
 
             <button
               onClick={() => setSelectedCategory('workstations')}
-              className={`flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
                 selectedCategory === 'workstations'
-                  ? 'bg-[#0070BA] text-white shadow-2xs'
+                  ? 'bg-[#0070BA] text-white shadow-xs'
                   : 'bg-white hover:bg-gray-50 text-gray-700 border border-gray-200'
               }`}
             >
@@ -283,17 +283,17 @@ export default function CatalogPage() {
           <div className="relative">
             <button
               onClick={() => setShowBrandDropdown(!showBrandDropdown)}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-700 transition-colors shadow-2xs cursor-pointer"
+              className="flex items-center gap-2 px-4 py-2 bg-white hover:bg-gray-50 border border-gray-200 rounded-xl text-sm font-semibold text-gray-700 transition-colors shadow-xs cursor-pointer"
             >
-              <Tag className="w-3.5 h-3.5 text-gray-400" />
+              <Tag className="w-4 h-4 text-gray-400" />
               <span>
                 Brand: {selectedBrand === 'all' ? 'All Brands' : selectedBrand}
               </span>
-              <ChevronDown className="w-3 h-3 text-gray-400 ml-0.5" />
+              <ChevronDown className="w-4 h-4 text-gray-400 ml-0.5" />
             </button>
 
             {showBrandDropdown && (
-              <div className="absolute left-0 mt-1.5 w-44 bg-white rounded-xl shadow-xl border border-gray-200 py-1 z-30 text-xs animate-fade-in">
+              <div className="absolute left-0 mt-1.5 w-48 bg-white rounded-xl shadow-xl border border-gray-200 py-1 z-30 text-sm animate-fade-in">
                 {['all', 'Lenovo', 'Apple', 'HP', 'ASUS', 'Dell'].map((brand) => (
                   <button
                     key={brand}
@@ -301,7 +301,7 @@ export default function CatalogPage() {
                       setSelectedBrand(brand);
                       setShowBrandDropdown(false);
                     }}
-                    className={`w-full text-left px-3 py-1.5 hover:bg-gray-50 transition-colors ${
+                    className={`w-full text-left px-4 py-2 hover:bg-gray-50 transition-colors ${
                       selectedBrand === brand
                         ? 'font-bold text-[#0070BA] bg-[#EBF5FF]/50'
                         : 'text-gray-700'
@@ -317,13 +317,13 @@ export default function CatalogPage() {
           {/* Active Budget Constraint Pill */}
           <button
             onClick={() => setIsBudgetFilterActive(!isBudgetFilterActive)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all shadow-2xs cursor-pointer ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all shadow-xs cursor-pointer ${
               isBudgetFilterActive
                 ? 'bg-[#EBF5FF] text-[#0070BA] border border-[#D0E5FF] hover:bg-[#D9EDFF]'
                 : 'bg-white hover:bg-gray-50 text-gray-600 border border-gray-200'
             }`}
           >
-            <Filter className="w-3 h-3 text-[#0070BA]" />
+            <Filter className="w-4 h-4 text-[#0070BA]" />
             <span>Budget: Under ₹70,000 ($824 USD)</span>
             <span
               className={`p-0.5 rounded-full ${
@@ -332,42 +332,42 @@ export default function CatalogPage() {
                   : 'text-gray-400'
               }`}
             >
-              <X className="w-3 h-3" />
+              <X className="w-3.5 h-3.5" />
             </span>
           </button>
         </div>
 
-        {/* 3x2 Responsive Product Grid (Exact Match to Blueprint) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        {/* 3x2 Responsive Product Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
           {filteredItems.map((item) => (
             <div
               key={item.id}
-              className="bg-white rounded-2xl border border-gray-200 hover:border-gray-300 p-4 shadow-2xs hover:shadow-xs transition-all flex flex-col justify-between space-y-3 relative group"
+              className="bg-white rounded-2xl border border-gray-200 hover:border-gray-300 p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-4 relative group"
             >
               {/* Card Header: Top Pick Badge & Channel3 Verified Pill */}
-              <div className="flex items-center justify-between min-h-[22px]">
+              <div className="flex items-center justify-between min-h-[26px]">
                 {item.isTopPick ? (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#FEF3C7] text-[#B45309] border border-[#FDE68A] shadow-2xs">
-                    <Star className="w-3 h-3 fill-amber-500 text-amber-600" />
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-bold bg-[#FEF3C7] text-[#B45309] border border-[#FDE68A] shadow-xs">
+                    <Star className="w-4 h-4 fill-amber-500 text-amber-600" />
                     Top Pick #1
                   </span>
                 ) : (
                   <div />
                 )}
 
-                <div className="flex items-center gap-1.5">
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/80">
-                    <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                     Channel3 Verified
                   </span>
 
                   <button
                     onClick={() => toggleFavorite(item.id)}
-                    className="p-1 rounded-lg text-gray-400 hover:text-rose-500 hover:bg-gray-100 transition-colors cursor-pointer"
+                    className="p-1.5 rounded-lg text-gray-400 hover:text-rose-500 hover:bg-gray-100 transition-colors cursor-pointer"
                     title="Add to wishlist"
                   >
                     <Heart
-                      className={`w-3.5 h-3.5 ${
+                      className={`w-4 h-4 ${
                         favorites[item.id] ? 'fill-rose-500 text-rose-500' : ''
                       }`}
                     />
@@ -376,26 +376,26 @@ export default function CatalogPage() {
               </div>
 
               {/* Side-by-Side Content: Laptop Visual on Left, Details on Right */}
-              <div className="grid grid-cols-12 gap-2 items-center">
+              <div className="grid grid-cols-12 gap-3 items-center">
                 {/* Left Column: Visual Hardware (~50% width) */}
-                <div className="col-span-6 flex items-center justify-center p-1 bg-gradient-to-b from-gray-50/60 to-gray-100/30 rounded-xl border border-gray-100">
+                <div className="col-span-6 flex items-center justify-center p-2 bg-gradient-to-b from-gray-50/60 to-gray-100/30 rounded-xl border border-gray-100">
                   <LaptopVisual model={item.visualModel} />
                 </div>
 
                 {/* Right Column: Title, Subtitle, AI Score (~50% width) */}
-                <div className="col-span-6 flex flex-col justify-center space-y-1.5 pl-1">
+                <div className="col-span-6 flex flex-col justify-center space-y-2 pl-1">
                   <div>
-                    <h3 className="font-extrabold text-gray-900 text-sm sm:text-base leading-tight tracking-tight line-clamp-1">
+                    <h3 className="font-extrabold text-gray-900 text-base sm:text-lg leading-snug tracking-tight line-clamp-1">
                       {item.name}
                     </h3>
-                    <p className="text-[11px] text-gray-500 mt-0.5 line-clamp-1">
+                    <p className="text-sm text-gray-500 mt-0.5 line-clamp-1">
                       {item.subtitle}
                     </p>
                   </div>
 
                   {/* Gold AI Score Badge */}
-                  <div className="bg-[#FEF3C7] border border-[#FDE68A] rounded-xl px-2.5 py-1 text-center shadow-2xs">
-                    <div className="inline-flex items-center justify-center gap-1 text-[11px] sm:text-xs font-bold text-[#92400E]">
+                  <div className="bg-[#FEF3C7] border border-[#FDE68A] rounded-xl px-3 py-1.5 text-center shadow-xs">
+                    <div className="inline-flex items-center justify-center gap-1.5 text-sm font-bold text-[#92400E]">
                       <span>🏆</span>
                       <span>{item.score}</span>
                     </div>
@@ -404,47 +404,47 @@ export default function CatalogPage() {
               </div>
 
               {/* 3 Spec Chips Row */}
-              <div className="grid grid-cols-3 gap-1.5 pt-1 border-t border-gray-100">
-                <div className="p-1.5 bg-gray-50 rounded-lg border border-gray-200/70 text-center space-y-0.5">
-                  <div className="w-4 h-4 rounded-md bg-blue-100 text-[#0070BA] flex items-center justify-center mx-auto">
-                    <Cpu className="w-2.5 h-2.5" />
+              <div className="grid grid-cols-3 gap-2 pt-2 border-t border-gray-100">
+                <div className="p-2 bg-gray-50 rounded-xl border border-gray-200 text-center space-y-1">
+                  <div className="w-5 h-5 rounded-md bg-blue-100 text-[#0070BA] flex items-center justify-center mx-auto">
+                    <Cpu className="w-3.5 h-3.5" />
                   </div>
-                  <div className="text-[9.5px] font-bold text-gray-800 leading-tight truncate">
+                  <div className="text-sm font-bold text-gray-800 leading-tight truncate">
                     {item.specs[0]}
                   </div>
                 </div>
 
-                <div className="p-1.5 bg-gray-50 rounded-lg border border-gray-200/70 text-center space-y-0.5">
-                  <div className="w-4 h-4 rounded-md bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto">
-                    <Zap className="w-2.5 h-2.5" />
+                <div className="p-2 bg-gray-50 rounded-xl border border-gray-200 text-center space-y-1">
+                  <div className="w-5 h-5 rounded-md bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto">
+                    <Zap className="w-3.5 h-3.5" />
                   </div>
-                  <div className="text-[9.5px] font-bold text-gray-800 leading-tight truncate">
+                  <div className="text-sm font-bold text-gray-800 leading-tight truncate">
                     {item.specs[1]}
                   </div>
                 </div>
 
-                <div className="p-1.5 bg-gray-50 rounded-lg border border-gray-200/70 text-center space-y-0.5">
-                  <div className="w-4 h-4 rounded-md bg-purple-100 text-purple-700 flex items-center justify-center mx-auto">
-                    <Monitor className="w-2.5 h-2.5" />
+                <div className="p-2 bg-gray-50 rounded-xl border border-gray-200 text-center space-y-1">
+                  <div className="w-5 h-5 rounded-md bg-purple-100 text-purple-700 flex items-center justify-center mx-auto">
+                    <Monitor className="w-3.5 h-3.5" />
                   </div>
-                  <div className="text-[9.5px] font-bold text-gray-800 leading-tight truncate">
+                  <div className="text-sm font-bold text-gray-800 leading-tight truncate">
                     {item.specs[2]}
                   </div>
                 </div>
               </div>
 
               {/* Bottom Row: Price & Inspect in Studio CTA */}
-              <div className="flex items-center justify-between pt-1 border-t border-gray-100">
+              <div className="flex items-center justify-between pt-2 border-t border-gray-100">
                 <div>
-                  <div className="text-lg sm:text-xl font-black text-gray-900 font-mono tracking-tight">
+                  <div className="text-xl sm:text-2xl font-bold text-gray-900 font-sans tracking-tight">
                     ${item.price.toFixed(2)}{' '}
-                    <span className="text-[10px] font-bold text-gray-500">USD</span>
+                    <span className="text-sm font-semibold text-gray-500">USD</span>
                   </div>
                 </div>
 
                 <button
                   onClick={() => router.push('/studio')}
-                  className="px-3.5 py-1.5 bg-[#0070BA] hover:bg-[#005ea6] text-white text-xs font-bold rounded-xl transition-all shadow-2xs hover:shadow-xs cursor-pointer flex items-center gap-1"
+                  className="px-4 py-2 bg-[#0070BA] hover:bg-[#005ea6] text-white text-sm font-bold rounded-xl transition-all shadow-xs hover:shadow-sm cursor-pointer flex items-center gap-1.5"
                 >
                   <span>Inspect in Studio</span>
                   <span>→</span>
