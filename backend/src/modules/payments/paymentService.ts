@@ -265,10 +265,19 @@ export class PaymentService {
   }
 
   /**
-   * Retrieves all orders with product and transaction associations
+   * Retrieves orders for a specific user (or filtered) with product and transaction associations
    */
-  public async getAllOrders(limit: number = 50) {
+  public async getAllOrders(limit: number = 50, userId?: string) {
+    const where: any = {};
+    if (userId) {
+      where.userId = userId;
+    } else {
+      // If no authenticated user or userId specified, do not leak existing user orders
+      return [];
+    }
+
     return Order.findAll({
+      where,
       limit,
       order: [['createdAt', 'DESC']],
       include: [

@@ -8,7 +8,15 @@ export class PaymentController {
    */
   public async createOrder(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const validatedData = createOrderSchema.parse(req.body);
+      const effectiveUserId =
+        req.user?.userId ||
+        req.body.userId ||
+        '00000000-0000-0000-0000-000000000001';
+
+      const validatedData = createOrderSchema.parse({
+        ...req.body,
+        userId: effectiveUserId,
+      });
       const result = await paymentService.createOrder(validatedData);
 
       res.status(201).json({
@@ -62,7 +70,8 @@ export class PaymentController {
   public async getOrders(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const limit = req.query.limit ? parseInt(String(req.query.limit), 10) : 50;
-      const orders = await paymentService.getAllOrders(limit);
+      const effectiveUserId = req.user?.userId || (req.query.userId as string);
+      const orders = await paymentService.getAllOrders(limit, effectiveUserId);
 
       res.status(200).json({
         success: true,

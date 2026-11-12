@@ -291,18 +291,6 @@ export const api = {
     } catch {
       // fallback
     }
-    return [
-      {
-        id: 'ORD-2026-8842',
-        productId: fallbackProduct.id,
-        Product: fallbackProduct,
-        totalAmount: 749.00,
-        currency: 'USD',
-        status: 'CAPTURED',
-        paypalOrderId: '57H46888ER9629107',
-        paypalCaptureId: '8B72938104889214',
-        createdAt: new Date().toISOString(),
-      },
-    ];
+    return [];
   },
 };

@@ -1,8 +1,10 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
+import Link from 'next/link';
 import { api } from '@/lib/api';
 import { ENABLE_SEED_DATA } from '@/lib/config';
+import { useAuth } from '@/context/AuthContext';
 import { Order } from '@/types/order';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import {
@@ -28,6 +30,7 @@ import {
   X,
   Truck,
   Check,
+  ArrowRight,
 } from 'lucide-react';
 
 interface OrderItem {
@@ -250,6 +253,7 @@ function MiniThumbnail({ model }: { model: OrderItem['modelKey'] }) {
 }
 
 export default function OrdersPage() {
+  const { user } = useAuth();
   const [selectedOrderId, setSelectedOrderId] = useState<string>('ORD-8842');
   const [searchQuery, setSearchQuery] = useState('');
   const [dateFilter, setDateFilter] = useState('7d');
@@ -285,8 +289,8 @@ export default function OrdersPage() {
       return {
         id: order.paypalOrderId || `ORD-${order.id.slice(0, 8).toUpperCase()}`,
         transactionId: order.paypalCaptureId || `TXN-${order.id.slice(0, 8).toUpperCase()}`,
-        customerName: 'Abhishek UthukotaSriram',
-        customerEmail: 'abhishek.sriram@example.com',
+        customerName: user?.name || 'Customer',
+        customerEmail: user?.email || '',
         name: order.Product?.name || 'Lenovo LOQ 15 Gaming & ML Laptop',
         specs: (order.Product as any)?.specifications
           ? Object.values((order.Product as any).specifications).slice(0, 3).join(' • ')
@@ -309,40 +313,35 @@ export default function OrdersPage() {
         tax: '$0.00',
       };
     });
-  }, [liveOrders]);
+  }, [liveOrders, user?.name, user?.email]);
 
-  // Combined dataset governed by NEXT_PUBLIC_ENABLE_SEED_DATA rule
+  // Combined dataset governed by user identity and seed data rule
   const allOrders = useMemo<OrderItem[]>(() => {
-    if (!ENABLE_SEED_DATA) {
-      return mappedLiveOrders;
+    // Only inject seed orders for demo accounts
+    if (ENABLE_SEED_DATA && user?.email === 'demo@paypilot.ai') {
+      const liveIds = new Set(mappedLiveOrders.map((o) => o.id));
+      const dedupedSeed = INITIAL_ORDERS.filter((o) => !liveIds.has(o.id));
+      return [...mappedLiveOrders, ...dedupedSeed];
     }
-    const liveIds = new Set(mappedLiveOrders.map((o) => o.id));
-    const dedupedSeed = INITIAL_ORDERS.filter((o) => !liveIds.has(o.id));
-    return [...mappedLiveOrders, ...dedupedSeed];
-  }, [mappedLiveOrders]);
+    return mappedLiveOrders;
+  }, [mappedLiveOrders, user?.email]);
 
   // Dynamic KPI Metrics
   const totalOrdersCount = useMemo(() => {
-    if (ENABLE_SEED_DATA && mappedLiveOrders.length === 0) {
-      return 6;
-    }
     return allOrders.length;
-  }, [allOrders, mappedLiveOrders.length]);
+  }, [allOrders]);
 
   const netInvoicedVolume = useMemo(() => {
-    if (ENABLE_SEED_DATA && mappedLiveOrders.length === 0) {
-      return '$6,874.00';
-    }
     const sum = allOrders.reduce((acc, o) => acc + o.amountNumeric, 0);
     return `$${sum.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-  }, [allOrders, mappedLiveOrders.length]);
+  }, [allOrders]);
 
-  // Selected Order
+  // Selected Order (null if no orders)
   const selectedOrder = useMemo(() => {
+    if (allOrders.length === 0) return null;
     return (
       allOrders.find((o) => o.id === selectedOrderId) ||
-      allOrders[0] ||
-      INITIAL_ORDERS[0]
+      allOrders[0]
     );
   }, [allOrders, selectedOrderId]);
 
@@ -732,8 +731,28 @@ export default function OrdersPage() {
             </div>
           </div>
 
-          {/* Right Column: Official PayPal Digital Receipt Preview (40% width = col-span-5) */}
+          {/* Right Column: Official PayPal Digital Receipt Preview or Empty State (40% width = col-span-5) */}
           <div className="lg:col-span-5">
+            {!selectedOrder ? (
+              <div className="bg-white rounded-xl border border-gray-200 p-8 shadow-2xs text-center space-y-4">
+                <div className="w-14 h-14 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center mx-auto text-[#0070BA] shadow-2xs">
+                  <Package className="w-7 h-7" />
+                </div>
+                <div className="space-y-1">
+                  <h3 className="text-base font-bold text-gray-900">No Orders in Your Account</h3>
+                  <p className="text-xs text-gray-500 max-w-sm mx-auto leading-relaxed">
+                    You haven&apos;t placed any hardware orders yet. Explore the catalog or ask PayPilot Copilot in Studio to find and checkout your preferred machine.
+                  </p>
+                </div>
+                <Link
+                  href="/studio"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#0070BA] hover:bg-[#003087] text-white text-xs font-bold rounded-xl shadow-2xs transition-all"
+                >
+                  <span>Open Shopping Studio</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            ) : (
             <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-2xs space-y-4 relative">
               {/* Receipt Top Header */}
               <div className="flex items-start justify-between pb-3 border-b border-gray-100">
@@ -968,6 +987,7 @@ export default function OrdersPage() {
                 </div>
               )}
             </div>
+            )}
           </div>
         </div>
 

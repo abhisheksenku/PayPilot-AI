@@ -3,6 +3,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { api } from '@/lib/api';
 import { ENABLE_SEED_DATA } from '@/lib/config';
+import { useAuth } from '@/context/AuthContext';
 import { Order } from '@/types/order';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import {
@@ -253,6 +254,7 @@ function MiniThumbnail({ model }: { model: TransactionItem['modelKey'] }) {
 }
 
 export default function TransactionsPage() {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<'logs' | 'summary' | 'webhooks'>('logs');
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
@@ -334,38 +336,30 @@ export default function TransactionsPage() {
     });
   }, [liveOrders]);
 
-  // Combined dataset governed by NEXT_PUBLIC_ENABLE_SEED_DATA rule
+  // Combined dataset governed by user identity and seed data rule
   const allTransactions = useMemo<TransactionItem[]>(() => {
-    if (!ENABLE_SEED_DATA) {
-      return mappedLiveTransactions;
+    // Only inject seed transactions for the demo account
+    if (ENABLE_SEED_DATA && user?.email === 'demo@paypilot.ai') {
+      const liveIds = new Set(mappedLiveTransactions.map((t) => t.orderId));
+      const dedupedSeed = INITIAL_TRANSACTIONS.filter((t) => !liveIds.has(t.orderId));
+      return [...mappedLiveTransactions, ...dedupedSeed];
     }
-    const liveIds = new Set(mappedLiveTransactions.map((t) => t.orderId));
-    const dedupedSeed = INITIAL_TRANSACTIONS.filter((t) => !liveIds.has(t.orderId));
-    return [...mappedLiveTransactions, ...dedupedSeed];
-  }, [mappedLiveTransactions]);
+    return mappedLiveTransactions;
+  }, [mappedLiveTransactions, user?.email]);
 
   // Dynamic KPI Metrics
   const totalVolumeFormatted = useMemo(() => {
-    if (ENABLE_SEED_DATA && mappedLiveTransactions.length === 0) {
-      return '$4,215.00';
-    }
     const sum = allTransactions.reduce((acc, t) => acc + t.amountNumeric, 0);
     return `$${sum.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-  }, [allTransactions, mappedLiveTransactions.length]);
+  }, [allTransactions]);
 
   const settledCapturesCount = useMemo(() => {
-    if (ENABLE_SEED_DATA && mappedLiveTransactions.length === 0) {
-      return 6;
-    }
     return allTransactions.filter((t) => t.status === 'CAPTURED').length;
-  }, [allTransactions, mappedLiveTransactions.length]);
+  }, [allTransactions]);
 
   const activeEscrowsCount = useMemo(() => {
-    if (ENABLE_SEED_DATA && mappedLiveTransactions.length === 0) {
-      return 1;
-    }
     return allTransactions.filter((t) => t.status === 'ON_HOLD').length;
-  }, [allTransactions, mappedLiveTransactions.length]);
+  }, [allTransactions]);
 
   // Copy helper with animated checkmark
   const handleCopy = (text: string, key: string) => {
