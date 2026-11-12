@@ -302,6 +302,50 @@ export default function TransactionsPage() {
     return allTransactions.filter((t) => t.status === 'ON_HOLD').length;
   }, [allTransactions]);
 
+  // Dynamic Settlement Summary Metrics
+  const settlementSummary = useMemo(() => {
+    const capturedTxns = allTransactions.filter((t) => t.status === 'CAPTURED');
+    const grossVolume = capturedTxns.reduce((sum, t) => sum + t.amountNumeric, 0);
+    const merchantFees = Math.round(grossVolume * 0.025);
+    const netPayout = grossVolume - merchantFees;
+    const capturedCount = capturedTxns.length;
+    const totalCount = allTransactions.length;
+
+    // Aggregate by payment channel
+    const channelMap: Record<string, { count: number; total: number; speed: string; status: string }> = {
+      'PayPal Balance / Instant': { count: 0, total: 0, speed: 'Instantaneous', status: 'Cleared' },
+      'PayPal Credit / Pay Later': { count: 0, total: 0, speed: 'Upfront Merchant Credit', status: 'Cleared' },
+      'Debit / Credit Card (Direct)': { count: 0, total: 0, speed: 'T+0 Sandbox Settlement', status: 'Cleared' },
+    };
+
+    capturedTxns.forEach((t) => {
+      const method = (t.paymentMethod || '').toLowerCase();
+      if (method.includes('balance') || method.includes('instant')) {
+        channelMap['PayPal Balance / Instant'].count += 1;
+        channelMap['PayPal Balance / Instant'].total += t.amountNumeric;
+      } else if (method.includes('credit') || method.includes('later')) {
+        channelMap['PayPal Credit / Pay Later'].count += 1;
+        channelMap['PayPal Credit / Pay Later'].total += t.amountNumeric;
+      } else {
+        channelMap['Debit / Credit Card (Direct)'].count += 1;
+        channelMap['Debit / Credit Card (Direct)'].total += t.amountNumeric;
+      }
+    });
+
+    return {
+      grossVolume,
+      merchantFees,
+      netPayout,
+      capturedCount,
+      totalCount,
+      channels: [
+        { name: 'PayPal Balance / Instant', ...channelMap['PayPal Balance / Instant'] },
+        { name: 'PayPal Credit / Pay Later', ...channelMap['PayPal Credit / Pay Later'] },
+        { name: 'Debit / Credit Card (Direct)', ...channelMap['Debit / Credit Card (Direct)'] },
+      ],
+    };
+  }, [allTransactions]);
+
   // Copy helper with animated checkmark
   const handleCopy = (text: string, key: string) => {
     navigator.clipboard.writeText(text);
@@ -1080,85 +1124,121 @@ export default function TransactionsPage() {
 
         {/* Tab 2: Ledger Summary View */}
         {activeTab === 'summary' && (
-          <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-xs space-y-6 font-sans">
-            <div>
-              <h2 className="text-xl font-bold text-gray-900">
-                PayPal Sandbox Financial Settlement Summary
-              </h2>
-              <p className="text-sm text-gray-600 mt-1">
-                Real-time breakdown of gross settlement volumes, merchant fees, and seller protection eligibility.
-              </p>
+          allTransactions.length === 0 ? (
+            <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center shadow-xs space-y-6 font-sans">
+              <div className="w-16 h-16 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center mx-auto text-[#0070BA]">
+                <Coins className="w-8 h-8" />
+              </div>
+              <div className="space-y-2 max-w-lg mx-auto">
+                <h2 className="text-2xl font-bold text-gray-900 tracking-tight">
+                  No Settlement Records for {user?.name || user?.email || 'this Account'}
+                </h2>
+                <p className="text-sm text-gray-600 leading-relaxed">
+                  Gross settlement volumes, RBI domestic merchant fees, and net payouts will automatically calculate here in real time once orders are captured through PayPal sandbox checkout.
+                </p>
+              </div>
+              <div className="flex items-center justify-center gap-3 flex-wrap pt-2">
+                <Link
+                  href="/catalog"
+                  className="px-5 py-2.5 bg-[#0070BA] hover:bg-[#005ea6] text-white rounded-xl text-sm font-semibold shadow-xs transition-colors"
+                >
+                  Browse Hardware Catalog
+                </Link>
+                <Link
+                  href="/studio"
+                  className="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-xl text-sm font-semibold transition-colors"
+                >
+                  Launch Shopping Studio
+                </Link>
+                <button
+                  onClick={() => setShowDemoPreview(true)}
+                  className="px-4 py-2.5 border border-dashed border-gray-300 hover:border-gray-400 text-gray-600 rounded-xl text-sm font-medium transition-colors cursor-pointer"
+                >
+                  Preview Sample Financial Settlement
+                </button>
+              </div>
             </div>
+          ) : (
+            <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-xs space-y-6 font-sans">
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">
+                  PayPal Sandbox Financial Settlement Summary
+                </h2>
+                <p className="text-sm text-gray-600 mt-1">
+                  Real-time breakdown of gross settlement volumes, merchant fees, and seller protection eligibility.
+                </p>
+              </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
-                <span className="text-sm text-gray-500 font-medium">Gross Captured Volume</span>
-                <p className="text-2xl font-bold font-sans text-gray-900 mt-1">₹5,93,350 INR</p>
-                <span className="text-sm text-emerald-700 font-semibold mt-1 block">
-                  6 of 6 Orders Captured
-                </span>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
+                  <span className="text-sm text-gray-500 font-medium">Gross Captured Volume</span>
+                  <p className="text-2xl font-bold font-sans text-gray-900 mt-1">
+                    ₹{settlementSummary.grossVolume.toLocaleString('en-IN')} INR
+                  </p>
+                  <span className="text-sm text-emerald-700 font-semibold mt-1 block">
+                    {settlementSummary.capturedCount} of {settlementSummary.totalCount} Orders Captured
+                  </span>
+                </div>
+                <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
+                  <span className="text-sm text-gray-500 font-medium">Estimated Merchant Fees</span>
+                  <p className="text-2xl font-bold font-sans text-gray-900 mt-1">
+                    ₹{settlementSummary.merchantFees.toLocaleString('en-IN')} INR
+                  </p>
+                  <span className="text-sm text-gray-500 mt-1 block">
+                    2.5% RBI domestic settlement fee
+                  </span>
+                </div>
+                <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
+                  <span className="text-sm text-gray-500 font-medium">Net Settlement Payout</span>
+                  <p className="text-2xl font-bold font-sans text-[#0070BA] mt-1">
+                    ₹{settlementSummary.netPayout.toLocaleString('en-IN')} INR
+                  </p>
+                  <span className="text-sm text-emerald-700 font-semibold mt-1 block">
+                    Immediate Sandbox Release
+                  </span>
+                </div>
+                <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
+                  <span className="text-sm text-gray-500 font-medium">Seller Protection Coverage</span>
+                  <p className="text-2xl font-bold font-sans text-emerald-600 mt-1">
+                    {settlementSummary.totalCount > 0 ? '100.0%' : '0.0%'}
+                  </p>
+                  <span className="text-sm text-gray-500 mt-1 block">
+                    {settlementSummary.capturedCount > 0
+                      ? `All ${settlementSummary.capturedCount} items hardware verified`
+                      : 'Awaiting first transaction'}
+                  </span>
+                </div>
               </div>
-              <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
-                <span className="text-sm text-gray-500 font-medium">Estimated Merchant Fees</span>
-                <p className="text-2xl font-bold font-sans text-gray-900 mt-1">₹14,834 INR</p>
-                <span className="text-sm text-gray-500 mt-1 block">
-                  2.5% RBI domestic settlement fee
-                </span>
-              </div>
-              <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
-                <span className="text-sm text-gray-500 font-medium">Net Settlement Payout</span>
-                <p className="text-2xl font-bold font-sans text-[#0070BA] mt-1">₹5,78,516 INR</p>
-                <span className="text-sm text-emerald-700 font-semibold mt-1 block">
-                  Immediate Sandbox Release
-                </span>
-              </div>
-              <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
-                <span className="text-sm text-gray-500 font-medium">Seller Protection Coverage</span>
-                <p className="text-2xl font-bold font-sans text-emerald-600 mt-1">100.0%</p>
-                <span className="text-sm text-gray-500 mt-1 block">
-                  All 6 items hardware verified
-                </span>
-              </div>
-            </div>
 
-            {/* Settlement Table */}
-            <div className="border border-gray-200 rounded-xl overflow-hidden">
-              <table className="w-full text-sm text-left">
-                <thead className="bg-gray-50 font-semibold text-gray-700 border-b border-gray-200">
-                  <tr>
-                    <th className="py-3 px-4">Payment Channel</th>
-                    <th className="py-3 px-4">Transactions</th>
-                    <th className="py-3 px-4">Total Settled</th>
-                    <th className="py-3 px-4">Settlement Speed</th>
-                    <th className="py-3 px-4">Status</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100 text-gray-800">
-                  <tr>
-                    <td className="py-3.5 px-4 font-semibold text-gray-900">PayPal Balance / Instant</td>
-                    <td className="py-3.5 px-4">3</td>
-                    <td className="py-3.5 px-4 font-bold text-gray-900">₹2,98,970 INR</td>
-                    <td className="py-3.5 px-4">Instantaneous</td>
-                    <td className="py-3.5 px-4 text-emerald-700 font-semibold">Cleared</td>
-                  </tr>
-                  <tr>
-                    <td className="py-3.5 px-4 font-semibold text-gray-900">PayPal Credit / Pay Later</td>
-                    <td className="py-3.5 px-4">1</td>
-                    <td className="py-3.5 px-4 font-bold text-gray-900">₹1,69,900 INR</td>
-                    <td className="py-3.5 px-4">Upfront Merchant Credit</td>
-                    <td className="py-3.5 px-4 text-emerald-700 font-semibold">Cleared</td>
-                  </tr>
-                  <tr>
-                    <td className="py-3.5 px-4 font-semibold text-gray-900">Debit / Credit Card (Direct)</td>
-                    <td className="py-3.5 px-4">2</td>
-                    <td className="py-3.5 px-4 font-bold text-gray-900">₹1,24,480 INR</td>
-                    <td className="py-3.5 px-4">T+0 Sandbox Settlement</td>
-                    <td className="py-3.5 px-4 text-emerald-700 font-semibold">Cleared</td>
-                  </tr>
-                </tbody>
-              </table>
+              {/* Settlement Table */}
+              <div className="border border-gray-200 rounded-xl overflow-hidden">
+                <table className="w-full text-sm text-left">
+                  <thead className="bg-gray-50 font-semibold text-gray-700 border-b border-gray-200">
+                    <tr>
+                      <th className="py-3 px-4">Payment Channel</th>
+                      <th className="py-3 px-4">Transactions</th>
+                      <th className="py-3 px-4">Total Settled</th>
+                      <th className="py-3 px-4">Settlement Speed</th>
+                      <th className="py-3 px-4">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100 text-gray-800">
+                    {settlementSummary.channels.map((ch) => (
+                      <tr key={ch.name}>
+                        <td className="py-3.5 px-4 font-semibold text-gray-900">{ch.name}</td>
+                        <td className="py-3.5 px-4">{ch.count}</td>
+                        <td className="py-3.5 px-4 font-bold text-gray-900">
+                          ₹{ch.total.toLocaleString('en-IN')} INR
+                        </td>
+                        <td className="py-3.5 px-4">{ch.speed}</td>
+                        <td className="py-3.5 px-4 text-emerald-700 font-semibold">{ch.status}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
+          )
         )}
 
         {/* Tab 3: Webhooks Log View */}
@@ -1180,39 +1260,55 @@ export default function TransactionsPage() {
               </span>
             </div>
 
-            <div className="space-y-2.5">
-              {filteredTransactions.map((txn) => (
-                <div
-                  key={txn.id}
-                  onClick={() => setSelectedTxn(txn)}
-                  className="p-4 rounded-xl border border-gray-200 hover:border-blue-300 hover:bg-blue-50/20 transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+            {filteredTransactions.length === 0 ? (
+              <div className="py-12 text-center text-gray-500">
+                <Code2 className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                <h3 className="font-bold text-gray-800 text-base">No Webhook Events Recorded</h3>
+                <p className="text-sm text-gray-500 mt-1 max-w-md mx-auto">
+                  Webhook notifications (PAYMENT.CAPTURE.COMPLETED) are automatically logged when transactions settle for this account. Place an order or click below to preview.
+                </p>
+                <button
+                  onClick={() => setShowDemoPreview(true)}
+                  className="mt-4 px-4 py-2 border border-dashed border-gray-300 hover:border-gray-400 text-gray-700 rounded-xl text-sm font-semibold transition-colors cursor-pointer"
                 >
-                  <div className="flex items-center gap-3">
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0" />
-                    <div>
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-mono font-bold text-sm text-gray-900">
-                          PAYMENT.CAPTURE.COMPLETED
-                        </span>
-                        <span className="text-sm font-mono bg-gray-100 text-gray-700 px-2 py-0.5 rounded border border-gray-200">
-                          {txn.captureId}
+                  Preview Sample Webhooks
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-2.5">
+                {filteredTransactions.map((txn) => (
+                  <div
+                    key={txn.id}
+                    onClick={() => setSelectedTxn(txn)}
+                    className="p-4 rounded-xl border border-gray-200 hover:border-blue-300 hover:bg-blue-50/20 transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0" />
+                      <div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-mono font-bold text-sm text-gray-900">
+                            PAYMENT.CAPTURE.COMPLETED
+                          </span>
+                          <span className="text-sm font-mono bg-gray-100 text-gray-700 px-2 py-0.5 rounded border border-gray-200">
+                            {txn.captureId}
+                          </span>
+                        </div>
+                        <span className="text-sm text-gray-600 block mt-1">
+                          Order {txn.orderId} • Captured {txn.amount} for {txn.name}
                         </span>
                       </div>
-                      <span className="text-sm text-gray-600 block mt-1">
-                        Order {txn.orderId} • Captured {txn.amount} for {txn.name}
-                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-3 text-sm text-gray-600 shrink-0">
+                      <span className="font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200">HTTP 200 OK</span>
+                      <span className="text-gray-400">•</span>
+                      <span>{txn.date} {txn.time}</span>
+                      <Code2 className="w-4 h-4 text-[#0070BA]" />
                     </div>
                   </div>
-
-                  <div className="flex items-center gap-3 text-sm text-gray-600 shrink-0">
-                    <span className="font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200">HTTP 200 OK</span>
-                    <span className="text-gray-400">•</span>
-                    <span>{txn.date} {txn.time}</span>
-                    <Code2 className="w-4 h-4 text-[#0070BA]" />
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
