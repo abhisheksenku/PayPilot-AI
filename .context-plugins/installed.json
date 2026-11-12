@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "plugins": [
+    {
+      "plugin": "paypal",
+      "repo": "context-plugins/plugin-marketplace",
+      "marketplace": "context-plugins",
+      "ref": "main",
+      "targets": [
+        "vscode"
+      ],
+      "installedAt": "2026-11-12T08:55:43.451Z"
+    }
+  ]
+}
