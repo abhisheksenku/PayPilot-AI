@@ -1,6 +1,10 @@
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
+import { AgGridReact } from 'ag-grid-react';
+import type { ColDef } from 'ag-grid-community';
+import 'ag-grid-community/styles/ag-grid.css';
+import 'ag-grid-community/styles/ag-theme-quartz.css';
 import { api } from '@/lib/api';
 import { ENABLE_SEED_DATA } from '@/lib/config';
 import { useAuth } from '@/context/AuthContext';
@@ -256,6 +260,7 @@ function MiniThumbnail({ model }: { model: TransactionItem['modelKey'] }) {
 export default function TransactionsPage() {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<'logs' | 'summary' | 'webhooks'>('logs');
+  const [viewMode, setViewMode] = useState<'aggrid' | 'standard'>('aggrid');
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
   const [dateFilter, setDateFilter] = useState<string>('7d');
@@ -263,6 +268,8 @@ export default function TransactionsPage() {
   const [selectedTxn, setSelectedTxn] = useState<TransactionItem | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [liveOrders, setLiveOrders] = useState<Order[]>([]);
+
+  const gridRef = useRef<AgGridReact<TransactionItem>>(null);
 
   // Fetch live orders from MySQL database
   const fetchOrders = async () => {
@@ -386,8 +393,145 @@ export default function TransactionsPage() {
     });
   }, [allTransactions, searchQuery, statusFilter]);
 
+  // Synchronize search input with AG Grid quick filter
+  useEffect(() => {
+    if (gridRef.current?.api) {
+      gridRef.current.api.setGridOption('quickFilterText', searchQuery);
+    }
+  }, [searchQuery]);
+
+  // AG Grid Column Definitions
+  const defaultColDef = useMemo<ColDef>(
+    () => ({
+      sortable: true,
+      filter: true,
+      resizable: true,
+    }),
+    []
+  );
+
+  const columnDefs = useMemo<ColDef<TransactionItem>[]>(
+    () => [
+      {
+        headerName: '#',
+        valueGetter: (params) => (params.node ? (params.node.rowIndex ?? 0) + 1 : ''),
+        width: 65,
+        pinned: 'left',
+        sortable: false,
+        filter: false,
+        cellClass: 'text-gray-400 font-mono text-[11px] flex items-center justify-center',
+      },
+      {
+        headerName: 'Transaction ID',
+        field: 'id',
+        width: 175,
+        pinned: 'left',
+        cellRenderer: (params: any) => {
+          const id = params.value;
+          return (
+            <div className="flex items-center gap-1.5 font-mono font-bold text-[#0070BA] text-xs h-full">
+              <span>{id}</span>
+            </div>
+          );
+        },
+      },
+      {
+        headerName: 'Hardware Model & Specs',
+        field: 'name',
+        flex: 2,
+        minWidth: 260,
+        cellRenderer: (params: any) => {
+          const data = params.data as TransactionItem;
+          if (!data) return null;
+          return (
+            <div className="flex items-center gap-2.5 h-full py-1">
+              <div className="w-8 h-8 rounded bg-gray-50 border border-gray-200 flex items-center justify-center p-0.5 shrink-0">
+                <MiniThumbnail model={data.modelKey} />
+              </div>
+              <div className="min-w-0">
+                <div className="font-bold text-gray-900 text-xs truncate leading-tight">
+                  {data.name}
+                </div>
+                <div className="text-[10px] text-gray-500 truncate leading-tight">
+                  {data.specs}
+                </div>
+              </div>
+            </div>
+          );
+        },
+      },
+      {
+        headerName: 'Amount',
+        field: 'amountNumeric',
+        width: 140,
+        filter: 'agNumberColumnFilter',
+        cellRenderer: (params: any) => (
+          <span className="font-mono font-bold text-xs text-gray-900 flex items-center h-full">
+            ${Number(params.value || 0).toFixed(2)} USD
+          </span>
+        ),
+      },
+      {
+        headerName: 'PayPal Order ID',
+        field: 'orderId',
+        width: 195,
+        cellRenderer: (params: any) => (
+          <span className="font-mono text-gray-700 text-[11px] bg-gray-50 px-2 py-0.5 rounded border border-gray-200">
+            {params.value}
+          </span>
+        ),
+      },
+      {
+        headerName: 'Capture ID',
+        field: 'captureId',
+        width: 180,
+        cellRenderer: (params: any) => (
+          <span className="font-mono text-gray-500 text-[11px]">
+            {params.value}
+          </span>
+        ),
+      },
+      {
+        headerName: 'Settlement Status',
+        field: 'status',
+        width: 150,
+        cellRenderer: (params: any) => {
+          const status = params.value;
+          if (status === 'CAPTURED') {
+            return (
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                <CheckCircle2 className="w-2.5 h-2.5 text-emerald-600" />
+                CAPTURED
+              </span>
+            );
+          }
+          return (
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+              <Clock className="w-2.5 h-2.5 text-amber-600" />
+              ON_HOLD
+            </span>
+          );
+        },
+      },
+      {
+        headerName: 'Created At',
+        valueGetter: (params: any) => `${params.data?.date || ''} ${params.data?.time || ''}`,
+        width: 160,
+        cellClass: 'text-xs text-gray-600 flex items-center',
+      },
+    ],
+    []
+  );
+
   // Export CSV generator
   const handleExportCSV = () => {
+    if (viewMode === 'aggrid' && gridRef.current?.api) {
+      gridRef.current.api.exportDataAsCsv({
+        fileName: `paypilot-transactions-ledger-${new Date().toISOString().slice(0, 10)}.csv`,
+      });
+      return;
+    }
+
     const headers = [
       'Index',
       'Transaction ID',
@@ -632,6 +776,32 @@ export default function TransactionsPage() {
                   />
                 </button>
 
+                {/* View Switcher: AG Grid vs Standard Table */}
+                <div className="flex items-center bg-gray-100 p-0.5 rounded-lg border border-gray-200">
+                  <button
+                    type="button"
+                    onClick={() => setViewMode('aggrid')}
+                    className={`px-2.5 py-1 text-xs font-bold rounded-md transition-all cursor-pointer flex items-center gap-1 ${
+                      viewMode === 'aggrid'
+                        ? 'bg-white text-[#0070BA] shadow-2xs'
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    <span>⚡ AG Grid Engine</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setViewMode('standard')}
+                    className={`px-2.5 py-1 text-xs font-semibold rounded-md transition-all cursor-pointer ${
+                      viewMode === 'standard'
+                        ? 'bg-white text-gray-900 shadow-2xs font-bold'
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    <span>Standard Table</span>
+                  </button>
+                </div>
+
                 {/* Export CSV Button */}
                 <button
                   onClick={handleExportCSV}
@@ -643,7 +813,44 @@ export default function TransactionsPage() {
               </div>
             </div>
 
-            {/* Financial Ledger Table */}
+            {/* Financial Ledger: AG Grid or Standard Table */}
+            {viewMode === 'aggrid' ? (
+              <div className="bg-white rounded-xl border border-gray-200 shadow-2xs p-3 space-y-2.5">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-1">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="text-xs font-bold text-gray-900">
+                      AG Grid Interactive Enterprise Ledger
+                    </span>
+                    <span className="text-[10px] font-mono bg-blue-50 text-[#0070BA] border border-blue-200 px-1.5 py-0.2 rounded font-bold">
+                      v31.3.4
+                    </span>
+                  </div>
+                  <span className="text-[11px] text-gray-400">
+                    Sort by clicking headers • Filter via column menu • Auto-size by double-clicking column borders
+                  </span>
+                </div>
+
+                <div className="ag-theme-quartz w-full h-[520px] rounded-lg overflow-hidden border border-gray-100">
+                  <AgGridReact<TransactionItem>
+                    ref={gridRef}
+                    rowData={filteredTransactions}
+                    columnDefs={columnDefs}
+                    defaultColDef={defaultColDef}
+                    pagination={true}
+                    paginationPageSize={10}
+                    paginationPageSizeSelector={[10, 25, 50]}
+                    onRowClicked={(event) => {
+                      if (event.data) setSelectedTxn(event.data);
+                    }}
+                    rowHeight={48}
+                    headerHeight={42}
+                    animateRows={true}
+                  />
+                </div>
+              </div>
+            ) : (
+            /* Financial Ledger Table (Standard) */
             <div className="bg-white rounded-xl border border-gray-200 shadow-2xs overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs border-collapse">
@@ -896,6 +1103,7 @@ export default function TransactionsPage() {
                 </div>
               </div>
             </div>
+            )}
           </div>
         )}
 

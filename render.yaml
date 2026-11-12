@@ -1,0 +1,69 @@
+# Render Blueprint Specification for PayPilot AI
+# Official Infrastructure as Code for Render Cloud Hosting
+# https://render.com/docs/blueprint-spec
+
+services:
+  # ---------------------------------------------------------------------------
+  # 1. PayPilot Express Backend API (LangGraph Swarm, Gemini, PayPal & MySQL)
+  # ---------------------------------------------------------------------------
+  - type: web
+    name: paypilot-backend
+    env: node
+    plan: starter
+    region: oregon
+    buildCommand: cd backend && npm install && npm run build
+    startCommand: cd backend && npm run start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CORS_ORIGIN
+        value: https://paypilot-frontend.onrender.com
+      - key: PAYPAL_MODE
+        value: sandbox
+      - key: PAYPAL_CLIENT_ID
+        sync: false
+      - key: PAYPAL_CLIENT_SECRET
+        sync: false
+      - key: PAYPAL_WEBHOOK_ID
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: CHANNEL3_API_KEY
+        sync: false
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        value: 3306
+      - key: DB_NAME
+        value: paypilot_db
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+
+  # ---------------------------------------------------------------------------
+  # 2. PayPilot Next.js 14 Frontend (App Router, AG Grid, PayPal SDK v6)
+  # ---------------------------------------------------------------------------
+  - type: web
+    name: paypilot-frontend
+    env: node
+    plan: starter
+    region: oregon
+    buildCommand: cd frontend && npm install && npm run build
+    startCommand: cd frontend && npm run start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: NEXT_PUBLIC_API_URL
+        value: https://paypilot-backend.onrender.com/api
+      - key: NEXT_PUBLIC_ENABLE_SEED_DATA
+        value: "true"
+      - key: NEXT_PUBLIC_PAYPAL_CLIENT_ID
+        sync: false
