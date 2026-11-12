@@ -3,8 +3,7 @@ const nextConfig = {
   reactStrictMode: true,
   output: 'standalone',
   experimental: {
-    cpus: 1,
-    workerThreads: false,
+    optimizePackageImports: ['lucide-react', '@paypal/react-paypal-js'],
   },
   images: {
     remotePatterns: [

@@ -4,6 +4,23 @@ import { Order } from '../types/order';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
+/**
+ * Robust fetch wrapper with configurable timeout to prevent page transitions from hanging
+ */
+async function fetchWithTimeout(url: string, options: RequestInit = {}, timeoutMs = 2500): Promise<Response> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal,
+    });
+    return response;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 export const fallbackProduct: RankedProduct = {
   id: '769d593b-4db0-49ee-a3f3-ea81dd010ff8',
   externalId: 'CH3-LENOVO-LOQ-15',
@@ -38,11 +55,15 @@ export const fallbackProduct: RankedProduct = {
 export const api = {
   async getMe(): Promise<{ id: string; name: string; email: string } | null> {
     try {
-      const res = await fetch(`${API_BASE_URL}/auth/me`, {
-        method: 'GET',
-        credentials: 'include',
-        cache: 'no-store',
-      });
+      const res = await fetchWithTimeout(
+        `${API_BASE_URL}/auth/me`,
+        {
+          method: 'GET',
+          credentials: 'include',
+          cache: 'no-store',
+        },
+        1500
+      );
       if (!res.ok) return null;
       const data = await res.json();
       return data.success && data.user ? data.user : null;
@@ -56,12 +77,16 @@ export const api = {
     password: string;
   }): Promise<{ success: boolean; user?: any; error?: string }> {
     try {
-      const res = await fetch(`${API_BASE_URL}/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(credentials),
-      });
+      const res = await fetchWithTimeout(
+        `${API_BASE_URL}/auth/login`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify(credentials),
+        },
+        3000
+      );
       const data = await res.json();
       if (!res.ok || !data.success) {
         return { success: false, error: data?.error?.message || 'Invalid email or password' };
@@ -78,12 +103,16 @@ export const api = {
     password: string;
   }): Promise<{ success: boolean; user?: any; error?: string }> {
     try {
-      const res = await fetch(`${API_BASE_URL}/auth/signup`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(data),
-      });
+      const res = await fetchWithTimeout(
+        `${API_BASE_URL}/auth/signup`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify(data),
+        },
+        3000
+      );
       const json = await res.json();
       if (!res.ok || !json.success) {
         return { success: false, error: json?.error?.message || 'Failed to create account' };
@@ -96,16 +125,24 @@ export const api = {
 
   async logout(): Promise<void> {
     try {
-      await fetch(`${API_BASE_URL}/auth/logout`, {
-        method: 'POST',
-        credentials: 'include',
-      });
+      await fetchWithTimeout(
+        `${API_BASE_URL}/auth/logout`,
+        {
+          method: 'POST',
+          credentials: 'include',
+        },
+        1500
+      );
     } catch {}
   },
 
   async checkHealth(): Promise<boolean> {
     try {
-      const res = await fetch(`${API_BASE_URL}/health`, { method: 'GET', cache: 'no-store' });
+      const res = await fetchWithTimeout(
+        `${API_BASE_URL}/health`,
+        { method: 'GET', cache: 'no-store' },
+        1500
+      );
       return res.ok;
     } catch {
       return false;
@@ -114,7 +151,7 @@ export const api = {
 
   async getProducts(): Promise<Product[]> {
     try {
-      const res = await fetch(`${API_BASE_URL}/products`);
+      const res = await fetchWithTimeout(`${API_BASE_URL}/products`, {}, 2000);
       if (!res.ok) throw new Error('Failed to fetch products');
       const json = await res.json();
       return json.data || [fallbackProduct];
@@ -126,9 +163,13 @@ export const api = {
 
   async getConversations(): Promise<any[]> {
     try {
-      const res = await fetch(`${API_BASE_URL}/agent/conversations`, {
-        credentials: 'include',
-      });
+      const res = await fetchWithTimeout(
+        `${API_BASE_URL}/agent/conversations`,
+        {
+          credentials: 'include',
+        },
+        2000
+      );
       if (!res.ok) return [];
       const json = await res.json();
       return json.data || [];
@@ -147,12 +188,16 @@ export const api = {
     activeAgent?: string;
   }> {
     try {
-      const res = await fetch(`${API_BASE_URL}/agent/chat`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ message, conversationId }),
-      });
+      const res = await fetchWithTimeout(
+        `${API_BASE_URL}/agent/chat`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ message, conversationId }),
+        },
+        6000
+      );
       if (res.ok) {
         const json = await res.json();
         return {
@@ -295,12 +340,16 @@ export const api = {
     approvalUrl: string;
   }> {
     try {
-      const res = await fetch(`${API_BASE_URL}/payments/create-order`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ productId, quantity: 1 }),
-      });
+      const res = await fetchWithTimeout(
+        `${API_BASE_URL}/payments/create-order`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ productId, quantity: 1 }),
+        },
+        4000
+      );
       if (res.ok) {
         const json = await res.json();
         return {
@@ -322,12 +371,16 @@ export const api = {
     status: string;
   }> {
     try {
-      const res = await fetch(`${API_BASE_URL}/payments/capture-order`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ paypalOrderId }),
-      });
+      const res = await fetchWithTimeout(
+        `${API_BASE_URL}/payments/capture-order`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ paypalOrderId }),
+        },
+        4000
+      );
       if (res.ok) {
         const json = await res.json();
         return {
@@ -346,9 +399,13 @@ export const api = {
 
   async getOrders(): Promise<Order[]> {
     try {
-      const res = await fetch(`${API_BASE_URL}/payments/orders`, {
-        credentials: 'include',
-      });
+      const res = await fetchWithTimeout(
+        `${API_BASE_URL}/payments/orders`,
+        {
+          credentials: 'include',
+        },
+        2000
+      );
       if (res.ok) {
         const json = await res.json();
         return json.data || [];
