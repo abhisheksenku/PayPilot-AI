@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { agentService } from './agentService';
-import { AgentExecution } from '../../models';
+import { AgentExecution, Conversation, Message } from '../../models';
 
 export class AgentController {
   /**
@@ -8,7 +8,11 @@ export class AgentController {
    */
   public async chat(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { message, conversationId, userId, selectedProductId, selectedQuantity } = req.body;
+      const { message, conversationId, selectedProductId, selectedQuantity } = req.body;
+      const effectiveUserId =
+        req.user?.userId ||
+        req.body.userId ||
+        '00000000-0000-0000-0000-000000000001';
 
       if (!message || typeof message !== 'string') {
         res.status(400).json({
@@ -21,7 +25,7 @@ export class AgentController {
       const result = await agentService.processMessage({
         message,
         conversationId,
-        userId,
+        userId: effectiveUserId,
         selectedProductId,
         selectedQuantity,
       });
@@ -29,6 +33,40 @@ export class AgentController {
       res.status(200).json({
         success: true,
         data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * GET /api/v1/agent/conversations
+   */
+  public async getConversations(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const effectiveUserId =
+        req.user?.userId ||
+        (req.query.userId as string) ||
+        '00000000-0000-0000-0000-000000000001';
+
+      const conversations = await Conversation.findAll({
+        where: { userId: effectiveUserId },
+        include: [
+          {
+            model: Message,
+            as: 'messages',
+          },
+        ],
+        order: [
+          ['createdAt', 'DESC'],
+          [{ model: Message, as: 'messages' }, 'createdAt', 'ASC'],
+        ],
+        limit: 15,
+      });
+
+      res.status(200).json({
+        success: true,
+        data: conversations,
       });
     } catch (error) {
       next(error);

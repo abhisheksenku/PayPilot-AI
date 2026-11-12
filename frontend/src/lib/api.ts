@@ -124,7 +124,20 @@ export const api = {
     }
   },
 
-  async runAgentChat(message: string): Promise<{
+  async getConversations(): Promise<any[]> {
+    try {
+      const res = await fetch(`${API_BASE_URL}/agent/conversations`, {
+        credentials: 'include',
+      });
+      if (!res.ok) return [];
+      const json = await res.json();
+      return json.data || [];
+    } catch {
+      return [];
+    }
+  },
+
+  async runAgentChat(message: string, conversationId?: string): Promise<{
     agentResponse: string;
     requirements: any;
     rankedProducts: RankedProduct[];
@@ -136,7 +149,7 @@ export const api = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ message }),
+        body: JSON.stringify({ message, conversationId }),
       });
       if (res.ok) {
         const json = await res.json();

@@ -316,6 +316,7 @@ export default function StudioPage() {
   const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
   const [showHistoryDropdown, setShowHistoryDropdown] = useState(false);
   const [inspectingProduct, setInspectingProduct] = useState<RankedProduct | null>(null);
+  const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
 
   // Multi-Turn Conversation State (restores active chat from session, clean slate for new users)
   const [turns, setTurns] = useState<ChatTurn[]>(() => {
@@ -341,8 +342,45 @@ export default function StudioPage() {
       hasLoadedSessionRef.current = true;
       setTurns([SEED_TURN_1]);
       setSelectedProduct(SEED_TURN_1.product);
+    } else if (turns.length === 0 && user && user.email !== 'demo@paypilot.ai') {
+      // Query MySQL database for user's past conversation messages
+      api.getConversations().then((convs) => {
+        if (convs && convs.length > 0 && turns.length === 0) {
+          hasLoadedSessionRef.current = true;
+          const latestConv = convs[0];
+          setActiveConversationId(latestConv.id);
+
+          const userMsgs = (latestConv.messages || []).filter((m: any) => m.role === 'user');
+          const assistantMsgs = (latestConv.messages || []).filter((m: any) => m.role === 'assistant');
+
+          if (userMsgs.length > 0) {
+            const reconstructedTurns: ChatTurn[] = userMsgs.map((um: any, idx: number) => {
+              const am = assistantMsgs[idx];
+              return {
+                id: um.id || `turn-${idx}`,
+                turnNumber: idx + 1,
+                userQuery: um.content,
+                timestamp: new Date(um.createdAt || Date.now()).toLocaleTimeString('en-US', {
+                  hour: 'numeric',
+                  minute: '2-digit',
+                }),
+                assistantSummary: am?.content || "I've evaluated the catalog and identified the optimal hardware recommendation:",
+                agentSteps: SEED_TURN_1.agentSteps,
+                product: fallbackProduct,
+                alternativeProducts: SEED_TURN_1.alternativeProducts,
+                isLogsExpanded: idx === userMsgs.length - 1,
+                isTurnCollapsed: idx < userMsgs.length - 1,
+              };
+            });
+            setTurns(reconstructedTurns);
+            if (reconstructedTurns.length > 0) {
+              setSelectedProduct(reconstructedTurns[reconstructedTurns.length - 1].product);
+            }
+          }
+        }
+      }).catch(() => {});
     }
-  }, [user?.email, turns.length]);
+  }, [user?.email, user?.id, turns.length]);
 
   // Persist turns to sessionStorage so page refresh preserves ongoing conversation
   useEffect(() => {
@@ -400,23 +438,11 @@ export default function StudioPage() {
     );
 
     try {
-      // 1. Check if user clicked the seed Q2 query for instant blueprint fidelity
-      if (text.toLowerCase().includes('32gb') || text.toLowerCase().includes('better option with 32gb')) {
-        // Artificial micro-pause for smooth realistic agent execution feel
-        await new Promise((resolve) => setTimeout(resolve, 600));
-        const newTurn: ChatTurn = {
-          ...SEED_TURN_2,
-          timestamp: timeString,
-          turnNumber: turns.length + 1,
-        };
-        setTurns((prev) => [...prev, newTurn]);
-        setSelectedProduct(newTurn.product);
-        setIsProcessing(false);
-        return;
+      // Run LangGraph Multi-Agent Swarm against Express backend & MySQL
+      const res = await api.runAgentChat(text, activeConversationId || undefined);
+      if (res.orderDraftId) {
+        setActiveConversationId(res.orderDraftId);
       }
-
-      // 2. Run LangGraph Multi-Agent Swarm against backend
-      const res = await api.runAgentChat(text);
 
       let winningProduct: RankedProduct;
       let altProducts: RankedProduct[] = [];
