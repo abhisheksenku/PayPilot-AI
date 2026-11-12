@@ -195,7 +195,7 @@ export default function CatalogPage() {
 
   return (
     <DashboardLayout>
-      <div className="px-4 sm:px-6 pt-3 pb-6 max-w-[1600px] mx-auto space-y-4 select-none">
+      <div className="px-4 sm:px-6 pt-3 pb-6 max-w-[1600px] mx-auto space-y-4">
         {/* Page Header Bar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>

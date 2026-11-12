@@ -16,7 +16,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   return (
-    <div className="h-screen w-screen bg-[#F5F7FA] text-gray-900 flex flex-col antialiased overflow-hidden select-none">
+    <div className="h-screen w-screen bg-[#F5F7FA] text-gray-900 flex flex-col antialiased overflow-hidden">
       {/* Persistent App Header with Dual Banners (Fixed at top) */}
       <div className="shrink-0 z-40">
         <AppHeader
