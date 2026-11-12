@@ -317,22 +317,45 @@ export default function StudioPage() {
   const [showHistoryDropdown, setShowHistoryDropdown] = useState(false);
   const [inspectingProduct, setInspectingProduct] = useState<RankedProduct | null>(null);
 
-  // Multi-Turn Conversation State (clean slate for newly registered users)
-  const [turns, setTurns] = useState<ChatTurn[]>([]);
+  // Multi-Turn Conversation State (restores active chat from session, clean slate for new users)
+  const [turns, setTurns] = useState<ChatTurn[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = sessionStorage.getItem('paypilot_studio_turns');
+        if (saved) return JSON.parse(saved);
+      } catch {}
+    }
+    return [];
+  });
 
   // Selected Spotlight Product
   const [selectedProduct, setSelectedProduct] = useState<RankedProduct>(fallbackProduct);
 
-  // Initialize turn history based on user session (pre-seed only for demo account)
+  const hasLoadedSessionRef = useRef(false);
+
+  // Initialize turn history based on user session (pre-seed only for demo account if empty)
   useEffect(() => {
-    if (user?.email === 'demo@paypilot.ai' && ENABLE_SEED_DATA) {
+    if (hasLoadedSessionRef.current) return;
+
+    if (turns.length === 0 && user?.email === 'demo@paypilot.ai' && ENABLE_SEED_DATA) {
+      hasLoadedSessionRef.current = true;
       setTurns([SEED_TURN_1]);
       setSelectedProduct(SEED_TURN_1.product);
-    } else {
-      setTurns([]);
-      setSelectedProduct(fallbackProduct);
     }
-  }, [user?.email]);
+  }, [user?.email, turns.length]);
+
+  // Persist turns to sessionStorage so page refresh preserves ongoing conversation
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        if (turns.length > 0) {
+          sessionStorage.setItem('paypilot_studio_turns', JSON.stringify(turns));
+        } else {
+          sessionStorage.removeItem('paypilot_studio_turns');
+        }
+      } catch {}
+    }
+  }, [turns]);
 
   const [paymentSuccess, setPaymentSuccess] = useState<{
     captureId: string;
@@ -514,6 +537,11 @@ export default function StudioPage() {
     setTurns([]);
     setSelectedProduct(fallbackProduct);
     setPaymentSuccess(null);
+    if (typeof window !== 'undefined') {
+      try {
+        sessionStorage.removeItem('paypilot_studio_turns');
+      } catch {}
+    }
     inputRef.current?.focus();
   };
 
