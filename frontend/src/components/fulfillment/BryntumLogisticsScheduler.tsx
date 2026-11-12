@@ -53,21 +53,21 @@ const DEFAULT_RESOURCES: FulfillmentResource[] = [
     id: 'res-carrier-fedex',
     name: 'FedEx Priority Air Fleet',
     role: 'Express Courier',
-    hub: 'Global Logistics',
+    hub: 'Domestic Priority',
     status: 'ACTIVE',
   },
   {
     id: 'res-carrier-dhl',
     name: 'DHL International Express',
     role: 'Cross-Border Air',
-    hub: 'Worldwide Express',
+    hub: 'Worldwide Priority',
     status: 'ACTIVE',
   },
   {
     id: 'res-agent-ai',
     name: 'PayPal Autonomous Dispatcher',
-    role: 'AI Escrow & Release',
-    hub: 'Cloud Autonomous Agent',
+    role: 'Escrow Settlement',
+    hub: 'Fintech Rail',
     status: 'ONLINE',
   },
 ];
@@ -76,10 +76,10 @@ const DEFAULT_EVENTS: FulfillmentEvent[] = [
   {
     id: 'evt-1',
     resourceId: 'res-hub-1',
-    name: 'ORD-8850: ASUS ROG Zephyrus G16 Allocation',
+    name: 'ORD-8850: ASUS ROG Zephyrus G16 (QA & Prep)',
     orderId: 'ORD-8850',
-    startDate: '2026-11-10 09:00',
-    endDate: '2026-11-11 14:00',
+    startDate: '2026-11-09 09:00',
+    endDate: '2026-11-10 14:00',
     eventColor: 'purple',
     iconCls: 'b-fa b-fa-laptop',
     status: 'Completed',
@@ -87,10 +87,10 @@ const DEFAULT_EVENTS: FulfillmentEvent[] = [
   {
     id: 'evt-2',
     resourceId: 'res-carrier-fedex',
-    name: 'ORD-8850: Next-Day Air Express Transit',
+    name: 'ORD-8850: FedEx Air Express Transit',
     orderId: 'ORD-8850',
-    startDate: '2026-11-11 14:30',
-    endDate: '2026-11-13 18:00',
+    startDate: '2026-11-10 14:30',
+    endDate: '2026-11-12 18:00',
     eventColor: 'blue',
     iconCls: 'b-fa b-fa-plane',
     status: 'In Transit',
@@ -98,10 +98,10 @@ const DEFAULT_EVENTS: FulfillmentEvent[] = [
   {
     id: 'evt-3',
     resourceId: 'res-hub-2',
-    name: 'ORD-8842: Lenovo LOQ 15 Inspection & Packing',
+    name: 'ORD-8842: Lenovo LOQ 15 (Inspection)',
     orderId: 'ORD-8842',
-    startDate: '2026-11-09 08:00',
-    endDate: '2026-11-10 11:00',
+    startDate: '2026-11-08 08:00',
+    endDate: '2026-11-09 11:00',
     eventColor: 'green',
     iconCls: 'b-fa b-fa-box-check',
     status: 'Completed',
@@ -109,9 +109,9 @@ const DEFAULT_EVENTS: FulfillmentEvent[] = [
   {
     id: 'evt-4',
     resourceId: 'res-carrier-fedex',
-    name: 'ORD-8842: Final Mile Delivery (San Francisco)',
+    name: 'ORD-8842: Final Mile Delivery',
     orderId: 'ORD-8842',
-    startDate: '2026-11-10 11:30',
+    startDate: '2026-11-09 11:30',
     endDate: '2026-11-11 16:00',
     eventColor: 'teal',
     iconCls: 'b-fa b-fa-truck',
@@ -120,10 +120,10 @@ const DEFAULT_EVENTS: FulfillmentEvent[] = [
   {
     id: 'evt-5',
     resourceId: 'res-hub-1',
-    name: 'ORD-8837: MacBook Pro 14 Quality Benchmark',
+    name: 'ORD-8837: MacBook Pro 14 (Benchmarking)',
     orderId: 'ORD-8837',
-    startDate: '2026-11-09 13:00',
-    endDate: '2026-11-10 17:00',
+    startDate: '2026-11-08 13:00',
+    endDate: '2026-11-09 17:00',
     eventColor: 'indigo',
     iconCls: 'b-fa b-fa-microchip',
     status: 'Completed',
@@ -131,10 +131,10 @@ const DEFAULT_EVENTS: FulfillmentEvent[] = [
   {
     id: 'evt-6',
     resourceId: 'res-carrier-dhl',
-    name: 'ORD-8837: International Cross-Border Air',
+    name: 'ORD-8837: DHL International Air',
     orderId: 'ORD-8837',
-    startDate: '2026-11-10 18:00',
-    endDate: '2026-11-13 12:00',
+    startDate: '2026-11-09 18:00',
+    endDate: '2026-11-12 12:00',
     eventColor: 'orange',
     iconCls: 'b-fa b-fa-plane-departure',
     status: 'In Transit',
@@ -142,12 +142,12 @@ const DEFAULT_EVENTS: FulfillmentEvent[] = [
   {
     id: 'evt-7',
     resourceId: 'res-agent-ai',
-    name: 'PayPilot Swarm: Real-time Price Lock & Escrow Hold',
-    startDate: '2026-11-09 00:00',
-    endDate: '2026-11-14 23:59',
+    name: 'PayPal Autonomous Escrow Lock',
+    startDate: '2026-11-08 00:00',
+    endDate: '2026-11-13 23:59',
     eventColor: 'cyan',
     iconCls: 'b-fa b-fa-shield-halved',
-    status: 'Autonomous Guard Active',
+    status: 'Active',
   },
 ];
 
@@ -166,17 +166,17 @@ export function BryntumLogisticsScheduler({
     {
       text: 'Logistics Facility & Carrier',
       field: 'name',
-      width: 240,
+      width: 260,
     },
     {
       text: 'Operational Role',
       field: 'role',
-      width: 170,
+      width: 180,
     },
     {
-      text: 'Base / Hub',
+      text: 'Hub Location',
       field: 'hub',
-      width: 150,
+      width: 160,
     },
   ];
 
@@ -192,35 +192,35 @@ export function BryntumLogisticsScheduler({
   };
 
   return (
-    <div className="space-y-3">
-      {/* Bryntum Toolbar */}
-      <div className="flex items-center justify-between bg-[#1E293B] border border-[#334155] rounded-xl px-4 py-2.5 text-xs text-gray-300">
-        <div className="flex items-center gap-2">
-          <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
-          <span className="font-semibold text-white">Bryntum High-Performance Scheduler Engine</span>
-          <span className="text-gray-400 font-mono">v7.3.8</span>
+    <div className="space-y-3 font-sans">
+      {/* Clean Enterprise Toolbar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between bg-slate-900 border border-slate-800 rounded-xl px-5 py-3 gap-3 text-sm">
+        <div className="flex items-center gap-3">
+          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+          <span className="font-semibold text-white text-sm">Fulfillment Schedule Timeline</span>
+          <span className="text-slate-400 text-sm">| 5 Active Carrier Routes</span>
         </div>
 
-        <div className="flex items-center gap-1.5">
-          <span className="text-gray-400 mr-1">Zoom Preset:</span>
+        <div className="flex items-center gap-2">
+          <span className="text-slate-400 text-sm mr-1">Time View:</span>
           {(['hourAndDay', 'dayAndWeek', 'weekAndMonth'] as const).map((preset) => (
             <button
               key={preset}
               onClick={() => handleZoom(preset)}
-              className={`px-2.5 py-1 rounded font-semibold transition-colors cursor-pointer ${
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
                 activePreset === preset
-                  ? 'bg-indigo-600 text-white shadow-xs'
-                  : 'bg-[#0F172A] text-gray-300 hover:bg-[#334155]'
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
               }`}
             >
-              {preset === 'hourAndDay' ? 'Hour/Day' : preset === 'dayAndWeek' ? 'Day/Week' : 'Week/Month'}
+              {preset === 'hourAndDay' ? 'Hours' : preset === 'dayAndWeek' ? 'Days' : 'Weeks'}
             </button>
           ))}
         </div>
       </div>
 
       <div
-        className="bryntum-scheduler-container rounded-xl overflow-hidden border border-[#2D3748] shadow-2xl bg-[#0F172A]"
+        className="bryntum-scheduler-container rounded-xl overflow-hidden border border-slate-800 shadow-xl bg-slate-950"
         style={{ height }}
       >
         <BryntumScheduler
@@ -228,8 +228,8 @@ export function BryntumLogisticsScheduler({
           startDate={startDate}
           endDate={endDate}
           viewPreset={activePreset}
-          rowHeight={58}
-          barMargin={7}
+          rowHeight={60}
+          barMargin={8}
           resources={resources}
           events={events}
           columns={columns}

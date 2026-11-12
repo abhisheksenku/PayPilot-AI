@@ -78,11 +78,10 @@ export function AppSidebar({
     },
     {
       id: 'bryntum-schedule',
-      label: 'Bryntum Logistics',
+      label: 'Shipping Schedule',
       href: '/orders?view=bryntum',
       icon: Calendar,
       hasChevron: true,
-      badge: 'PRO',
     },
   ];
 
@@ -187,10 +186,10 @@ export function AppSidebar({
                     onCloseMobile?.();
                   }
                 }}
-                className={`flex items-center justify-between px-3.5 py-2 rounded-xl text-[13px] font-medium transition-colors ${
+                className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-colors ${
                   isActive
-                    ? 'bg-[#EBF5FF] text-[#0070BA] font-semibold border border-[#D0E5FF]/70 shadow-2xs'
-                    : 'text-gray-700 hover:bg-gray-100/70 hover:text-gray-900'
+                    ? 'bg-[#EBF5FF] text-[#0070BA] font-semibold border border-[#D0E5FF]/70 shadow-xs'
+                    : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -203,12 +202,12 @@ export function AppSidebar({
                 </div>
                 <div className="flex items-center gap-1.5">
                   {(item as any).badge && (
-                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-700 border border-indigo-200">
+                    <span className="text-xs font-semibold px-2 py-0.5 rounded bg-blue-100 text-blue-700 border border-blue-200">
                       {(item as any).badge}
                     </span>
                   )}
                   {item.hasChevron && (
-                    <ChevronRight className="w-3.5 h-3.5 text-gray-400" />
+                    <ChevronRight className="w-4 h-4 text-gray-400" />
                   )}
                 </div>
               </Link>

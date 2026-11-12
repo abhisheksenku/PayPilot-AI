@@ -69,17 +69,16 @@ body {
 }
 
 .ag-theme-quartz .ag-header-cell {
-  font-family: 'JetBrains Mono', ui-monospace, monospace !important;
-  font-size: 12px !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.05em !important;
-  font-weight: 700 !important;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: #334155 !important;
 }
 
 .ag-theme-quartz .ag-cell {
   display: flex !important;
   align-items: center !important;
-  font-family: 'JetBrains Mono', ui-monospace, monospace !important;
-  font-size: 13.5px !important;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif !important;
+  font-size: 14px !important;
   color: #0F172A !important;
 }

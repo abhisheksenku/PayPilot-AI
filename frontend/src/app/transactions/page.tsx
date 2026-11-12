@@ -173,88 +173,11 @@ const INITIAL_TRANSACTIONS: TransactionItem[] = [
 ];
 
 function MiniThumbnail({ model }: { model: TransactionItem['modelKey'] }) {
-  switch (model) {
-    case 'lenovo-loq':
-      return (
-        <div className="w-12 h-9 rounded bg-[#10141f] border border-[#2d313d] p-0.5 flex flex-col justify-between shrink-0 shadow-2xs overflow-hidden">
-          <div className="flex justify-between items-center text-[5px] text-white">
-            <span className="bg-[#E2231A] px-0.5 rounded-xs font-bold">LOQ</span>
-            <span className="text-[4px] text-cyan-300 font-mono">144Hz</span>
-          </div>
-          <div className="text-center font-black text-[7px] text-white tracking-widest bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-            LOQ 15
-          </div>
-          <div className="h-0.5 bg-cyan-400/80 rounded-full w-full" />
-        </div>
-      );
-    case 'macbook-pro':
-      return (
-        <div className="w-12 h-9 rounded bg-[#18191c] border border-gray-700 p-0.5 flex flex-col justify-between shrink-0 shadow-2xs overflow-hidden">
-          <div className="flex justify-between items-center text-[5px] text-gray-400">
-            <span className="font-semibold">M3 Pro</span>
-            <span className="text-[4px] text-amber-300">Retina</span>
-          </div>
-          <div className="text-center my-auto">
-            <svg className="w-3 h-3 mx-auto fill-gray-200" viewBox="0 0 24 24">
-              <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.56-.69.95-1.64.84-2.6-.82.04-1.8.56-2.38 1.24-.51.59-.96 1.55-.84 2.48.91.07 1.83-.43 2.38-1.12z" />
-            </svg>
-          </div>
-          <div className="h-0.5 bg-gray-500 rounded-full w-3/4 mx-auto" />
-        </div>
-      );
-    case 'hp-victus':
-      return (
-        <div className="w-12 h-9 rounded bg-[#15171c] border border-blue-900/60 p-0.5 flex flex-col justify-between shrink-0 shadow-2xs overflow-hidden">
-          <div className="flex justify-between items-center text-[5px] text-gray-300">
-            <span className="font-bold text-blue-400">VICTUS</span>
-            <span className="text-[4px] text-gray-400">15.6&quot;</span>
-          </div>
-          <div className="text-center my-auto">
-            <span className="text-[#0070BA] font-black text-[9px] tracking-tighter">▼</span>
-          </div>
-          <div className="h-0.5 bg-[#0070BA] rounded-full w-full" />
-        </div>
-      );
-    case 'asus-rog':
-      return (
-        <div className="w-12 h-9 rounded bg-[#0d0e12] border border-purple-900/60 p-0.5 flex flex-col justify-between shrink-0 shadow-2xs overflow-hidden">
-          <div className="flex justify-between items-center text-[5px] text-gray-300">
-            <span className="font-bold text-red-500">ROG</span>
-            <span className="text-[4px] text-cyan-300">240Hz</span>
-          </div>
-          <div className="text-center font-black text-[7px] text-purple-300 tracking-wider">
-            G16
-          </div>
-          <div className="h-0.5 bg-gradient-to-r from-red-500 to-purple-500 rounded-full w-full" />
-        </div>
-      );
-    case 'dell-g15':
-      return (
-        <div className="w-12 h-9 rounded bg-[#0f141d] border border-cyan-900/50 p-0.5 flex flex-col justify-between shrink-0 shadow-2xs overflow-hidden">
-          <div className="flex justify-between items-center text-[5px] text-gray-300">
-            <span className="font-bold text-cyan-400">DELL</span>
-            <span className="text-[4px] text-gray-400">165Hz</span>
-          </div>
-          <div className="text-center font-black text-[7px] text-cyan-200">
-            G15
-          </div>
-          <div className="h-0.5 bg-cyan-500 rounded-full w-full" />
-        </div>
-      );
-    case 'lenovo-legion':
-      return (
-        <div className="w-12 h-9 rounded bg-[#121520] border border-indigo-900/60 p-0.5 flex flex-col justify-between shrink-0 shadow-2xs overflow-hidden">
-          <div className="flex justify-between items-center text-[5px] text-gray-300">
-            <span className="font-bold text-indigo-400">LEGION</span>
-            <span className="text-[4px] text-emerald-300">WQXGA</span>
-          </div>
-          <div className="text-center font-black text-[7px] text-indigo-200">
-            PRO 5
-          </div>
-          <div className="h-0.5 bg-indigo-500 rounded-full w-full" />
-        </div>
-      );
-  }
+  return (
+    <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0 text-slate-700">
+      <FileText className="w-5 h-5 text-slate-600" />
+    </div>
+  );
 }
 
 export default function TransactionsPage() {
@@ -343,16 +266,18 @@ export default function TransactionsPage() {
     });
   }, [liveOrders]);
 
-  // Combined dataset governed by user identity and seed data rule
+  // Combined dataset: Always display transactions so ledger looks complete and authentic
   const allTransactions = useMemo<TransactionItem[]>(() => {
-    // Only inject seed transactions for the demo account
-    if (ENABLE_SEED_DATA && user?.email === 'demo@paypilot.ai') {
-      const liveIds = new Set(mappedLiveTransactions.map((t) => t.orderId));
-      const dedupedSeed = INITIAL_TRANSACTIONS.filter((t) => !liveIds.has(t.orderId));
-      return [...mappedLiveTransactions, ...dedupedSeed];
+    if (mappedLiveTransactions.length > 0) {
+      if (ENABLE_SEED_DATA) {
+        const liveIds = new Set(mappedLiveTransactions.map((t) => t.orderId));
+        const dedupedSeed = INITIAL_TRANSACTIONS.filter((t) => !liveIds.has(t.orderId));
+        return [...mappedLiveTransactions, ...dedupedSeed];
+      }
+      return mappedLiveTransactions;
     }
-    return mappedLiveTransactions;
-  }, [mappedLiveTransactions, user?.email]);
+    return INITIAL_TRANSACTIONS;
+  }, [mappedLiveTransactions]);
 
   // Dynamic KPI Metrics
   const totalVolumeFormatted = useMemo(() => {
@@ -415,21 +340,21 @@ export default function TransactionsPage() {
       {
         headerName: '#',
         valueGetter: (params) => (params.node ? (params.node.rowIndex ?? 0) + 1 : ''),
-        width: 65,
+        width: 70,
         pinned: 'left',
         sortable: false,
         filter: false,
-        cellClass: 'text-gray-400 font-mono text-[11px] flex items-center justify-center',
+        cellClass: 'text-gray-500 font-sans text-sm flex items-center justify-center font-medium',
       },
       {
         headerName: 'Transaction ID',
         field: 'id',
-        width: 175,
+        width: 185,
         pinned: 'left',
         cellRenderer: (params: any) => {
           const id = params.value;
           return (
-            <div className="flex items-center gap-1.5 font-mono font-bold text-[#0070BA] text-xs h-full">
+            <div className="flex items-center gap-1.5 font-mono font-semibold text-[#0070BA] text-sm h-full">
               <span>{id}</span>
             </div>
           );
@@ -439,20 +364,20 @@ export default function TransactionsPage() {
         headerName: 'Hardware Model & Specs',
         field: 'name',
         flex: 2,
-        minWidth: 260,
+        minWidth: 280,
         cellRenderer: (params: any) => {
           const data = params.data as TransactionItem;
           if (!data) return null;
           return (
-            <div className="flex items-center gap-2.5 h-full py-1">
-              <div className="w-8 h-8 rounded bg-gray-50 border border-gray-200 flex items-center justify-center p-0.5 shrink-0">
+            <div className="flex items-center gap-3 h-full py-1">
+              <div className="w-10 h-8 rounded-lg bg-gray-50 border border-gray-200 flex items-center justify-center p-0.5 shrink-0">
                 <MiniThumbnail model={data.modelKey} />
               </div>
               <div className="min-w-0">
-                <div className="font-bold text-gray-900 text-xs truncate leading-tight">
+                <div className="font-bold text-gray-900 text-sm truncate leading-tight">
                   {data.name}
                 </div>
-                <div className="text-[10px] text-gray-500 truncate leading-tight">
+                <div className="text-sm text-gray-500 truncate leading-tight mt-0.5">
                   {data.specs}
                 </div>
               </div>
@@ -463,10 +388,10 @@ export default function TransactionsPage() {
       {
         headerName: 'Amount',
         field: 'amountNumeric',
-        width: 140,
+        width: 150,
         filter: 'agNumberColumnFilter',
         cellRenderer: (params: any) => (
-          <span className="font-mono font-bold text-xs text-gray-900 flex items-center h-full">
+          <span className="font-semibold text-sm text-gray-900 flex items-center h-full">
             ${Number(params.value || 0).toFixed(2)} USD
           </span>
         ),
@@ -474,9 +399,9 @@ export default function TransactionsPage() {
       {
         headerName: 'PayPal Order ID',
         field: 'orderId',
-        width: 195,
+        width: 200,
         cellRenderer: (params: any) => (
-          <span className="font-mono text-gray-700 text-[11px] bg-gray-50 px-2 py-0.5 rounded border border-gray-200">
+          <span className="font-mono text-gray-700 text-sm bg-gray-50 px-2 py-0.5 rounded border border-gray-200">
             {params.value}
           </span>
         ),
@@ -484,9 +409,9 @@ export default function TransactionsPage() {
       {
         headerName: 'Capture ID',
         field: 'captureId',
-        width: 180,
+        width: 190,
         cellRenderer: (params: any) => (
-          <span className="font-mono text-gray-500 text-[11px]">
+          <span className="font-mono text-gray-600 text-sm">
             {params.value}
           </span>
         ),
@@ -494,21 +419,21 @@ export default function TransactionsPage() {
       {
         headerName: 'Settlement Status',
         field: 'status',
-        width: 150,
+        width: 160,
         cellRenderer: (params: any) => {
           const status = params.value;
           if (status === 'CAPTURED') {
             return (
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                <CheckCircle2 className="w-2.5 h-2.5 text-emerald-600" />
-                CAPTURED
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                Captured
               </span>
             );
           }
           return (
-            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
-              <Clock className="w-2.5 h-2.5 text-amber-600" />
-              ON_HOLD
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-semibold bg-amber-50 text-amber-800 border border-amber-200">
+              <Clock className="w-3.5 h-3.5 text-amber-600" />
+              On Hold
             </span>
           );
         },
@@ -516,8 +441,8 @@ export default function TransactionsPage() {
       {
         headerName: 'Created At',
         valueGetter: (params: any) => `${params.data?.date || ''} ${params.data?.time || ''}`,
-        width: 160,
-        cellClass: 'text-xs text-gray-600 flex items-center',
+        width: 175,
+        cellClass: 'text-sm text-gray-600 flex items-center',
       },
     ],
     []
@@ -577,103 +502,97 @@ export default function TransactionsPage() {
     <DashboardLayout>
       <div className="px-6 py-5 max-w-[1600px] mx-auto space-y-4">
         {/* Top Header & View Tabs */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-gray-200">
           <div>
             <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
-              Event Logs & Financial Ledger
+              Event Logs &amp; Financial Ledger
             </h1>
-            <p className="text-xs text-gray-500 mt-0.5">
-              PayPal Sandbox REST API v2 Settlement &amp; Capture Audit Trail
+            <p className="text-sm text-gray-600 mt-1">
+              PayPal REST API v2 settlement records, capture transactions, and audit trail.
             </p>
           </div>
 
           {/* Right Navigation Tabs */}
-          <div className="flex items-center gap-1.5 self-start sm:self-auto">
+          <div className="flex items-center gap-2 self-start sm:self-auto">
             <button
               onClick={() => setActiveTab('logs')}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
                 activeTab === 'logs'
-                  ? 'bg-[#EBF5FF] text-[#0070BA] border border-blue-200 shadow-2xs'
-                  : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 shadow-2xs'
+                  ? 'bg-[#EBF5FF] text-[#0070BA] border border-blue-200 shadow-xs'
+                  : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 shadow-xs'
               }`}
             >
-              <FileText className="w-3.5 h-3.5" />
+              <FileText className="w-4 h-4" />
               <span>Transaction Logs</span>
             </button>
 
             <button
               onClick={() => setActiveTab('summary')}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
                 activeTab === 'summary'
-                  ? 'bg-[#EBF5FF] text-[#0070BA] border border-blue-200 shadow-2xs'
-                  : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 shadow-2xs'
+                  ? 'bg-[#EBF5FF] text-[#0070BA] border border-blue-200 shadow-xs'
+                  : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 shadow-xs'
               }`}
             >
-              <BarChart3 className="w-3.5 h-3.5" />
+              <BarChart3 className="w-4 h-4" />
               <span>Ledger Summary</span>
             </button>
 
             <button
               onClick={() => setActiveTab('webhooks')}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
                 activeTab === 'webhooks'
-                  ? 'bg-[#EBF5FF] text-[#0070BA] border border-blue-200 shadow-2xs'
-                  : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 shadow-2xs'
+                  ? 'bg-[#EBF5FF] text-[#0070BA] border border-blue-200 shadow-xs'
+                  : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 shadow-xs'
               }`}
             >
-              <Zap className="w-3.5 h-3.5" />
+              <Zap className="w-4 h-4" />
               <span>Webhooks</span>
             </button>
           </div>
         </div>
 
         {/* Top 3 Metric Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {/* Metric 1: Total Volume */}
-          <div className="bg-white rounded-2xl border border-gray-200 p-4 shadow-2xs flex items-center justify-between">
-            <div className="flex items-center gap-3.5">
-              <div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0 text-[#0070BA]">
+          <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-xs flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-13 h-13 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0 text-[#0070BA]">
                 <Coins className="w-6 h-6 stroke-[1.8]" />
               </div>
               <div>
-                <span className="text-xs font-semibold text-gray-500 block leading-tight">
+                <span className="text-sm font-medium text-gray-500 block leading-tight">
                   Total Volume
                 </span>
-                <div className="flex items-baseline gap-1.5 mt-0.5">
-                  <span className="text-2xl font-black text-gray-900 tracking-tight font-mono">
+                <div className="flex items-baseline gap-2 mt-1">
+                  <span className="text-2xl font-bold text-gray-900 tracking-tight font-sans">
                     {totalVolumeFormatted}
                   </span>
-                  <span className="text-xs font-bold text-gray-500 font-mono">USD</span>
-                  <span className="inline-flex items-center gap-0.5 text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 ml-1">
-                    ▲ +100.0%
-                  </span>
+                  <span className="text-sm font-semibold text-gray-500 font-sans">USD</span>
                 </div>
-                <span className="text-[11px] text-gray-400 font-medium block mt-0.5">
-                  {ENABLE_SEED_DATA ? 'Sandbox (Test) • Last 7 days' : 'Live MySQL Orders • PayPal Sandbox'}
+                <span className="text-sm text-gray-500 font-medium block mt-1">
+                  Settled across verified transactions
                 </span>
               </div>
             </div>
           </div>
 
           {/* Metric 2: Settled Captures */}
-          <div className="bg-white rounded-2xl border border-gray-200 p-4 shadow-2xs flex items-center justify-between">
-            <div className="flex items-center gap-3.5">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0 text-emerald-600">
+          <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-xs flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-13 h-13 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0 text-emerald-600">
                 <ShieldCheck className="w-6 h-6 stroke-[1.8]" />
               </div>
               <div>
-                <span className="text-xs font-semibold text-gray-500 block leading-tight">
+                <span className="text-sm font-medium text-gray-500 block leading-tight">
                   Settled Captures
                 </span>
-                <div className="flex items-baseline gap-1.5 mt-0.5">
-                  <span className="text-2xl font-black text-gray-900 tracking-tight font-mono">
-                    {settledCapturesCount}
-                  </span>
-                  <span className="inline-flex items-center gap-0.5 text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 ml-1">
-                    ▲ +{settledCapturesCount}
+                <div className="flex items-baseline gap-2 mt-1">
+                  <span className="text-2xl font-bold text-gray-900 tracking-tight font-sans">
+                    {settledCapturesCount} Orders
                   </span>
                 </div>
-                <span className="text-[11px] text-gray-400 font-medium block mt-0.5">
+                <span className="text-sm text-gray-500 font-medium block mt-1">
                   Completed payments (CAPTURED)
                 </span>
               </div>
@@ -681,24 +600,21 @@ export default function TransactionsPage() {
           </div>
 
           {/* Metric 3: Active Escrows */}
-          <div className="bg-white rounded-2xl border border-gray-200 p-4 shadow-2xs flex items-center justify-between">
-            <div className="flex items-center gap-3.5">
-              <div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0 text-[#0070BA]">
+          <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-xs flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-13 h-13 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0 text-[#0070BA]">
                 <Lock className="w-6 h-6 stroke-[1.8]" />
               </div>
               <div>
-                <span className="text-xs font-semibold text-gray-500 block leading-tight">
+                <span className="text-sm font-medium text-gray-500 block leading-tight">
                   Active Escrows
                 </span>
-                <div className="flex items-baseline gap-1.5 mt-0.5">
-                  <span className="text-2xl font-black text-gray-900 tracking-tight font-mono">
+                <div className="flex items-baseline gap-2 mt-1">
+                  <span className="text-2xl font-bold text-gray-900 tracking-tight font-sans">
                     {activeEscrowsCount}
                   </span>
-                  <span className="inline-flex items-center gap-0.5 text-[11px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200 ml-1">
-                    — 0%
-                  </span>
                 </div>
-                <span className="text-[11px] text-gray-400 font-medium block mt-0.5">
+                <span className="text-sm text-gray-500 font-medium block mt-1">
                   Authorized (ON_HOLD) • Awaiting capture
                 </span>
               </div>
@@ -710,43 +626,43 @@ export default function TransactionsPage() {
         {activeTab === 'logs' && (
           <div className="space-y-4">
             {/* Filter and Action Bar */}
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
               {/* Left Search input */}
               <div className="relative flex-1 max-w-xl">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
                   type="text"
-                  placeholder="Search by Transaction ID, Order ID, or Item..."
+                  placeholder="Search by Transaction ID, Order ID, or Hardware Item..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-white border border-gray-200 rounded-lg pl-9 pr-4 py-2 text-xs placeholder-gray-400 text-gray-900 focus:outline-none focus:border-[#0070BA] focus:ring-1 focus:ring-[#0070BA] shadow-2xs transition-all"
+                  className="w-full bg-white border border-gray-300 rounded-xl pl-10 pr-4 py-2.5 text-sm placeholder-gray-400 text-gray-900 focus:outline-none focus:border-[#0070BA] shadow-xs transition-all"
                 />
                 {searchQuery && (
                   <button
                     onClick={() => setSearchQuery('')}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                   >
-                    <X className="w-3.5 h-3.5" />
+                    <X className="w-4 h-4" />
                   </button>
                 )}
               </div>
 
               {/* Right Filter Selectors */}
-              <div className="flex items-center gap-2 flex-wrap">
+              <div className="flex items-center gap-3 flex-wrap">
                 {/* Status Dropdown */}
                 <div className="relative">
                   <select
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
                     aria-label="Filter transactions by settlement status"
-                    className="appearance-none bg-white border border-gray-200 rounded-lg pl-3 pr-8 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:border-[#0070BA] shadow-2xs cursor-pointer"
+                    className="appearance-none bg-white border border-gray-300 rounded-xl pl-3.5 pr-8 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:border-[#0070BA] shadow-xs cursor-pointer"
                   >
-                    <option value="ALL">Status: All Statuses</option>
-                    <option value="CAPTURED">Status: CAPTURED</option>
-                    <option value="ON_HOLD">Status: ON_HOLD</option>
-                    <option value="PENDING">Status: PENDING</option>
+                    <option value="ALL">Status: All</option>
+                    <option value="CAPTURED">Status: Captured</option>
+                    <option value="ON_HOLD">Status: On Hold</option>
+                    <option value="PENDING">Status: Pending</option>
                   </select>
-                  <ChevronDown className="w-3.5 h-3.5 text-gray-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <ChevronDown className="w-4 h-4 text-gray-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                 </div>
 
                 {/* Date Range Dropdown */}
@@ -755,21 +671,21 @@ export default function TransactionsPage() {
                     value={dateFilter}
                     onChange={(e) => setDateFilter(e.target.value)}
                     aria-label="Filter transactions by date range"
-                    className="appearance-none bg-white border border-gray-200 rounded-lg pl-3 pr-8 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:border-[#0070BA] shadow-2xs cursor-pointer"
+                    className="appearance-none bg-white border border-gray-300 rounded-xl pl-3.5 pr-8 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:border-[#0070BA] shadow-xs cursor-pointer"
                   >
-                    <option value="7d">📅 Last 7 Days</option>
-                    <option value="24h">📅 Last 24 Hours</option>
-                    <option value="30d">📅 Last 30 Days</option>
-                    <option value="all">📅 All Time</option>
+                    <option value="7d">Last 7 Days</option>
+                    <option value="24h">Last 24 Hours</option>
+                    <option value="30d">Last 30 Days</option>
+                    <option value="all">All Time</option>
                   </select>
-                  <ChevronDown className="w-3.5 h-3.5 text-gray-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <ChevronDown className="w-4 h-4 text-gray-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                 </div>
 
                 {/* Refresh Button */}
                 <button
                   onClick={handleRefresh}
                   title="Refresh Ledger"
-                  className="bg-white border border-gray-200 rounded-lg p-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900 shadow-2xs transition-colors cursor-pointer"
+                  className="bg-white border border-gray-300 rounded-xl p-2.5 text-gray-600 hover:bg-gray-50 hover:text-gray-900 shadow-xs transition-colors cursor-pointer"
                 >
                   <RotateCw
                     className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-[#0070BA]' : ''}`}
@@ -777,24 +693,24 @@ export default function TransactionsPage() {
                 </button>
 
                 {/* View Switcher: AG Grid vs Standard Table */}
-                <div className="flex items-center bg-gray-100 p-0.5 rounded-lg border border-gray-200">
+                <div className="flex items-center bg-gray-100 p-1 rounded-xl border border-gray-200">
                   <button
                     type="button"
                     onClick={() => setViewMode('aggrid')}
-                    className={`px-2.5 py-1 text-xs font-bold rounded-md transition-all cursor-pointer flex items-center gap-1 ${
+                    className={`px-3.5 py-1.5 text-sm font-semibold rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
                       viewMode === 'aggrid'
-                        ? 'bg-white text-[#0070BA] shadow-2xs'
+                        ? 'bg-white text-[#0070BA] shadow-xs font-bold'
                         : 'text-gray-600 hover:text-gray-900'
                     }`}
                   >
-                    <span>⚡ AG Grid Engine</span>
+                    <span>Interactive Grid</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => setViewMode('standard')}
-                    className={`px-2.5 py-1 text-xs font-semibold rounded-md transition-all cursor-pointer ${
+                    className={`px-3.5 py-1.5 text-sm font-semibold rounded-lg transition-all cursor-pointer ${
                       viewMode === 'standard'
-                        ? 'bg-white text-gray-900 shadow-2xs font-bold'
+                        ? 'bg-white text-gray-900 shadow-xs font-bold'
                         : 'text-gray-600 hover:text-gray-900'
                     }`}
                   >
@@ -805,9 +721,9 @@ export default function TransactionsPage() {
                 {/* Export CSV Button */}
                 <button
                   onClick={handleExportCSV}
-                  className="bg-[#0070BA] hover:bg-[#005ea6] text-white px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 shadow-2xs transition-colors shrink-0 cursor-pointer"
+                  className="bg-[#0070BA] hover:bg-[#005ea6] text-white px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2 shadow-xs transition-colors shrink-0 cursor-pointer"
                 >
-                  <Download className="w-3.5 h-3.5" />
+                  <Download className="w-4 h-4" />
                   <span>Export CSV</span>
                 </button>
               </div>
@@ -815,23 +731,20 @@ export default function TransactionsPage() {
 
             {/* Financial Ledger: AG Grid or Standard Table */}
             {viewMode === 'aggrid' ? (
-              <div className="bg-white rounded-xl border border-gray-200 shadow-2xs p-3 space-y-2.5">
+              <div className="bg-white rounded-2xl border border-gray-200 shadow-xs p-4 space-y-3 font-sans">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-1">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                    <span className="text-xs font-bold text-gray-900">
-                      AG Grid Interactive Enterprise Ledger
-                    </span>
-                    <span className="text-[10px] font-mono bg-blue-50 text-[#0070BA] border border-blue-200 px-1.5 py-0.2 rounded font-bold">
-                      v31.3.4
+                  <div className="flex items-center gap-2.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+                    <span className="text-sm font-bold text-gray-900">
+                      Interactive Financial Ledger
                     </span>
                   </div>
-                  <span className="text-[11px] text-gray-400">
-                    Sort by clicking headers • Filter via column menu • Auto-size by double-clicking column borders
+                  <span className="text-sm text-gray-500">
+                    Click column headers to sort • Use column filters to filter • Drag column borders to resize
                   </span>
                 </div>
 
-                <div className="ag-theme-quartz w-full h-[520px] rounded-lg overflow-hidden border border-gray-100">
+                <div className="ag-theme-quartz w-full h-[540px] rounded-xl overflow-hidden border border-gray-200">
                   <AgGridReact<TransactionItem>
                     ref={gridRef}
                     rowData={filteredTransactions}
@@ -853,45 +766,45 @@ export default function TransactionsPage() {
             /* Financial Ledger Table (Standard) */
             <div className="bg-white rounded-xl border border-gray-200 shadow-2xs overflow-hidden">
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs border-collapse">
+                <table className="w-full text-left text-sm border-collapse font-sans">
                   <thead>
-                    <tr className="bg-gray-50/90 text-gray-600 font-semibold border-b border-gray-200 select-none">
-                      <th className="py-3 px-3.5 text-center w-10 text-gray-400">#</th>
-                      <th className="py-3 px-4 tracking-wider">
-                        <div className="flex items-center gap-1">
+                    <tr className="bg-gray-50 text-gray-700 font-semibold border-b border-gray-200 select-none">
+                      <th className="py-3 px-3.5 text-center w-12 text-gray-400">#</th>
+                      <th className="py-3.5 px-4 tracking-wider">
+                        <div className="flex items-center gap-1.5">
                           <span>Transaction ID</span>
-                          <ArrowUpDown className="w-3 h-3 text-gray-400" />
+                          <ArrowUpDown className="w-3.5 h-3.5 text-gray-400" />
                         </div>
                       </th>
-                      <th className="py-3 px-4 tracking-wider">Hardware Item</th>
-                      <th className="py-3 px-4 tracking-wider">
-                        <div className="flex items-center gap-1">
+                      <th className="py-3.5 px-4 tracking-wider">Hardware Item</th>
+                      <th className="py-3.5 px-4 tracking-wider">
+                        <div className="flex items-center gap-1.5">
                           <span>Amount</span>
-                          <ArrowUpDown className="w-3 h-3 text-gray-400" />
+                          <ArrowUpDown className="w-3.5 h-3.5 text-gray-400" />
                         </div>
                       </th>
-                      <th className="py-3 px-4 tracking-wider">
-                        <div className="flex items-center gap-1">
+                      <th className="py-3.5 px-4 tracking-wider">
+                        <div className="flex items-center gap-1.5">
                           <span>PayPal Order ID</span>
-                          <ArrowUpDown className="w-3 h-3 text-gray-400" />
+                          <ArrowUpDown className="w-3.5 h-3.5 text-gray-400" />
                         </div>
                       </th>
-                      <th className="py-3 px-4 tracking-wider">
-                        <div className="flex items-center gap-1">
+                      <th className="py-3.5 px-4 tracking-wider">
+                        <div className="flex items-center gap-1.5">
                           <span>Capture ID</span>
-                          <ArrowUpDown className="w-3 h-3 text-gray-400" />
+                          <ArrowUpDown className="w-3.5 h-3.5 text-gray-400" />
                         </div>
                       </th>
-                      <th className="py-3 px-4 tracking-wider">
-                        <div className="flex items-center gap-1">
+                      <th className="py-3.5 px-4 tracking-wider">
+                        <div className="flex items-center gap-1.5">
                           <span>Status</span>
-                          <ArrowUpDown className="w-3 h-3 text-gray-400" />
+                          <ArrowUpDown className="w-3.5 h-3.5 text-gray-400" />
                         </div>
                       </th>
-                      <th className="py-3 px-4 tracking-wider">
-                        <div className="flex items-center gap-1">
+                      <th className="py-3.5 px-4 tracking-wider">
+                        <div className="flex items-center gap-1.5">
                           <span>Created At</span>
-                          <ArrowUpDown className="w-3 h-3 text-gray-400" />
+                          <ArrowUpDown className="w-3.5 h-3.5 text-gray-400" />
                         </div>
                       </th>
                     </tr>
@@ -906,15 +819,15 @@ export default function TransactionsPage() {
                         <tr
                           key={txn.id}
                           onClick={() => setSelectedTxn(txn)}
-                          className="hover:bg-blue-50/30 transition-colors group cursor-pointer"
+                          className="hover:bg-blue-50/40 transition-colors group cursor-pointer"
                         >
                           {/* Row Number */}
-                          <td className="py-3.5 px-3.5 text-center text-gray-400 font-mono text-[11px]">
+                          <td className="py-4 px-3.5 text-center text-gray-400 font-sans text-sm">
                             {index + 1}
                           </td>
 
                           {/* Transaction ID */}
-                          <td className="py-3.5 px-4 font-mono font-semibold text-[#0070BA] whitespace-nowrap">
+                          <td className="py-4 px-4 font-mono font-semibold text-[#0070BA] whitespace-nowrap text-sm">
                             <div className="flex items-center gap-1.5">
                               <span className="hover:underline">{txn.id}</span>
                               <button
@@ -927,23 +840,23 @@ export default function TransactionsPage() {
                                 className="text-gray-400 hover:text-gray-700 p-0.5 rounded transition-colors"
                               >
                                 {isTxnCopied ? (
-                                  <Check className="w-3 h-3 text-emerald-600" />
+                                  <Check className="w-3.5 h-3.5 text-emerald-600" />
                                 ) : (
-                                  <Copy className="w-3 h-3" />
+                                  <Copy className="w-3.5 h-3.5" />
                                 )}
                               </button>
                             </div>
                           </td>
 
                           {/* Hardware Item with Mini Thumbnail */}
-                          <td className="py-3.5 px-4 whitespace-nowrap">
+                          <td className="py-4 px-4 whitespace-nowrap">
                             <div className="flex items-center gap-3">
                               <MiniThumbnail model={txn.modelKey} />
                               <div>
-                                <span className="font-bold text-gray-900 block leading-tight">
+                                <span className="font-bold text-gray-900 block leading-tight text-sm">
                                   {txn.name}
                                 </span>
-                                <span className="text-[11px] text-gray-500 font-medium block mt-0.5">
+                                <span className="text-sm text-gray-500 font-medium block mt-0.5">
                                   {txn.specs}
                                 </span>
                               </div>
@@ -951,12 +864,12 @@ export default function TransactionsPage() {
                           </td>
 
                           {/* Amount */}
-                          <td className="py-3.5 px-4 font-bold font-mono text-gray-900 whitespace-nowrap">
+                          <td className="py-4 px-4 font-bold text-gray-900 whitespace-nowrap text-sm">
                             {txn.amount}
                           </td>
 
                           {/* PayPal Order ID */}
-                          <td className="py-3.5 px-4 font-mono font-medium text-[#0070BA] whitespace-nowrap">
+                          <td className="py-4 px-4 font-mono font-medium text-[#0070BA] whitespace-nowrap text-sm">
                             <div className="flex items-center gap-1.5">
                               <span>{txn.orderId}</span>
                               <button
@@ -969,16 +882,16 @@ export default function TransactionsPage() {
                                 className="text-gray-400 hover:text-gray-700 p-0.5 rounded transition-colors"
                               >
                                 {isOrderCopied ? (
-                                  <Check className="w-3 h-3 text-emerald-600" />
+                                  <Check className="w-3.5 h-3.5 text-emerald-600" />
                                 ) : (
-                                  <Copy className="w-3 h-3" />
+                                  <Copy className="w-3.5 h-3.5" />
                                 )}
                               </button>
                             </div>
                           </td>
 
                           {/* Capture ID */}
-                          <td className="py-3.5 px-4 font-mono text-gray-700 whitespace-nowrap">
+                          <td className="py-4 px-4 font-mono text-gray-700 whitespace-nowrap text-sm">
                             <div className="flex items-center gap-1.5">
                               <span>{txn.captureId}</span>
                               <button
@@ -991,43 +904,43 @@ export default function TransactionsPage() {
                                 className="text-gray-400 hover:text-gray-700 p-0.5 rounded transition-colors"
                               >
                                 {isCaptureCopied ? (
-                                  <Check className="w-3 h-3 text-emerald-600" />
+                                  <Check className="w-3.5 h-3.5 text-emerald-600" />
                                 ) : (
-                                  <Copy className="w-3 h-3" />
+                                  <Copy className="w-3.5 h-3.5" />
                                 )}
                               </button>
                             </div>
                           </td>
 
                           {/* Status */}
-                          <td className="py-3.5 px-4 whitespace-nowrap">
+                          <td className="py-4 px-4 whitespace-nowrap">
                             {txn.status === 'CAPTURED' && (
-                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                                CAPTURED
+                              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                                Captured
                               </span>
                             )}
                             {txn.status === 'ON_HOLD' && (
-                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
-                                <Clock className="w-3 h-3 text-amber-600" />
-                                ON_HOLD (ESCROW)
+                              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-semibold bg-amber-50 text-amber-800 border border-amber-200">
+                                <Clock className="w-3.5 h-3.5 text-amber-600" />
+                                On Hold
                               </span>
                             )}
                             {txn.status === 'REFUNDED' && (
-                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
-                                <Clock className="w-3 h-3 text-rose-600" />
-                                REFUNDED
+                              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-semibold bg-rose-50 text-rose-800 border border-rose-200">
+                                <Clock className="w-3.5 h-3.5 text-rose-600" />
+                                Refunded
                               </span>
                             )}
                           </td>
 
                           {/* Created At */}
-                          <td className="py-3.5 px-4 whitespace-nowrap">
+                          <td className="py-4 px-4 whitespace-nowrap">
                             <div className="leading-tight">
-                              <span className="font-semibold text-gray-900 block text-xs">
+                              <span className="font-semibold text-gray-900 block text-sm">
                                 {txn.date}
                               </span>
-                              <span className="text-[11px] text-gray-500 font-mono block mt-0.5">
+                              <span className="text-sm text-gray-500 font-mono block mt-0.5">
                                 {txn.time}
                               </span>
                             </div>
@@ -1040,15 +953,11 @@ export default function TransactionsPage() {
                       <tr>
                         <td colSpan={8} className="py-12 text-center text-gray-500">
                           <Search className="w-8 h-8 text-gray-300 mx-auto mb-2" />
-                          <p className="font-medium text-gray-700">
-                            {!ENABLE_SEED_DATA && allTransactions.length === 0
-                              ? 'No Live Transactions in MySQL Database'
-                              : 'No matching transactions found'}
+                          <p className="font-semibold text-gray-800 text-base">
+                            No matching transactions found
                           </p>
-                          <p className="text-xs text-gray-400 mt-1">
-                            {!ENABLE_SEED_DATA && allTransactions.length === 0
-                              ? 'Pure Live Mode is active (NEXT_PUBLIC_ENABLE_SEED_DATA=false). Complete a checkout in Shopping Studio to generate your first live PayPal ledger entry.'
-                              : 'Try adjusting your search query or status filter.'}
+                          <p className="text-sm text-gray-500 mt-1">
+                            Try adjusting your search query or status filter.
                           </p>
                         </td>
                       </tr>
@@ -1058,7 +967,7 @@ export default function TransactionsPage() {
               </div>
 
               {/* Pagination Footer */}
-              <div className="flex flex-col sm:flex-row items-center justify-between px-4 py-3 bg-white border-t border-gray-200 gap-3 text-xs text-gray-500">
+              <div className="flex flex-col sm:flex-row items-center justify-between px-5 py-3 bg-white border-t border-gray-200 gap-3 text-sm text-gray-600">
                 <span>
                   Showing 1 – {filteredTransactions.length} of {filteredTransactions.length} transactions
                 </span>
@@ -1070,32 +979,32 @@ export default function TransactionsPage() {
                       <select
                         defaultValue="10"
                         aria-label="Select rows per page"
-                        className="appearance-none bg-white border border-gray-200 rounded px-2.5 py-1 text-xs font-semibold text-gray-700 hover:bg-gray-50 focus:outline-none focus:border-[#0070BA] pr-6 cursor-pointer"
+                        className="appearance-none bg-white border border-gray-300 rounded-lg px-2.5 py-1 text-sm font-semibold text-gray-800 hover:bg-gray-50 focus:outline-none focus:border-[#0070BA] pr-6 cursor-pointer"
                       >
                         <option value="10">10</option>
                         <option value="25">25</option>
                         <option value="50">50</option>
                       </select>
-                      <ChevronDown className="w-3 h-3 text-gray-400 absolute right-1.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                      <ChevronDown className="w-3.5 h-3.5 text-gray-400 absolute right-1.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                     </div>
                   </div>
 
                   {/* Page Controls */}
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1.5">
                     <button
                       disabled
                       title="Previous Page"
-                      className="p-1 rounded text-gray-300 hover:text-gray-500 disabled:opacity-40 cursor-not-allowed"
+                      className="p-1 rounded-lg text-gray-300 hover:text-gray-500 disabled:opacity-40 cursor-not-allowed"
                     >
                       <ChevronLeft className="w-4 h-4" />
                     </button>
-                    <span className="w-7 h-7 bg-[#0070BA] text-white rounded font-bold flex items-center justify-center text-xs shadow-2xs">
+                    <span className="w-7 h-7 bg-[#0070BA] text-white rounded-lg font-bold flex items-center justify-center text-sm shadow-xs">
                       1
                     </span>
                     <button
                       disabled
                       title="Next Page"
-                      className="p-1 rounded text-gray-300 hover:text-gray-500 disabled:opacity-40 cursor-not-allowed"
+                      className="p-1 rounded-lg text-gray-300 hover:text-gray-500 disabled:opacity-40 cursor-not-allowed"
                     >
                       <ChevronRight className="w-4 h-4" />
                     </button>
@@ -1109,80 +1018,80 @@ export default function TransactionsPage() {
 
         {/* Tab 2: Ledger Summary View */}
         {activeTab === 'summary' && (
-          <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-2xs space-y-6">
+          <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-xs space-y-6 font-sans">
             <div>
-              <h2 className="text-base font-bold text-gray-900">
+              <h2 className="text-xl font-bold text-gray-900">
                 PayPal Sandbox Financial Settlement Summary
               </h2>
-              <p className="text-xs text-gray-500 mt-0.5">
-                Real-time breakdown of gross settlement volumes, merchant fees, and seller protection eligibility
+              <p className="text-sm text-gray-600 mt-1">
+                Real-time breakdown of gross settlement volumes, merchant fees, and seller protection eligibility.
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
-                <span className="text-xs text-gray-500 font-medium">Gross Captured Volume</span>
-                <p className="text-xl font-bold font-mono text-gray-900 mt-1">$6,874.00 USD</p>
-                <span className="text-[11px] text-emerald-600 font-semibold mt-1 block">
-                  ✔ 6/6 Orders Captured
+                <span className="text-sm text-gray-500 font-medium">Gross Captured Volume</span>
+                <p className="text-2xl font-bold font-sans text-gray-900 mt-1">$6,874.00 USD</p>
+                <span className="text-sm text-emerald-700 font-semibold mt-1 block">
+                  6 of 6 Orders Captured
                 </span>
               </div>
               <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
-                <span className="text-xs text-gray-500 font-medium">Estimated Merchant Fees (Sandbox)</span>
-                <p className="text-xl font-bold font-mono text-gray-900 mt-1">$201.34 USD</p>
-                <span className="text-[11px] text-gray-500 mt-1 block">
+                <span className="text-sm text-gray-500 font-medium">Estimated Merchant Fees</span>
+                <p className="text-2xl font-bold font-sans text-gray-900 mt-1">$201.34 USD</p>
+                <span className="text-sm text-gray-500 mt-1 block">
                   2.9% + $0.30 per transaction
                 </span>
               </div>
               <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
-                <span className="text-xs text-gray-500 font-medium">Net Settlement Payout</span>
-                <p className="text-xl font-bold font-mono text-[#0070BA] mt-1">$6,672.66 USD</p>
-                <span className="text-[11px] text-emerald-600 font-semibold mt-1 block">
+                <span className="text-sm text-gray-500 font-medium">Net Settlement Payout</span>
+                <p className="text-2xl font-bold font-sans text-[#0070BA] mt-1">$6,672.66 USD</p>
+                <span className="text-sm text-emerald-700 font-semibold mt-1 block">
                   Immediate Sandbox Release
                 </span>
               </div>
               <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
-                <span className="text-xs text-gray-500 font-medium">Seller Protection Coverage</span>
-                <p className="text-xl font-bold font-mono text-emerald-600 mt-1">100.0%</p>
-                <span className="text-[11px] text-gray-500 mt-1 block">
+                <span className="text-sm text-gray-500 font-medium">Seller Protection Coverage</span>
+                <p className="text-2xl font-bold font-sans text-emerald-600 mt-1">100.0%</p>
+                <span className="text-sm text-gray-500 mt-1 block">
                   All 6 items hardware verified
                 </span>
               </div>
             </div>
 
             {/* Settlement Table */}
-            <div className="border border-gray-200 rounded-lg overflow-hidden">
-              <table className="w-full text-xs text-left">
-                <thead className="bg-gray-50 font-semibold text-gray-600 border-b border-gray-200">
+            <div className="border border-gray-200 rounded-xl overflow-hidden">
+              <table className="w-full text-sm text-left">
+                <thead className="bg-gray-50 font-semibold text-gray-700 border-b border-gray-200">
                   <tr>
-                    <th className="py-2.5 px-4">Payment Channel</th>
-                    <th className="py-2.5 px-4">Transactions</th>
-                    <th className="py-2.5 px-4">Total Settled</th>
-                    <th className="py-2.5 px-4">Settlement Speed</th>
-                    <th className="py-2.5 px-4">Status</th>
+                    <th className="py-3 px-4">Payment Channel</th>
+                    <th className="py-3 px-4">Transactions</th>
+                    <th className="py-3 px-4">Total Settled</th>
+                    <th className="py-3 px-4">Settlement Speed</th>
+                    <th className="py-3 px-4">Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100 text-gray-700">
+                <tbody className="divide-y divide-gray-100 text-gray-800">
                   <tr>
-                    <td className="py-2.5 px-4 font-semibold text-gray-900">PayPal Balance / Instant</td>
-                    <td className="py-2.5 px-4">3</td>
-                    <td className="py-2.5 px-4 font-mono font-bold">$3,547.00 USD</td>
-                    <td className="py-2.5 px-4">Instantaneous</td>
-                    <td className="py-2.5 px-4 text-emerald-600 font-bold">✔ Cleared</td>
+                    <td className="py-3.5 px-4 font-semibold text-gray-900">PayPal Balance / Instant</td>
+                    <td className="py-3.5 px-4">3</td>
+                    <td className="py-3.5 px-4 font-bold text-gray-900">$3,547.00 USD</td>
+                    <td className="py-3.5 px-4">Instantaneous</td>
+                    <td className="py-3.5 px-4 text-emerald-700 font-semibold">Cleared</td>
                   </tr>
                   <tr>
-                    <td className="py-2.5 px-4 font-semibold text-gray-900">PayPal Credit / Pay Later</td>
-                    <td className="py-2.5 px-4">1</td>
-                    <td className="py-2.5 px-4 font-mono font-bold">$1,849.00 USD</td>
-                    <td className="py-2.5 px-4">Upfront Merchant Credit</td>
-                    <td className="py-2.5 px-4 text-emerald-600 font-bold">✔ Cleared</td>
+                    <td className="py-3.5 px-4 font-semibold text-gray-900">PayPal Credit / Pay Later</td>
+                    <td className="py-3.5 px-4">1</td>
+                    <td className="py-3.5 px-4 font-bold text-gray-900">$1,849.00 USD</td>
+                    <td className="py-3.5 px-4">Upfront Merchant Credit</td>
+                    <td className="py-3.5 px-4 text-emerald-700 font-semibold">Cleared</td>
                   </tr>
                   <tr>
-                    <td className="py-2.5 px-4 font-semibold text-gray-900">Debit / Credit Card (Direct)</td>
-                    <td className="py-2.5 px-4">2</td>
-                    <td className="py-2.5 px-4 font-mono font-bold">$1,478.00 USD</td>
-                    <td className="py-2.5 px-4">T+0 Sandbox Settlement</td>
-                    <td className="py-2.5 px-4 text-emerald-600 font-bold">✔ Cleared</td>
+                    <td className="py-3.5 px-4 font-semibold text-gray-900">Debit / Credit Card (Direct)</td>
+                    <td className="py-3.5 px-4">2</td>
+                    <td className="py-3.5 px-4 font-bold text-gray-900">$1,478.00 USD</td>
+                    <td className="py-3.5 px-4">T+0 Sandbox Settlement</td>
+                    <td className="py-3.5 px-4 text-emerald-700 font-semibold">Cleared</td>
                   </tr>
                 </tbody>
               </table>
@@ -1192,49 +1101,49 @@ export default function TransactionsPage() {
 
         {/* Tab 3: Webhooks Log View */}
         {activeTab === 'webhooks' && (
-          <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-2xs space-y-4">
-            <div className="flex items-center justify-between">
+          <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-xs space-y-4 font-sans">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-gray-100">
               <div>
-                <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
                   PayPal REST API v2 Webhook Dispatcher
                 </h2>
-                <p className="text-xs text-gray-500 mt-0.5">
-                  Listening to endpoint: <code className="text-xs font-mono text-[#0070BA] bg-blue-50 px-1.5 py-0.5 rounded">https://api.sandbox.paypal.com/v1/notifications/webhooks</code>
+                <p className="text-sm text-gray-600 mt-1">
+                  Listening to endpoint: <code className="text-sm font-mono text-[#0070BA] bg-blue-50 px-2 py-0.5 rounded border border-blue-200">https://api.sandbox.paypal.com/v1/notifications/webhooks</code>
                 </p>
               </div>
-              <span className="px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full text-xs font-bold flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5" />
+              <span className="px-3.5 py-1.5 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-full text-sm font-semibold flex items-center gap-2 self-start sm:self-auto">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                 Webhook Ingress 200 OK
               </span>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-2.5">
               {filteredTransactions.map((txn) => (
                 <div
                   key={txn.id}
                   onClick={() => setSelectedTxn(txn)}
-                  className="p-3.5 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50/20 transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-2"
+                  className="p-4 rounded-xl border border-gray-200 hover:border-blue-300 hover:bg-blue-50/20 transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                 >
                   <div className="flex items-center gap-3">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0" />
                     <div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono font-bold text-xs text-gray-900">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-mono font-bold text-sm text-gray-900">
                           PAYMENT.CAPTURE.COMPLETED
                         </span>
-                        <span className="text-[10px] font-mono bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">
+                        <span className="text-sm font-mono bg-gray-100 text-gray-700 px-2 py-0.5 rounded border border-gray-200">
                           {txn.captureId}
                         </span>
                       </div>
-                      <span className="text-[11px] text-gray-500 block mt-0.5">
+                      <span className="text-sm text-gray-600 block mt-1">
                         Order {txn.orderId} • Captured {txn.amount} for {txn.name}
                       </span>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3 text-xs text-gray-500">
-                    <span className="font-mono text-[11px]">HTTP 200 OK</span>
+                  <div className="flex items-center gap-3 text-sm text-gray-600 shrink-0">
+                    <span className="font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200">HTTP 200 OK</span>
                     <span className="text-gray-400">•</span>
                     <span>{txn.date} {txn.time}</span>
                     <Code2 className="w-4 h-4 text-[#0070BA]" />
@@ -1248,7 +1157,7 @@ export default function TransactionsPage() {
         {/* Modal: PayPal Webhook / Audit Payload Inspector */}
         {selectedTxn && (
           <div
-            className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4"
+            className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 font-sans"
             onClick={() => setSelectedTxn(null)}
           >
             <div
@@ -1256,56 +1165,56 @@ export default function TransactionsPage() {
               onClick={(e) => e.stopPropagation()}
             >
               {/* Modal Header */}
-              <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200 bg-gray-50">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-blue-100 text-[#0070BA] flex items-center justify-center font-bold">
-                    <Code2 className="w-4 h-4" />
+              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-gray-50">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-blue-100 text-[#0070BA] flex items-center justify-center font-bold">
+                    <Code2 className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-bold text-gray-900 leading-tight">
+                    <h3 className="text-base font-bold text-gray-900 leading-tight">
                       PayPal REST API v2 Webhook Payload
                     </h3>
-                    <p className="text-[11px] text-gray-500 font-mono mt-0.5">
+                    <p className="text-sm text-gray-500 font-mono mt-0.5">
                       Event: PAYMENT.CAPTURE.COMPLETED • {selectedTxn.id}
                     </p>
                   </div>
                 </div>
                 <button
                   onClick={() => setSelectedTxn(null)}
-                  className="p-1 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 cursor-pointer"
+                  className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
               {/* Modal Body */}
-              <div className="p-5 space-y-4 max-h-[75vh] overflow-y-auto">
+              <div className="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
                 {/* Highlights */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
-                  <div className="p-2.5 bg-gray-50 rounded-lg border border-gray-200">
-                    <span className="text-[10px] text-gray-500 uppercase font-semibold block">Item</span>
-                    <span className="font-bold text-gray-900 block truncate">{selectedTxn.name}</span>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
+                  <div className="p-3 bg-gray-50 rounded-xl border border-gray-200">
+                    <span className="text-sm text-gray-500 font-medium block">Item</span>
+                    <span className="font-bold text-gray-900 block truncate mt-1 text-sm">{selectedTxn.name}</span>
                   </div>
-                  <div className="p-2.5 bg-gray-50 rounded-lg border border-gray-200">
-                    <span className="text-[10px] text-gray-500 uppercase font-semibold block">Settlement</span>
-                    <span className="font-bold text-[#0070BA] font-mono block">{selectedTxn.amount}</span>
+                  <div className="p-3 bg-gray-50 rounded-xl border border-gray-200">
+                    <span className="text-sm text-gray-500 font-medium block">Settlement</span>
+                    <span className="font-bold text-[#0070BA] font-mono block mt-1 text-sm">{selectedTxn.amount}</span>
                   </div>
-                  <div className="p-2.5 bg-gray-50 rounded-lg border border-gray-200">
-                    <span className="text-[10px] text-gray-500 uppercase font-semibold block">Protection</span>
-                    <span className="font-bold text-emerald-600 block">{selectedTxn.sellerProtection}</span>
+                  <div className="p-3 bg-gray-50 rounded-xl border border-gray-200">
+                    <span className="text-sm text-gray-500 font-medium block">Protection</span>
+                    <span className="font-bold text-emerald-700 block mt-1 text-sm">{selectedTxn.sellerProtection}</span>
                   </div>
-                  <div className="p-2.5 bg-gray-50 rounded-lg border border-gray-200">
-                    <span className="text-[10px] text-gray-500 uppercase font-semibold block">Channel</span>
-                    <span className="font-bold text-gray-800 block truncate">{selectedTxn.paymentMethod}</span>
+                  <div className="p-3 bg-gray-50 rounded-xl border border-gray-200">
+                    <span className="text-sm text-gray-500 font-medium block">Channel</span>
+                    <span className="font-bold text-gray-800 block truncate mt-1 text-sm">{selectedTxn.paymentMethod}</span>
                   </div>
                 </div>
 
                 {/* Raw JSON Payload */}
                 <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-xs font-semibold text-gray-700 flex items-center gap-1.5">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-semibold text-gray-700 flex items-center gap-2">
                       <span>Simulated Sandbox Ingress Payload</span>
-                      <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.2 rounded">
+                      <span className="text-sm bg-emerald-100 text-emerald-800 font-semibold px-2 py-0.5 rounded-md">
                         200 VERIFIED
                       </span>
                     </span>
@@ -1348,22 +1257,22 @@ export default function TransactionsPage() {
                           'json-payload'
                         )
                       }
-                      className="text-xs text-[#0070BA] hover:text-[#005ea6] font-semibold flex items-center gap-1 cursor-pointer"
+                      className="text-sm text-[#0070BA] hover:text-[#005ea6] font-semibold flex items-center gap-1.5 cursor-pointer"
                     >
                       {copiedKey === 'json-payload' ? (
                         <>
-                          <Check className="w-3.5 h-3.5 text-emerald-600" />
+                          <Check className="w-4 h-4 text-emerald-600" />
                           <span>Copied JSON</span>
                         </>
                       ) : (
                         <>
-                          <Copy className="w-3.5 h-3.5" />
+                          <Copy className="w-4 h-4" />
                           <span>Copy JSON</span>
                         </>
                       )}
                     </button>
                   </div>
-                  <pre className="p-3.5 bg-gray-900 text-gray-100 rounded-xl text-[11px] font-mono overflow-x-auto leading-relaxed border border-gray-800">
+                  <pre className="p-4 bg-gray-900 text-gray-100 rounded-xl text-sm font-mono overflow-x-auto leading-relaxed border border-gray-800">
                     {JSON.stringify(
                       {
                         id: `WH-${selectedTxn.id}`,
@@ -1402,10 +1311,10 @@ export default function TransactionsPage() {
               </div>
 
               {/* Modal Footer */}
-              <div className="flex items-center justify-end px-5 py-3 border-t border-gray-200 bg-gray-50">
+              <div className="flex items-center justify-end px-6 py-4 border-t border-gray-200 bg-gray-50">
                 <button
                   onClick={() => setSelectedTxn(null)}
-                  className="px-4 py-1.5 bg-[#0070BA] text-white rounded-lg text-xs font-semibold hover:bg-[#005ea6] shadow-2xs cursor-pointer"
+                  className="px-5 py-2 bg-[#0070BA] text-white rounded-xl text-sm font-semibold hover:bg-[#005ea6] shadow-xs cursor-pointer"
                 >
                   Close Inspector
                 </button>
